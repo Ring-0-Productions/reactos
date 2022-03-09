@@ -38,6 +38,31 @@ HalpInitProcessor(
 
     /* Initialize the local APIC for this cpu */
     ApicInitializeLocalApic(ProcessorNumber);
+    if(ProcessorNumber >= 1)
+    {
+        ULONG_PTR EFlags;
+
+    /* Save EFlags and disable interrupts */
+        EFlags = __readeflags();
+        _disable();
+
+        /* Set interrupt handlers in the IDT */
+        KeRegisterInterruptHandler(APIC_CLOCK_VECTOR, HalpClockInterrupt);
+        KeRegisterInterruptHandler(APIC_IPI_VECTOR, HalpIpiInterrupt);
+    #ifndef _M_AMD64
+        KeRegisterInterruptHandler(APC_VECTOR, HalpApcInterrupt);
+        KeRegisterInterruptHandler(DISPATCH_VECTOR, HalpDispatchInterrupt);
+    #endif
+
+        /* Register the vectors for APC and dispatch interrupts */
+        HalpRegisterVector(IDT_INTERNAL, 0, APC_VECTOR, APC_LEVEL);
+        HalpRegisterVector(IDT_INTERNAL, 0, DISPATCH_VECTOR, DISPATCH_LEVEL);
+        HalpRegisterVector(IDT_INTERNAL, 0, APIC_IPI_VECTOR, IPI_LEVEL);
+        /* Restore interrupt state */
+        EFlags |= EFLAGS_INTERRUPT_MASK;
+        __writeeflags(EFlags);
+
+    }
 
     /* Initialize profiling data (but don't start it) */
     HalInitializeProfiling();
@@ -62,13 +87,17 @@ HalpInitPhase0(IN PLOADER_PARAMETER_BLOCK LoaderBlock)
                                CLOCK2_LEVEL,
                                HalpClockInterrupt,
                                Latched);
+
 }
 
 VOID
 HalpInitPhase1(VOID)
 {
-    /* Initialize DMA. NT does this in Phase 0 */
-    HalpInitDma();
+    if (KeGetCurrentProcessorNumber() == 0)
+    {
+        /* Initialize DMA. NT does this in Phase 0 */
+        HalpInitDma();
+    }
 }
 
 /* EOF */

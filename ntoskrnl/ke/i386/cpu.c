@@ -1600,21 +1600,26 @@ KeFlushEntireTb(IN BOOLEAN Invalid,
     OldIrql = KeRaiseIrqlToSynchLevel();
 
 #ifdef CONFIG_SMP
-    /* FIXME: Use KiTbFlushTimeStamp to synchronize TB flush */
+    /* Really If it's not all processors than its just self. What a pointless boolean */
 
-    /* Get the current processor affinity, and exclude ourselves */
-    TargetAffinity = KeActiveProcessors;
-    TargetAffinity &= ~Prcb->SetMember;
-
-    /* Make sure this is MP */
-    if (TargetAffinity)
+    if (AllProcessors == TRUE)
     {
-        /* Send an IPI TB flush to the other processors */
-        KiIpiSendPacket(TargetAffinity,
-                        KiFlushTargetEntireTb,
-                        NULL,
-                        0,
-                        NULL);
+        /* FIXME: Use KiTbFlushTimeStamp to synchronize TB flush */
+
+        /* Get the current processor affinity, and exclude ourselves */
+        TargetAffinity = KeActiveProcessors;
+        TargetAffinity &= ~Prcb->SetMember;
+
+        /* Make sure this is MP */
+        if (TargetAffinity)
+        {
+            /* Send an IPI TB flush to the other processors */
+            KiIpiSendPacket(TargetAffinity,
+                            KiFlushTargetEntireTb,
+                            NULL,
+                            0,
+                            NULL);
+        }
     }
 #endif
 
@@ -1628,8 +1633,11 @@ KeFlushEntireTb(IN BOOLEAN Invalid,
         /* Sanity check */
         ASSERT(Prcb == KeGetCurrentPrcb());
 
-        /* FIXME: TODO */
-        ASSERTMSG("Not yet implemented\n", FALSE);
+        if (AllProcessors == TRUE)
+        {
+            /* FIXME: TODO */
+            ASSERTMSG("Not yet implemented\n", FALSE);
+        }
     }
 #endif
 

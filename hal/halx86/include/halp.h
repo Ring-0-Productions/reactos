@@ -216,6 +216,7 @@ HalpEnableInterruptHandler(IN UCHAR Flags,
 /* pic.c */
 VOID NTAPI HalpInitializePICs(IN BOOLEAN EnableInterrupts);
 VOID __cdecl HalpApcInterrupt(VOID);
+VOID __cdecl HalpIpiInterrupt(VOID);
 VOID __cdecl HalpDispatchInterrupt(VOID);
 PHAL_SW_INTERRUPT_HANDLER __cdecl HalpDispatchInterrupt2(VOID);
 DECLSPEC_NORETURN VOID FASTCALL HalpApcInterrupt2ndEntry(IN PKTRAP_FRAME TrapFrame);

@@ -24,7 +24,7 @@
 
 /* GLOBALS ********************************************************************/
 
-ULONG ApicVersion;
+APIC_VERSION_REGISTER ApicVersion;
 UCHAR HalpVectorToIndex[256];
 
 #ifndef _M_AMD64
@@ -308,10 +308,13 @@ ApicInitializeLocalApic(ULONG Cpu)
     ApicWrite(APIC_SIVR, SpIntRegister.Long);
 
     /* Read the version and save it globally */
-    if (Cpu == 0) ApicVersion = ApicRead(APIC_VER);
+    if (Cpu == 0)
+    {
+        ApicVersion.Long = ApicRead(APIC_VER);
 
-    /* Set the mode to flat (max 8 CPUs supported!) */
-    ApicWrite(APIC_DFR, APIC_DF_Flat);
+        /* Set the mode to flat (max 8 CPUs supported!) */
+        ApicWrite(APIC_DFR, APIC_DF_Flat);
+    }
 
     /* Set logical apic ID */
     ApicWrite(APIC_LDR, ApicLogicalId(Cpu) << 24);
@@ -529,9 +532,11 @@ HalpInitializePICs(IN BOOLEAN EnableInterrupts)
     HalpVectorToIndex[DISPATCH_VECTOR] = APIC_RESERVED_VECTOR;
     HalpVectorToIndex[APIC_CLOCK_VECTOR] = 8;
     HalpVectorToIndex[APIC_SPURIOUS_VECTOR] = APIC_RESERVED_VECTOR;
+    HalpVectorToIndex[APIC_IPI_VECTOR] = APIC_RESERVED_VECTOR;
 
     /* Set interrupt handlers in the IDT */
     KeRegisterInterruptHandler(APIC_CLOCK_VECTOR, HalpClockInterrupt);
+    KeRegisterInterruptHandler(APIC_IPI_VECTOR, HalpIpiInterrupt);
 #ifndef _M_AMD64
     KeRegisterInterruptHandler(APC_VECTOR, HalpApcInterrupt);
     KeRegisterInterruptHandler(DISPATCH_VECTOR, HalpDispatchInterrupt);
@@ -540,7 +545,7 @@ HalpInitializePICs(IN BOOLEAN EnableInterrupts)
     /* Register the vectors for APC and dispatch interrupts */
     HalpRegisterVector(IDT_INTERNAL, 0, APC_VECTOR, APC_LEVEL);
     HalpRegisterVector(IDT_INTERNAL, 0, DISPATCH_VECTOR, DISPATCH_LEVEL);
-
+    HalpRegisterVector(IDT_INTERNAL, 0, APIC_IPI_VECTOR, IPI_LEVEL);
     /* Restore interrupt state */
     if (EnableInterrupts) EFlags |= EFLAGS_INTERRUPT_MASK;
     __writeeflags(EFlags);
@@ -638,6 +643,39 @@ HalpDispatchInterruptHandler(IN PKTRAP_FRAME TrapFrame)
 
     /* Exit the interrupt */
     KiEoiHelper(TrapFrame);
+}
+
+VOID
+FASTCALL
+HalpIpiInterruptHandler(IN PKTRAP_FRAME TrapFrame)
+{
+    KIRQL Irql;
+
+    /* Enter trap */
+    KiEnterInterruptTrap(TrapFrame);
+
+    /* Start the interrupt */
+    if (!HalBeginSystemInterrupt(IPI_LEVEL, APIC_IPI_VECTOR, &Irql))
+    {
+        /* Spurious, just end the interrupt */
+        KiEoiHelper(TrapFrame);
+    }
+    /* Raise to DISPATCH_LEVEL */
+    ApicRaiseIrql(DISPATCH_LEVEL);
+
+    /* End the interrupt */
+    ApicSendEOI();
+
+    _enable();
+    KiIpiServiceRoutine(TrapFrame, NULL);
+    _disable();
+
+    /* Restore the old IRQL */
+    ApicLowerIrql(Irql);
+
+    /* Exit the interrupt */
+    KiEoiHelper(TrapFrame);
+
 }
 #endif
 

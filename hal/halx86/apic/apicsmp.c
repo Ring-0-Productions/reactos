@@ -110,9 +110,26 @@ VOID
 NTAPI
 HalpRequestIpi(_In_ KAFFINITY TargetProcessors)
 {
-    UNIMPLEMENTED;
-    __debugbreak();
+    LONG i;
+    KAFFINITY Current;
+    /*
+    *
+    * CPU masking is done in software thanks to KAFFINITY
+    * - Destination is ALWAYS : APIC_DSH_Destination
+    * - Mode is ALWAYS dependdent on xAPIC+ or legacy APIC
+    * -
+    */
+
+    for (i = 0, Current = 1; i < KeNumberProcessors; i++, Current <<= 1)
+    {
+        if (TargetProcessors & Current)
+        {
+            ApicRequestGlobalInterrupt(i, APIC_IPI_VECTOR, APIC_MT_Fixed,
+                APIC_TGM_Edge, APIC_DSH_Destination);
+        }
+    }
 }
+
 
 VOID
 ApicStartApplicationProcessor(

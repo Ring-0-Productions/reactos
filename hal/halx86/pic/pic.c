@@ -399,6 +399,13 @@ KfRaiseIrql(IN KIRQL NewIrql)
 }
 
 
+VOID
+FASTCALL
+HalpIpiInterruptHandler(IN PKTRAP_FRAME TrapFrame)
+{
+    /* nothing */
+}
+
 /*
  * @implemented
  */
