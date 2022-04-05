@@ -1403,9 +1403,9 @@ LdrpFreeTls(VOID)
         /* Free each entry */
         if (TlsVector[TlsData->TlsDirectory.Characteristics])
         {
-            RtlFreeHeap(RtlGetProcessHeap(),
-                        0,
-                        TlsVector[TlsData->TlsDirectory.Characteristics]);
+       //    RtlFreeHeap(RtlGetProcessHeap(),
+       //                0,
+       //                TlsVector[TlsData->TlsDirectory.Characteristics]);
         }
     }
 
