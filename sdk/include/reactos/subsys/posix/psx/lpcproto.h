@@ -111,6 +111,6 @@ typedef struct _PSX_TERMINAL_IO
 
 /* System I/O (system calls) */
 
-//#include <psx/syscall.h>
+#include "syscall.h"
 
 #endif /* ndef _PSX_LPCPROTO_H */
