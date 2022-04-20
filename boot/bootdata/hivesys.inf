@@ -95,32 +95,77 @@ HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PCI#CC_0300","Clas
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PCI#CC_0301","Service",0x00000000,"vga"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PCI#CC_0301","ClassGUID",0x00000000,"{4D36E968-E325-11CE-BFC1-08002BE10318}"
 
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PS2_KEYBOARD","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PS2_KEYBOARD","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0300","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0300","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0301","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0301","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0302","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0302","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0303","Service",0x00000000,"i8042prt"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0303","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0304","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0304","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0305","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0305","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0306","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0306","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0309","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0309","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP030A","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP030A","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
 
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP030B","Service",0x00000000,"i8042prt"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP030B","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
 
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F0E","Service",0x00000000,"i8042prt"
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F0E","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0320","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0320","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
 
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F19","Service",0x00000000,"i8042prt"
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F19","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0343","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0343","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0344","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0344","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0345","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0345","ClassGUID",0x00000000,{4D36E96B-E325-11CE-BFC1-08002BE10318}
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*CPQA0D7","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*CPQA0D7","ClassGUID",0x00000000,"{4D36E96B-E325-11CE-BFC1-08002BE10318}"
 
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PS2_MOUSE","Service",0x00000000,"i8042prt"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PS2_MOUSE","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
 
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F13","Service",0x00000000,"i8042prt"
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F13","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F03","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F03","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
 
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*IBM3780","Service",0x00000000,"i8042prt"
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*IBM3780","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F0B","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F0B","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F0E","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F0E","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
 
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F12","Service",0x00000000,"i8042prt"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F12","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
 
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F03","Service",0x00000000,"i8042prt"
-HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F03","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F13","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F13","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F19","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0F19","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*IBM3780","Service",0x00000000,"i8042prt"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*IBM3780","ClassGUID",0x00000000,"{4D36E96F-E325-11CE-BFC1-08002BE10318}"
 
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\ROOT#SWENUM","Service",0x00000000,"swenum"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\ROOT#SWENUM","ClassGUID",0x00000000,"{4d36e97d-e325-11ce-bfc1-08002be10318}"
