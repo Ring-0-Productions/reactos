@@ -14,7 +14,7 @@
  * The CSR_DBG macro is defined for building CSR Servers
  * with extended debugging information.
  */
-#if DBG
+#if 0
 #define CSR_DBG
 #endif
 
