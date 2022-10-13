@@ -354,6 +354,240 @@ typedef struct _SCSI_PNP_REQUEST_BLOCK {
 // SRB Functions
 //
 
+#define SRBEV_BUS_RESET               0x0001
+#define SRBEV_SCSI_ASYNC_NOTIFICATION 0x0002
+
+// begin_ntminitape
+
+#define MAXIMUM_CDB_SIZE 12
+
+//
+// SCSI I/O Request Block
+//
+
+typedef struct _SCSI_REQUEST_BLOCK {
+    USHORT Length;                  // offset 0
+    UCHAR Function;                 // offset 2
+    UCHAR SrbStatus;                // offset 3
+    UCHAR ScsiStatus;               // offset 4
+    UCHAR PathId;                   // offset 5
+    UCHAR TargetId;                 // offset 6
+    UCHAR Lun;                      // offset 7
+    UCHAR QueueTag;                 // offset 8
+    UCHAR QueueAction;              // offset 9
+    UCHAR CdbLength;                // offset a
+    UCHAR SenseInfoBufferLength;    // offset b
+    ULONG SrbFlags;                 // offset c
+    ULONG DataTransferLength;       // offset 10
+    ULONG TimeOutValue;             // offset 14
+    _Field_size_bytes_(DataTransferLength)
+    PVOID DataBuffer;               // offset 18
+    PVOID SenseInfoBuffer;          // offset 1c
+    struct _SCSI_REQUEST_BLOCK *NextSrb; // offset 20
+    PVOID OriginalRequest;          // offset 24
+    PVOID SrbExtension;             // offset 28
+    union {
+        ULONG InternalStatus;       // offset 2c
+        ULONG QueueSortKey;         // offset 2c
+        ULONG LinkTimeoutValue;     // offset 2c
+    };
+
+#if defined(_WIN64)
+
+    //
+    // Force PVOID alignment of Cdb
+    //
+
+    ULONG Reserved;
+
+#endif
+
+    UCHAR Cdb[16];                  // offset 30
+} SCSI_REQUEST_BLOCK, *PSCSI_REQUEST_BLOCK;
+
+#define SCSI_REQUEST_BLOCK_SIZE sizeof(SCSI_REQUEST_BLOCK)
+
+//
+// SCSI I/O Request Block for WMI Requests
+//
+
+typedef struct _SCSI_WMI_REQUEST_BLOCK {
+    USHORT Length;
+    UCHAR Function;        // SRB_FUNCTION_WMI
+    UCHAR SrbStatus;
+    UCHAR WMISubFunction;
+    UCHAR PathId;          // If SRB_WMI_FLAGS_ADAPTER_REQUEST is set in
+    UCHAR TargetId;        // WMIFlags then PathId, TargetId and Lun are
+    UCHAR Lun;             // reserved fields.
+    UCHAR Reserved1;
+    UCHAR WMIFlags;
+    UCHAR Reserved2[2];
+    ULONG SrbFlags;
+    ULONG DataTransferLength;
+    ULONG TimeOutValue;
+    PVOID DataBuffer;
+    PVOID DataPath;
+    PVOID Reserved3;
+    PVOID OriginalRequest;
+    PVOID SrbExtension;
+    ULONG Reserved4;
+
+#if (NTDDI_VERSION >= NTDDI_WS03SP1)
+#if defined(_WIN64)
+
+    //
+    // Force PVOID alignment of Cdb
+    //
+
+    ULONG Reserved6;
+
+#endif
+#endif
+
+    UCHAR Reserved5[16];
+} SCSI_WMI_REQUEST_BLOCK, *PSCSI_WMI_REQUEST_BLOCK;
+
+typedef enum _STOR_DEVICE_POWER_STATE {
+    StorPowerDeviceUnspecified = 0,
+    StorPowerDeviceD0,
+    StorPowerDeviceD1,
+    StorPowerDeviceD2,
+    StorPowerDeviceD3,
+    StorPowerDeviceMaximum
+} STOR_DEVICE_POWER_STATE, *PSTOR_DEVICE_POWER_STATE;
+
+typedef enum {
+    StorPowerActionNone = 0,
+    StorPowerActionReserved,
+    StorPowerActionSleep,
+    StorPowerActionHibernate,
+    StorPowerActionShutdown,
+    StorPowerActionShutdownReset,
+    StorPowerActionShutdownOff,
+    StorPowerActionWarmEject
+} STOR_POWER_ACTION, *PSTOR_POWER_ACTION;
+
+typedef struct _SCSI_POWER_REQUEST_BLOCK {
+    USHORT Length;                  // offset 0
+    UCHAR Function;                 // offset 2
+    UCHAR SrbStatus;                // offset 3
+    UCHAR SrbPowerFlags;            // offset 4
+    UCHAR PathId;                   // offset 5
+    UCHAR TargetId;                 // offset 6
+    UCHAR Lun;                      // offset 7
+    STOR_DEVICE_POWER_STATE DevicePowerState; // offset 8
+    ULONG SrbFlags;                 // offset c
+    ULONG DataTransferLength;       // offset 10
+    ULONG TimeOutValue;             // offset 14
+    PVOID DataBuffer;               // offset 18
+    PVOID SenseInfoBuffer;          // offset 1c
+    struct _SCSI_REQUEST_BLOCK *NextSrb; // offset 20
+    PVOID OriginalRequest;          // offset 24
+    PVOID SrbExtension;             // offset 28
+    STOR_POWER_ACTION PowerAction;       // offset 2c
+
+#if defined(_WIN64)
+
+    //
+    // Force PVOID alignment of Cdb
+    //
+
+    ULONG Reserved;
+
+#endif
+
+    UCHAR Reserved5[16];              // offset 30
+} SCSI_POWER_REQUEST_BLOCK, *PSCSI_POWER_REQUEST_BLOCK;
+
+//
+// PNP minor function codes.
+//
+typedef enum {
+    StorStartDevice = 0x0,
+    StorRemoveDevice = 0x2,
+    StorStopDevice  = 0x4,
+    StorQueryCapabilities = 0x9,
+    StorQueryResourceRequirements = 0xB,
+    StorFilterResourceRequirements = 0xD,
+    StorSurpriseRemoval = 0x17
+} STOR_PNP_ACTION, *PSTOR_PNP_ACTION;
+
+typedef struct _STOR_DEVICE_CAPABILITIES {
+    USHORT Version;
+    ULONG  DeviceD1:1;
+    ULONG  DeviceD2:1;
+    ULONG  LockSupported:1;
+    ULONG  EjectSupported:1;
+    ULONG  Removable:1;
+    ULONG  DockDevice:1;
+    ULONG  UniqueID:1;
+    ULONG  SilentInstall:1;
+    ULONG  SurpriseRemovalOK:1;
+    ULONG  NoDisplayInUI:1;
+
+} STOR_DEVICE_CAPABILITIES, *PSTOR_DEVICE_CAPABILITIES;
+
+
+#define STOR_DEVICE_CAPABILITIES_EX_VERSION_1    0x1
+
+typedef struct _STOR_DEVICE_CAPABILITIES_EX {
+    USHORT Version;
+    USHORT Size;
+    ULONG  DeviceD1:1;
+    ULONG  DeviceD2:1;
+    ULONG  LockSupported:1;
+    ULONG  EjectSupported:1;
+    ULONG  Removable:1;
+    ULONG  DockDevice:1;
+    ULONG  UniqueID:1;
+    ULONG  SilentInstall:1;
+    ULONG  RawDeviceOK:1;
+    ULONG  SurpriseRemovalOK:1;
+    ULONG  NoDisplayInUI:1;
+    ULONG  DefaultWriteCacheEnabled:1;
+    ULONG  Reserved0:20;
+
+    ULONG  Address;
+    ULONG  UINumber;
+
+    ULONG  Reserved1[2];
+} STOR_DEVICE_CAPABILITIES_EX, *PSTOR_DEVICE_CAPABILITIES_EX;
+
+typedef struct _SCSI_PNP_REQUEST_BLOCK {
+    USHORT Length;                  // offset 0
+    UCHAR Function;                 // offset 2
+    UCHAR SrbStatus;                // offset 3
+    UCHAR PnPSubFunction;           // offset 4
+    UCHAR PathId;                   // offset 5
+    UCHAR TargetId;                 // offset 6
+    UCHAR Lun;                      // offset 7
+    STOR_PNP_ACTION PnPAction;       // offset 8
+    ULONG SrbFlags;                 // offset c
+    ULONG DataTransferLength;       // offset 10
+    ULONG TimeOutValue;             // offset 14
+    PVOID DataBuffer;               // offset 18
+    PVOID SenseInfoBuffer;          // offset 1c
+    struct _SCSI_REQUEST_BLOCK *NextSrb; // offset 20
+    PVOID OriginalRequest;          // offset 24
+    PVOID SrbExtension;             // offset 28
+    ULONG SrbPnPFlags;              // offset 2c
+
+#if defined(_WIN64)
+
+    //
+    // Force PVOID alignment of Cdb
+    //
+
+    ULONG Reserved;
+
+#endif
+        UCHAR Reserved4[16];            // offset 30
+} SCSI_PNP_REQUEST_BLOCK, *PSCSI_PNP_REQUEST_BLOCK;
+
+//
+// SRB Functions
+//
+
 /* SCSI_REQUEST_BLOCK.Function constants */
 #define SRB_FUNCTION_EXECUTE_SCSI           0x00
 #define SRB_FUNCTION_CLAIM_DEVICE           0x01
@@ -384,6 +618,21 @@ typedef struct _SCSI_PNP_REQUEST_BLOCK {
 #define SRB_FUNCTION_PNP                    0x25
 #define SRB_FUNCTION_DUMP_POINTERS          0x26
 #define SRB_FUNCTION_FREE_DUMP_POINTERS     0x27
+
+//
+// Define extended SRB function that will be used to identify a new
+// type of SRB that is not a SCSI_REQUEST_BLOCK. A
+// SRB_FUNCTION_STORAGE_REQUEST_BLOCK will use a SRB that is of type
+// STORAGE_REQUEST_BLOCK.
+//
+#define SRB_FUNCTION_STORAGE_REQUEST_BLOCK  0x28
+
+#define SRB_FUNCTION_CRYPTO_OPERATION       0x29
+
+
+//
+// SRB Status
+//
 
 //
 // Define extended SRB function that will be used to identify a new
@@ -449,6 +698,12 @@ typedef struct _SCSI_PNP_REQUEST_BLOCK {
 
 #define SRB_STATUS_QUEUE_FROZEN             0x40
 #define SRB_STATUS_AUTOSENSE_VALID          0x80
+
+#define SRB_STATUS(Status) (Status & ~(SRB_STATUS_AUTOSENSE_VALID | SRB_STATUS_QUEUE_FROZEN))
+
+//
+// SRB Flag Bits
+//
 
 #define SRB_STATUS(Status) (Status & ~(SRB_STATUS_AUTOSENSE_VALID | SRB_STATUS_QUEUE_FROZEN))
 
