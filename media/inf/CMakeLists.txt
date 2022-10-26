@@ -37,7 +37,7 @@ list(APPEND INF_FILES
     usbvideo.inf
     usbprint.inf
     wmiacpi.inf)
-#
+
 list(APPEND UTF8_INF_FILES
     defltwk.inf
     font.inf

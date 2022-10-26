@@ -92,7 +92,7 @@ acpi.sys     = 1,,,,,,,4,1,,,1,4
 i8042prt.sys = 1,,,,,,,4,,,,1,4
 nmidebug.sys = 1,,,,,,x,4,,,,1,4
 sacdrv.sys   = 1,,,,,,x,4,,,,1,4
-uniata.sys   = 1,,,,,,x,4,,,,1,4
+storahci.sys   = 1,,,,,,x,4,,,,1,4
 nvme.sys     = 1,,,,,,x,4,,,,1,4
 buslogic.sys = 1,,,,,,x,4,,,,1,4
 blue.sys     = 1,,,,,,x,4,,,,1,4
@@ -179,7 +179,7 @@ PCI\CC_0104 = storahci
 PCI\CC_0105 = storahci
 PCI\CC_0106 = storahci
 ;PCI\CC_0106 = storahci
-*PNP0600 = uniata
+*PNP0600 = storahci
 USB\CLASS_09 = usbhub
 USB\ROOT_HUB = usbhub
 USB\ROOT_HUB20 = usbhub
@@ -220,9 +220,8 @@ i8042prt = i8042prt.sys
 pciide = pciide.sys
 
 [SCSI.Load]
-uniata = uniata.sys
-buslogic = buslogic.sys
 storahci = storahci.sys
+buslogic = buslogic.sys
 disk = disk.sys
 
 [MouseDrivers.Load]
