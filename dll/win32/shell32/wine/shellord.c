@@ -2877,3 +2877,9 @@ SHLimitInputCombo(HWND hWnd, IShellFolder *psf)
     return SHLimitInputEdit(hwndEdit, psf);
 }
 #endif
+HRESULT WINAPI
+SetCurrentProcessExplicitAppUserModelID(PCWSTR AppID)
+{
+    FIXME("SetCurrentProcessExplicitAppUserModelID stub\n");
+    return S_OK;
+}
