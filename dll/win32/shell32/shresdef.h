@@ -893,3 +893,5 @@
 #define IDR_SENDTOMENU          158
 #define IDR_COPYTOMENU          159
 #define IDR_MOVETOMENU          160
+#define IDR_SHELLLIBRARY        161
+#define IDR_USEREVENTTIMER      162
