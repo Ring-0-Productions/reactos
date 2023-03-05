@@ -81,6 +81,7 @@ HRESULT WINAPI CPanel_ExtractIconA(LPITEMIDLIST pidl, LPCSTR pszFile, UINT nIcon
 HRESULT WINAPI CPanel_ExtractIconW(LPITEMIDLIST pidl, LPCWSTR pszFile, UINT nIconIndex, HICON *phiconLarge, HICON *phiconSmall, UINT nIconSize) DECLSPEC_HIDDEN;
 
 HRESULT CRegFolder_CreateInstance(const GUID *pGuid, LPCITEMIDLIST pidlRoot, LPCWSTR lpszPath, LPCWSTR lpszEnumKeyName, REFIID riid, void **ppv);
+HRESULT WINAPI CustomDestinationList_Constructor(IUnknown *outer, REFIID riid, void **obj);
 
 /* initialisation for FORMATETC */
 #define InitFormatEtc(fe, cf, med) \
