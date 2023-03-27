@@ -64,7 +64,7 @@ extern BOOLEAN ShowProgressBar;
 /*
  * Change this to modify progress bar behaviour
  */
-#define ROT_BAR_DEFAULT_MODE RB_SQUARE_CELLS// RB_PROGRESS_BAR
+#define ROT_BAR_DEFAULT_MODE RB_SQUARE_CELLS
 
 /*
  * Values for PltRotBarStatus:
@@ -619,7 +619,7 @@ DisplayBootBitmap(
                           TRUE,
                           AL_HORIZONTAL_CENTER,
                           AL_VERTICAL_CENTER,
-                          0, 0, 0, 34);
+                          0, 20, 0, 0);
 
 #ifdef INBV_ROTBAR_IMPLEMENTED
             /* Choose progress bar */
@@ -654,15 +654,15 @@ DisplayBootBitmap(
                       TRUE,
                       AL_HORIZONTAL_CENTER,
                       AL_VERTICAL_CENTER,
-                      0, 118, 0, 0);
+                      0, 120, 0, 0);
 
         /* Load and draw copyright text bitmap */
         BootCopy = InbvGetResourceAddress(IDB_COPYRIGHT);
         BitBltAligned(BootCopy,
                       TRUE,
-                      AL_HORIZONTAL_LEFT,
+                      AL_HORIZONTAL_CENTER,
                       AL_VERTICAL_BOTTOM,
-                      22, 0, 0, 20);
+                      0, 40, 0, 0);
 
 #ifdef REACTOS_SKUS
         /* Draw the SKU text if it exits */
