@@ -511,7 +511,7 @@ DisplayBootBitmap(
         if (SharedUserData->NtProductType == NtProductWinNt)
         {
             /* Workstation; set colors */
-            InbvSetTextColor(BV_COLOR_WHITE);
+            InbvSetTextColor(BV_COLOR_BLACK);
             InbvSolidColorFill(0, 0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, BV_COLOR_DARK_GRAY);
             InbvSolidColorFill(0, VID_FOOTER_BG_TOP, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, BV_COLOR_RED);
 
@@ -522,7 +522,7 @@ DisplayBootBitmap(
         else
         {
             /* Server; set colors */
-            InbvSetTextColor(BV_COLOR_LIGHT_CYAN);
+            InbvSetTextColor(BV_COLOR_BLACK);
             InbvSolidColorFill(0, 0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, BV_COLOR_CYAN);
             InbvSolidColorFill(0, VID_FOOTER_BG_TOP, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, BV_COLOR_RED);
 
