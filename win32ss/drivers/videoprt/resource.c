@@ -26,7 +26,7 @@
 
 /* PRIVATE FUNCTIONS **********************************************************/
 
-NTSTATUS NTAPI
+static NTSTATUS
 IntVideoPortGetLegacyResources(
     IN PVIDEO_PORT_DRIVER_EXTENSION DriverExtension,
     IN PVIDEO_PORT_DEVICE_EXTENSION DeviceExtension,
@@ -73,7 +73,7 @@ IntVideoPortGetLegacyResources(
     return STATUS_SUCCESS;
 }
 
-NTSTATUS NTAPI
+NTSTATUS
 IntVideoPortFilterResourceRequirements(
     IN PDEVICE_OBJECT DeviceObject,
     IN PIO_STACK_LOCATION IrpStack,
@@ -215,13 +215,13 @@ IntVideoPortReleaseResources(
     /* Ignore the returned status however... */
 }
 
-NTSTATUS NTAPI
+NTSTATUS
 IntVideoPortMapPhysicalMemory(
    IN HANDLE Process,
    IN PHYSICAL_ADDRESS PhysicalAddress,
    IN ULONG SizeInBytes,
    IN ULONG Protect,
-   IN OUT PVOID *VirtualAddress  OPTIONAL)
+   IN OUT PVOID *VirtualAddress OPTIONAL)
 {
    OBJECT_ATTRIBUTES ObjAttribs;
    UNICODE_STRING UnicodeString;
@@ -265,8 +265,7 @@ IntVideoPortMapPhysicalMemory(
    return Status;
 }
 
-
-PVOID NTAPI
+static PVOID
 IntVideoPortMapMemory(
    IN PVIDEO_PORT_DEVICE_EXTENSION DeviceExtension,
    IN PHYSICAL_ADDRESS IoAddress,
@@ -421,7 +420,7 @@ IntVideoPortMapMemory(
    return NULL;
 }
 
-VOID NTAPI
+static VOID
 IntVideoPortUnmapMemory(
    IN PVIDEO_PORT_DEVICE_EXTENSION DeviceExtension,
    IN PVOID MappedAddress)
@@ -466,6 +465,264 @@ IntVideoPortUnmapMemory(
       WARN_(VIDEOPRT, "Warning: Mapping for address 0x%p not found!\n", MappedAddress);
    }
 }
+
+
+/**
+ * @brief
+ * Internal context structure to transmit data from
+ * the VideoPortGetDeviceData() call down to the callbacks.
+ **/
+typedef struct _VP_GET_DEVICE_DATA_CONTEXT
+{
+    /* Input parameters */
+    PVOID HwDeviceExtension;
+    VIDEO_DEVICE_DATA_TYPE DeviceDataType;
+    PMINIPORT_QUERY_DEVICE_ROUTINE CallbackRoutine;
+    PVOID Context;
+
+    /* Output data */
+    VP_STATUS CallbackStatus;
+} VP_GET_DEVICE_DATA_CONTEXT, *PVP_GET_DEVICE_DATA_CONTEXT;
+
+#ifdef __REACTOS__
+/*
+ * For WinNT3,4 and Win2000:
+ *
+ * DisplayController data is a VIDEO_HARDWARE_CONFIGURATION_DATA structure,
+ * and MonitorPeripheral data is a MONITOR_HARDWARE_CONFIGURATION_DATA
+ * structure (see vpcfgcnv.h), based on MONITOR_CONFIGURATION_DATA (see arc.h).
+ * Both of these are truncated versions of CM_FULL_RESOURCE_DESCRIPTOR and
+ * CM_PARTIAL_RESOURCE_LIST, where the fields in common are:
+ * InterfaceType, BusNumber, and Version, Revision.
+ *
+ * Ensure this format is maintained, even if the configuration data is
+ * upgraded to a standard CM_FULL_RESOURCE_DESCRIPTOR with one or more
+ * CM_PARTIAL_RESOURCE_LIST entries, by converting these to the legacy
+ * format. A pointer to the original data is appended afterwards and
+ * update the reported data length. (It has been verified that standard
+ * Windows miniports do not check this value.)
+ *
+ * This will allow to ensure backward compatibility with _legacy_ Windows
+ * video miniports that could use this data (typically NT <= 4 or 5,
+ * mostly for MIPS machines but also few x86 ones).
+ */
+#include <arc/arc.h> // For MONITOR_CONFIGURATION_DATA
+#include <drivers/videoprt/vpcfgcnv.h>
+
+/* Data structure we can receive from ConfigurationData
+ * for either VpControllerData or VpMonitorData. */
+typedef union _VP_HARDWARE_CONFIGURATION_DATA
+{
+    /* For VpControllerData */
+    struct
+    {
+        /* Legacy configuration data */
+        VIDEO_HARDWARE_CONFIGURATION_DATA legacyConfigData;
+
+        /* New configuration data via resource descriptor, if any */
+        PCM_FULL_RESOURCE_DESCRIPTOR cmDescriptor;
+        ULONG cmDescriptorLength;
+    } video;
+
+    /* For VpMonitorData */
+    struct
+    {
+        /* Legacy configuration data */
+        MONITOR_HARDWARE_CONFIGURATION_DATA legacyConfigData;
+
+        /* New configuration data via resource descriptor, if any */
+        PCM_FULL_RESOURCE_DESCRIPTOR cmDescriptor;
+        ULONG cmDescriptorLength;
+    } monitor;
+} VP_HARDWARE_CONFIGURATION_DATA, *PVP_HARDWARE_CONFIGURATION_DATA;
+#endif // __REACTOS__
+
+/**
+ * @brief
+ * A PIO_QUERY_DEVICE_ROUTINE callback to IoQueryDeviceDescription()
+ * for enumerating display controllers and peripherals.
+ *
+ * @note
+ * Each of the BusInformation, ControllerInformation and PeripheralInformation
+ * parameters point to an array of three PKEY_VALUE_FULL_INFORMATION elements,
+ * indexed by the values of the IO_QUERY_DEVICE_DATA_FORMAT enumeration.
+ *
+ * @see VideoPortGetDeviceData()
+ **/
+static NTSTATUS
+NTAPI
+IntVideoPortConfigCallback(
+    _In_ PVOID Context,
+    _In_ PUNICODE_STRING PathName,
+    _In_ INTERFACE_TYPE BusType,
+    _In_ ULONG BusNumber,
+    _In_ PKEY_VALUE_FULL_INFORMATION* BusInformation,
+    _In_ CONFIGURATION_TYPE ControllerType,
+    _In_ ULONG ControllerNumber,
+    _In_ PKEY_VALUE_FULL_INFORMATION* ControllerInformation,
+    _In_ CONFIGURATION_TYPE PeripheralType,
+    _In_ ULONG PeripheralNumber,
+    _In_ PKEY_VALUE_FULL_INFORMATION* PeripheralInformation)
+{
+#define GetDeviceInfoData(info) \
+    ((info) ? (PVOID)((ULONG_PTR)(info) + (info)->DataOffset) : NULL)
+
+#define GetDeviceInfoLength(info) \
+    ((info) ? (info)->DataLength : 0)
+
+    VP_STATUS Status;
+
+    PVP_GET_DEVICE_DATA_CONTEXT GetDeviceContext = Context;
+    PKEY_VALUE_FULL_INFORMATION* DeviceInformation;
+    PVOID ConfigurationData;
+    ULONG ConfigurationDataLength;
+
+#ifdef __REACTOS__
+    PVIDEO_PORT_DEVICE_EXTENSION DeviceExtension;
+    PVIDEO_PORT_DRIVER_EXTENSION DriverExtension;
+    /* Local buffer for conversion of VpControllerData and VpMonitorData */
+    VP_HARDWARE_CONFIGURATION_DATA configData = {0};
+#endif
+
+    /* Determine what to give to the CallbackRoutine, depending on
+     * the value of DeviceDataType: either the ControllerInformation
+     * or the PeripheralInformation. */
+    switch (GetDeviceContext->DeviceDataType)
+    {
+        case VpMachineData:
+        case VpCmosData:
+        case VpBusData:
+        {
+            DPRINT1("%s: Getting device data type %lu is UNIMPLEMENTED\n",
+                    __FUNCTION__, GetDeviceContext->DeviceDataType);
+            return STATUS_UNSUCCESSFUL;
+        }
+
+        case VpControllerData:
+        {
+            ASSERT(ControllerInformation);
+
+            /* Retrieve the pointers */
+            DeviceInformation = ControllerInformation;
+            ConfigurationData =
+                GetDeviceInfoData(DeviceInformation[IoQueryDeviceConfigurationData]);
+            ConfigurationDataLength =
+                GetDeviceInfoLength(DeviceInformation[IoQueryDeviceConfigurationData]);
+
+#ifdef __REACTOS__
+            /* Do not perform any conversion for WinXP/2003+ miniports
+             * but give them the original data directly. */
+            DeviceExtension =
+                VIDEO_PORT_GET_DEVICE_EXTENSION(GetDeviceContext->HwDeviceExtension);
+            DriverExtension = DeviceExtension->DriverExtension;
+            if (DriverExtension->InitializationData.HwInitDataSize
+                    > SIZE_OF_W2K_VIDEO_HW_INITIALIZATION_DATA)
+            {
+                break;
+            }
+
+            /* If the data is of legacy format, do not convert */
+            if (IsLegacyConfigData(ConfigurationData, ConfigurationDataLength,
+                                   sizeof(VIDEO_HARDWARE_CONFIGURATION_DATA)))
+            {
+                break;
+            }
+            else
+            /* If the data is of unknown format, do not convert */
+            if (!IsNewConfigData(ConfigurationData, ConfigurationDataLength))
+            {
+                break;
+            }
+
+            /* We should have a new-format configuration data,
+             * convert it back to legacy format */
+            ConvertVideoDataToLegacyConfigData(&configData.video.legacyConfigData,
+                                               ConfigurationData);
+            configData.video.cmDescriptor = ConfigurationData;
+            configData.video.cmDescriptorLength = ConfigurationDataLength;
+            ConfigurationData = &configData.video;
+            ConfigurationDataLength = sizeof(configData.video);
+#endif // __REACTOS__
+
+            break;
+        }
+
+        case VpMonitorData:
+        {
+            ASSERT(ControllerInformation);
+            ASSERT(PeripheralInformation);
+
+            /* Retrieve the pointers */
+            DeviceInformation = PeripheralInformation;
+            ConfigurationData =
+                GetDeviceInfoData(DeviceInformation[IoQueryDeviceConfigurationData]);
+            ConfigurationDataLength =
+                GetDeviceInfoLength(DeviceInformation[IoQueryDeviceConfigurationData]);
+
+#ifdef __REACTOS__
+            /* Do not perform any conversion for WinXP/2003+ miniports
+             * but give them the original data directly. */
+            DeviceExtension =
+                VIDEO_PORT_GET_DEVICE_EXTENSION(GetDeviceContext->HwDeviceExtension);
+            DriverExtension = DeviceExtension->DriverExtension;
+            if (DriverExtension->InitializationData.HwInitDataSize
+                    > SIZE_OF_W2K_VIDEO_HW_INITIALIZATION_DATA)
+            {
+                break;
+            }
+
+            /* If the data is of legacy format, do not convert */
+            if (IsLegacyConfigData(ConfigurationData, ConfigurationDataLength,
+                                   sizeof(MONITOR_HARDWARE_CONFIGURATION_DATA)))
+            {
+                break;
+            }
+            else
+            /* If the data is of unknown format, do not convert */
+            if (!IsNewConfigData(ConfigurationData, ConfigurationDataLength))
+            {
+                break;
+            }
+
+            /* We should have a new-format configuration data,
+             * convert it back to legacy format */
+            ConvertMonitorDataToLegacyConfigData(&configData.monitor.legacyConfigData,
+                                                 ConfigurationData);
+            configData.monitor.cmDescriptor = ConfigurationData;
+            configData.monitor.cmDescriptorLength = ConfigurationDataLength;
+            ConfigurationData = &configData.monitor;
+            ConfigurationDataLength = sizeof(configData.monitor);
+#endif // __REACTOS__
+
+            break;
+        }
+
+        default:
+            ASSERT(FALSE); // We should never be called there.
+            return STATUS_INVALID_PARAMETER;
+    }
+
+    /* Call the user-specified callback with the wanted information */
+    Status = GetDeviceContext->CallbackRoutine(
+                GetDeviceContext->HwDeviceExtension,
+                GetDeviceContext->Context,
+                GetDeviceContext->DeviceDataType,
+                GetDeviceInfoData(DeviceInformation[IoQueryDeviceIdentifier]),
+                GetDeviceInfoLength(DeviceInformation[IoQueryDeviceIdentifier]),
+                ConfigurationData,
+                ConfigurationDataLength,
+                GetDeviceInfoData(DeviceInformation[IoQueryDeviceComponentInformation]),
+                GetDeviceInfoLength(DeviceInformation[IoQueryDeviceComponentInformation]));
+
+    GetDeviceContext->CallbackStatus = Status;
+
+    // STATUS_DEVICE_DOES_NOT_EXIST;
+    return STATUS_SUCCESS;
+
+#undef GetDeviceInfoLength
+#undef GetDeviceInfoData
+}
+
 
 /* PUBLIC FUNCTIONS ***********************************************************/
 
@@ -1000,20 +1257,156 @@ VideoPortVerifyAccessRanges(
         return NO_ERROR;
 }
 
-/*
- * @unimplemented
- */
-
-VP_STATUS NTAPI
+/**
+ * @brief
+ * Retrieves system-detected configuration information from the
+ * \Registry\Machine\Hardware\Description tree in the registry.
+ *
+ * This information is bus-specific or adapter-specific and stored
+ * in the registry by the NT system loader or the HAL.
+ **/
+VP_STATUS
+NTAPI
 VideoPortGetDeviceData(
-   IN PVOID HwDeviceExtension,
-   IN VIDEO_DEVICE_DATA_TYPE DeviceDataType,
-   IN PMINIPORT_QUERY_DEVICE_ROUTINE CallbackRoutine,
-   IN PVOID Context)
+    _In_ PVOID HwDeviceExtension,
+    _In_ VIDEO_DEVICE_DATA_TYPE DeviceDataType,
+    _In_ PMINIPORT_QUERY_DEVICE_ROUTINE CallbackRoutine,
+    _In_ PVOID Context)
 {
-   TRACE_(VIDEOPRT, "VideoPortGetDeviceData\n");
-   UNIMPLEMENTED;
-   return ERROR_INVALID_FUNCTION;
+    NTSTATUS Status;
+    PVIDEO_PORT_DEVICE_EXTENSION DeviceExtension;
+
+    DeviceExtension = VIDEO_PORT_GET_DEVICE_EXTENSION(HwDeviceExtension);
+
+    switch (DeviceDataType)
+    {
+        case VpMachineData:
+        case VpCmosData:
+        {
+            DPRINT1("%s: Getting device data type %lu is UNIMPLEMENTED\n",
+                    __FUNCTION__, DeviceDataType);
+            return ERROR_INVALID_FUNCTION; // ERROR_CALL_NOT_IMPLEMENTED;
+        }
+
+        case VpBusData:
+        {
+            VP_GET_DEVICE_DATA_CONTEXT GetDeviceContext = {0};
+
+            GetDeviceContext.HwDeviceExtension = HwDeviceExtension;
+            GetDeviceContext.DeviceDataType = DeviceDataType;
+            GetDeviceContext.CallbackRoutine = CallbackRoutine;
+            GetDeviceContext.Context = Context;
+
+            Status = IoQueryDeviceDescription(&(DeviceExtension->AdapterInterfaceType),
+                                              &(DeviceExtension->SystemIoBusNumber),
+                                              NULL,
+                                              NULL,
+                                              NULL,
+                                              NULL,
+                                              IntVideoPortConfigCallback,
+                                              &GetDeviceContext);
+
+            DPRINT1("IoQueryDeviceDescription(VpBusData) returned 0x%08lx\n", Status);
+
+            // GetDeviceContext.CallbackStatus;
+            return (NT_SUCCESS(Status) ? NO_ERROR : ERROR_INVALID_PARAMETER);
+        }
+
+        case VpControllerData:
+        {
+            VP_GET_DEVICE_DATA_CONTEXT GetDeviceContext = {0};
+            CONFIGURATION_TYPE ControllerType = DisplayController;
+
+            GetDeviceContext.HwDeviceExtension = HwDeviceExtension;
+            GetDeviceContext.DeviceDataType = DeviceDataType;
+            GetDeviceContext.CallbackRoutine = CallbackRoutine;
+            GetDeviceContext.Context = Context;
+
+            /*
+             * Pre-increment the controller number, so as to use the same
+             * value in successive VpControllerData + VpMonitorData calls,
+             * while also being able to go to the next controller in the
+             * next VpControllerData call.
+             */
+            DeviceExtension->EnumDevice.ControllerNumber++;
+
+            /* Restart peripheral enumeration on this new controller */
+            DeviceExtension->EnumDevice.PeripheralNumber = 0;
+
+            /*
+             * For WinNT3,4 and Win2000: DisplayController data is a
+             * VIDEO_HARDWARE_CONFIGURATION_DATA structure, which is
+             * a truncated version of CM_FULL_RESOURCE_DESCRIPTOR and
+             * CM_PARTIAL_RESOURCE_LIST (fields in common are:
+             * InterfaceType, BusNumber, and Version, Revision).
+             *
+             * Ensure this format is maintained, even if the configuration
+             * data is upgraded to a standard CM_FULL_RESOURCE_DESCRIPTOR
+             * with one or more CM_PARTIAL_RESOURCE_LIST entries, by
+             * converting these to the legacy format, and appending the
+             * pointers to the original (new format) data afterwards.
+             */
+            Status = IoQueryDeviceDescription(&(DeviceExtension->AdapterInterfaceType),
+                                              &(DeviceExtension->SystemIoBusNumber),
+                                              &ControllerType,
+                                              &(DeviceExtension->EnumDevice.ControllerNumber),
+                                              NULL,
+                                              NULL,
+                                              IntVideoPortConfigCallback,
+                                              &GetDeviceContext);
+
+            DPRINT1("IoQueryDeviceDescription(VpControllerData) returned 0x%08lx\n", Status);
+
+            // GetDeviceContext.CallbackStatus;
+            return (NT_SUCCESS(Status) ? NO_ERROR : ERROR_INVALID_PARAMETER);
+        }
+
+        case VpMonitorData:
+        {
+            VP_GET_DEVICE_DATA_CONTEXT GetDeviceContext = {0};
+            CONFIGURATION_TYPE ControllerType = DisplayController;
+            CONFIGURATION_TYPE PeripheralType = MonitorPeripheral;
+
+            GetDeviceContext.HwDeviceExtension = HwDeviceExtension;
+            GetDeviceContext.DeviceDataType = DeviceDataType;
+            GetDeviceContext.CallbackRoutine = CallbackRoutine;
+            GetDeviceContext.Context = Context;
+
+            /*
+             * For WinNT3,4 and Win2000: MonitorPeripheral data is a
+             * MONITOR_HARDWARE_CONFIGURATION_DATA structure, which is
+             * a truncated version of CM_FULL_RESOURCE_DESCRIPTOR and
+             * CM_PARTIAL_RESOURCE_LIST (fields in common are:
+             * InterfaceType, BusNumber, and Version, Revision).
+             *
+             * Ensure this format is maintained, even if the configuration
+             * data is upgraded to a standard CM_FULL_RESOURCE_DESCRIPTOR
+             * with one or more CM_PARTIAL_RESOURCE_LIST entries, by
+             * converting these to the legacy format, and appending the
+             * pointers to the original (new format) data afterwards.
+             */
+            Status = IoQueryDeviceDescription(&(DeviceExtension->AdapterInterfaceType),
+                                              &(DeviceExtension->SystemIoBusNumber),
+                                              &ControllerType,
+                                              &(DeviceExtension->EnumDevice.ControllerNumber),
+                                              &PeripheralType,
+                                              &(DeviceExtension->EnumDevice.PeripheralNumber),
+                                              IntVideoPortConfigCallback,
+                                              &GetDeviceContext);
+
+            DPRINT1("IoQueryDeviceDescription(VpMonitorData) returned 0x%08lx\n", Status);
+
+            /* Go to the next peripheral in the next VpMonitorData call */
+            DeviceExtension->EnumDevice.PeripheralNumber++;
+
+            // GetDeviceContext.CallbackStatus;
+            return (NT_SUCCESS(Status) ? NO_ERROR : ERROR_INVALID_PARAMETER);
+        }
+
+        default:
+            DPRINT1("Invalid device data type %lu\n", DeviceDataType);
+            return ERROR_INVALID_PARAMETER;
+    }
 }
 
 /*

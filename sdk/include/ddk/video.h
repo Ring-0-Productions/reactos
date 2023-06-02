@@ -554,10 +554,11 @@ typedef enum _DMA_FLAGS {
 /*
  * Data returned with VpControllerData.
  *
- * The first two fields, InterfaceType and BusNumber, are common
- * with the CM_FULL_RESOURCE_DESCRIPTOR header.
- * The other fields are of legacy layout, instead of the newer
- * CM_PARTIAL_RESOURCE_LIST one.
+ * - The first two fields, InterfaceType and BusNumber, are
+ *   common with the CM_FULL_RESOURCE_DESCRIPTOR header;
+ * - The Version and Revision fields correspond to the first
+ *   two fields of CM_PARTIAL_RESOURCE_LIST;
+ * - The other fields are of legacy layout.
  */
 typedef struct _VIDEO_HARDWARE_CONFIGURATION_DATA {
   INTERFACE_TYPE InterfaceType;
@@ -949,10 +950,10 @@ VPAPI
 VP_STATUS
 NTAPI
 VideoPortGetDeviceData(
-  IN PVOID HwDeviceExtension,
-  IN VIDEO_DEVICE_DATA_TYPE DeviceDataType,
-  IN PMINIPORT_QUERY_DEVICE_ROUTINE CallbackRoutine,
-  IN PVOID Context);
+    _In_ PVOID HwDeviceExtension,
+    _In_ VIDEO_DEVICE_DATA_TYPE DeviceDataType,
+    _In_ PMINIPORT_QUERY_DEVICE_ROUTINE CallbackRoutine,
+    _In_ PVOID Context);
 
 VPAPI
 VP_STATUS

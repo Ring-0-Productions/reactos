@@ -24,6 +24,7 @@ extern UCHAR BitmapFont8x16[256 * 16];
 UCHAR MachDefaultTextColor = COLOR_GRAY;
 REACTOS_INTERNAL_BGCONTEXT framebufferData;
 EFI_GUID EfiGraphicsOutputProtocol = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+/****/EFI_PIXEL_BITMASK UefiGopPixelBitmask;/****/
 
 /* FUNCTIONS ******************************************************************/
 
@@ -50,7 +51,7 @@ UefiInitalizeVideo(VOID)
     framebufferData.ScreenHeight       = gop->Mode->Info->VerticalResolution;
     framebufferData.PixelsPerScanLine  = gop->Mode->Info->PixelsPerScanLine;
     framebufferData.PixelFormat        = gop->Mode->Info->PixelFormat;
-
+    /****/UefiGopPixelBitmask = gop->Mode->Info->PixelInformation;/****/
     return Status;
 }
 

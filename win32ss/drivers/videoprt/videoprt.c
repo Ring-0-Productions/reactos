@@ -426,9 +426,9 @@ IntVideoPortFindAdapter(
 
     DeviceExtension = (PVIDEO_PORT_DEVICE_EXTENSION)DeviceObject->DeviceExtension;
 
-    /* Setup a ConfigInfo structure that we will pass to HwFindAdapter. */
-    RtlZeroMemory(&ConfigInfo, sizeof(VIDEO_PORT_CONFIG_INFO));
-    ConfigInfo.Length = sizeof(VIDEO_PORT_CONFIG_INFO);
+    /* Setup a ConfigInfo structure that we will pass to HwFindAdapter */
+    RtlZeroMemory(&ConfigInfo, sizeof(ConfigInfo));
+    ConfigInfo.Length = sizeof(ConfigInfo);
     ConfigInfo.AdapterInterfaceType = DeviceExtension->AdapterInterfaceType;
     if (ConfigInfo.AdapterInterfaceType == PCIBus)
         ConfigInfo.InterruptMode = LevelSensitive;
@@ -486,6 +486,10 @@ IntVideoPortFindAdapter(
             DeviceExtension->SystemIoBusNumber =
                 ConfigInfo.SystemIoBusNumber = BusNumber;
 
+            /* Reset the enumeration state variables */
+            DeviceExtension->EnumDevice.ControllerNumber = -1; // Is pre-incremented.
+            DeviceExtension->EnumDevice.PeripheralNumber = 0;
+
             RtlZeroMemory(&DeviceExtension->MiniPortDeviceExtension,
                           DriverExtension->InitializationData.HwDeviceExtensionSize);
 
@@ -510,6 +514,10 @@ IntVideoPortFindAdapter(
     }
     else
     {
+        /* Reset the enumeration state variables */
+        DeviceExtension->EnumDevice.ControllerNumber = -1; // Is pre-incremented.
+        DeviceExtension->EnumDevice.PeripheralNumber = 0;
+
         /* FIXME: Need to figure out what string to pass as param 3. */
         vpStatus = DriverExtension->InitializationData.HwFindAdapter(
                      &DeviceExtension->MiniPortDeviceExtension,
