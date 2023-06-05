@@ -18,6 +18,7 @@
 
 #include <freeldr.h>
 #include <cportlib/cportlib.h>
+#include <drivers/bootvid/framebuf.h>
 
 #include "../ntldr/ntldropts.h"
 
@@ -1573,7 +1574,15 @@ DetectDisplayController(PCONFIGURATION_COMPONENT_DATA BusKey)
 {
     PCSTR Identifier;
     PCONFIGURATION_COMPONENT_DATA ControllerKey;
+    PCONFIGURATION_COMPONENT_DATA PeripheralKey;
     USHORT VesaVersion;
+    PCM_FRAMEBUF_DEVICE_DATA FramebufferData;
+    // PMONITOR_CONFIGURATION_DATA MonitorData;
+    PCM_MONITOR_DEVICE_DATA MonitorData;
+
+    PCM_PARTIAL_RESOURCE_LIST PartialResourceList;
+    PCM_PARTIAL_RESOURCE_DESCRIPTOR PartialDescriptor;
+    ULONG Size;
 
     /* FIXME: Set 'ComponentInformation' value */
 
@@ -1594,6 +1603,59 @@ DetectDisplayController(PCONFIGURATION_COMPONENT_DATA BusKey)
     else
         Identifier = "VGA Display";
 
+
+    Size = sizeof(CM_PARTIAL_RESOURCE_LIST) +
+           1 * sizeof(CM_PARTIAL_RESOURCE_DESCRIPTOR) +
+           sizeof(CM_FRAMEBUF_DEVICE_DATA);
+    PartialResourceList = FrLdrHeapAlloc(Size, TAG_HW_RESOURCE_LIST);
+    if (PartialResourceList == NULL)
+    {
+        ERR("Failed to allocate resource descriptor\n");
+        return;
+    }
+
+    /* Initialize resource descriptor */
+    RtlZeroMemory(PartialResourceList, Size);
+    PartialResourceList->Version  = ARC_VERSION;
+    PartialResourceList->Revision = ARC_REVISION;
+    PartialResourceList->Count = 2;
+
+    /* Set Memory */
+    PartialDescriptor = &PartialResourceList->PartialDescriptors[0];
+    PartialDescriptor->Type = CmResourceTypeMemory;
+    PartialDescriptor->ShareDisposition = CmResourceShareDeviceExclusive;
+    PartialDescriptor->Flags = CM_RESOURCE_MEMORY_READ_WRITE;
+    PartialDescriptor->u.Memory.Start.LowPart = (ULONG_PTR)0xA0000;
+    PartialDescriptor->u.Memory.Length = 256*1024;
+
+    /* Set framebuffer-specific data */
+    PartialDescriptor = &PartialResourceList->PartialDescriptors[1];
+    PartialDescriptor->Type = CmResourceTypeDeviceSpecific;
+    PartialDescriptor->ShareDisposition = CmResourceShareUndetermined;
+    PartialDescriptor->Flags = 0;
+    PartialDescriptor->u.DeviceSpecificData.DataSize =
+        sizeof(CM_FRAMEBUF_DEVICE_DATA);
+
+    /* Get pointer to framebuffer-specific data */
+    FramebufferData = (PVOID)(PartialDescriptor + 1);
+    RtlZeroMemory(FramebufferData, sizeof(*FramebufferData));
+    FramebufferData->Version  = 2;
+    FramebufferData->Revision = 0;
+
+    FramebufferData->VideoClock = 0; // FIXME: Use EDID
+
+    /* Horizontal and Vertical resolution in pixels */
+    FramebufferData->ScreenWidth  = 640;
+    FramebufferData->ScreenHeight = 480;
+
+    /* Number of pixel elements per video memory line */
+    FramebufferData->PixelsPerScanLine = 640;
+
+    /* Physical format of the pixel */
+    FramebufferData->BitsPerPixel = 16;
+    RtlZeroMemory(&FramebufferData->PixelInformation,
+                  sizeof(FramebufferData->PixelInformation));
+
     FldrCreateComponentKey(BusKey,
                            ControllerClass,
                            DisplayController,
@@ -1601,8 +1663,8 @@ DetectDisplayController(PCONFIGURATION_COMPONENT_DATA BusKey)
                            0,
                            0xFFFFFFFF,
                            Identifier,
-                           NULL,
-                           0,
+                           PartialResourceList,
+                           Size,
                            &ControllerKey);
 
     /* FIXME: Add display peripheral (monitor) data */
@@ -1617,6 +1679,109 @@ DetectDisplayController(PCONFIGURATION_COMPONENT_DATA BusKey)
             }
         }
     }
+
+#if 0 // Using "old" configuration data
+
+    Size = sizeof(MONITOR_CONFIGURATION_DATA);
+    MonitorData = FrLdrHeapAlloc(Size, TAG_HW_RESOURCE_LIST);
+    if (MonitorData == NULL)
+    {
+        ERR("Failed to allocate resource descriptor\n");
+        return;
+    }
+
+    RtlZeroMemory(MonitorData, sizeof(MonitorData));
+    MonitorData->HorizontalResolution = 1024;
+    MonitorData->HorizontalDisplayTime = 16000;
+    MonitorData->HorizontalBackPorch = 2000;
+    MonitorData->HorizontalFrontPorch = 1000;
+    MonitorData->HorizontalSync = 1500;
+    MonitorData->VerticalResolution = 768;
+    MonitorData->VerticalBackPorch = 39;
+    MonitorData->VerticalFrontPorch = 1;
+    MonitorData->VerticalSync = 1;
+    MonitorData->HorizontalScreenSize = 343;
+    MonitorData->VerticalScreenSize = 274;
+
+    FldrCreateComponentKey(ControllerKey,
+                           PeripheralClass,
+                           MonitorPeripheral,
+                           Output | ConsoleOut,
+                           0,
+                           0xFFFFFFFF,
+                           "1024x768",
+                           (PCM_PARTIAL_RESOURCE_LIST)MonitorData, // Pointer to MONITOR_CONFIGURATION_DATA
+                           Size,
+                           &PeripheralKey);
+
+#else // Using "new" configuration list
+
+    Size = sizeof(CM_PARTIAL_RESOURCE_LIST) +
+           sizeof(CM_MONITOR_DEVICE_DATA);
+    PartialResourceList = FrLdrHeapAlloc(Size, TAG_HW_RESOURCE_LIST);
+    if (PartialResourceList == NULL)
+    {
+        ERR("Failed to allocate resource descriptor\n");
+        return;
+    }
+
+    /* Initialize resource descriptor */
+    RtlZeroMemory(PartialResourceList, Size);
+    PartialResourceList->Version = 1;
+    PartialResourceList->Revision = 1;
+    PartialResourceList->Count = 1;
+
+    /* Set monitor-specific data */
+    PartialDescriptor = &PartialResourceList->PartialDescriptors[0];
+    PartialDescriptor->Type = CmResourceTypeDeviceSpecific;
+    PartialDescriptor->ShareDisposition = CmResourceShareUndetermined;
+    PartialDescriptor->Flags = 0;
+    PartialDescriptor->u.DeviceSpecificData.DataSize =
+        sizeof(CM_MONITOR_DEVICE_DATA);
+
+
+    /* Get pointer to geometry data */
+    MonitorData = (PVOID)(((ULONG_PTR)PartialResourceList) + sizeof(CM_PARTIAL_RESOURCE_LIST));
+
+    MonitorData->Version = 2;
+    MonitorData->Revision = 0;
+    MonitorData->HorizontalScreenSize = 343;
+    MonitorData->VerticalScreenSize = 274;
+    MonitorData->HorizontalResolution = 1024;
+    MonitorData->VerticalResolution = 768;
+    MonitorData->HorizontalDisplayTimeLow = 0;
+    MonitorData->HorizontalDisplayTime = 16000;
+    MonitorData->HorizontalDisplayTimeHigh = 0;
+    MonitorData->HorizontalBackPorchLow = 0;
+    MonitorData->HorizontalBackPorch = 2000;
+    MonitorData->HorizontalBackPorchHigh = 0;
+    MonitorData->HorizontalFrontPorchLow = 0;
+    MonitorData->HorizontalFrontPorch = 1000;
+    MonitorData->HorizontalFrontPorchHigh = 0;
+    MonitorData->HorizontalSyncLow = 0;
+    MonitorData->HorizontalSync = 1500;
+    MonitorData->HorizontalSyncHigh = 0;
+    MonitorData->VerticalBackPorchLow = 0;
+    MonitorData->VerticalBackPorch = 39;
+    MonitorData->VerticalBackPorchHigh = 0;
+    MonitorData->VerticalFrontPorchLow = 0;
+    MonitorData->VerticalFrontPorch = 1;
+    MonitorData->VerticalFrontPorchHigh = 0;
+    MonitorData->VerticalSyncLow = 0;
+    MonitorData->VerticalSync = 1;
+    MonitorData->VerticalSyncHigh = 0;
+
+    FldrCreateComponentKey(ControllerKey,
+                           PeripheralClass,
+                           MonitorPeripheral,
+                           Output | ConsoleOut,
+                           0,
+                           0xFFFFFFFF,
+                           "1024x768",
+                           PartialResourceList,
+                           Size,
+                           &PeripheralKey);
+#endif
 }
 
 static

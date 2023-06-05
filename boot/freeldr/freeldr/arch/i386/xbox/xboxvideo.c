@@ -27,9 +27,9 @@ DBG_DEFAULT_CHANNEL(UI);
 ULONG NvBase = 0xFD000000;
 PVOID FrameBuffer;
 ULONG FrameBufferSize;
-static ULONG ScreenWidth;
-static ULONG ScreenHeight;
-static ULONG BytesPerPixel;
+ULONG ScreenWidth;
+ULONG ScreenHeight;
+ULONG BytesPerPixel;
 static ULONG Delta;
 extern multiboot_info_t * MultibootInfoPtr;
 
@@ -199,6 +199,8 @@ XboxVideoInit(VOID)
   FrameBuffer = (PVOID)READ_REGISTER_ULONG(NvBase + NV2A_CRTC_FRAMEBUFFER_START);
   /* Verify that framebuffer address is page-aligned */
   ASSERT((ULONG_PTR)FrameBuffer % PAGE_SIZE == 0);
+
+ERR("XBOX framebuffer at 0x%p\n", FrameBuffer);
 
   /* Obtain framebuffer memory size from multiboot memory map */
   if ((FrameBufferSize = XboxGetFramebufferSize(FrameBuffer)) == 0)
