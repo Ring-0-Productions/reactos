@@ -288,7 +288,7 @@ GetVideoData(
     }
 }
 
-static inline
+/*static*/ inline
 VOID
 DoConvertVideoDataToLegacyConfigData(
     _Inout_ PVIDEO_HARDWARE_CONFIGURATION_DATA configData,
@@ -487,7 +487,7 @@ GetMonitorData(
     }
 }
 
-static inline
+/*static*/ inline
 VOID
 DoConvertMonitorDataToLegacyConfigData(
     _Inout_ PMONITOR_HARDWARE_CONFIGURATION_DATA configData,
