@@ -609,6 +609,8 @@ IntVideoPortConfigCallback(
             ConfigurationDataLength =
                 GetDeviceInfoLength(DeviceInformation[IoQueryDeviceConfigurationData]);
 
+            DPRINT1("VpControllerData\n");
+
 #ifdef __REACTOS__
             /* Do not perform any conversion for WinXP/2003+ miniports
              * but give them the original data directly. */
@@ -618,6 +620,7 @@ IntVideoPortConfigCallback(
             if (DriverExtension->InitializationData.HwInitDataSize
                     > SIZE_OF_W2K_VIDEO_HW_INITIALIZATION_DATA)
             {
+                DPRINT1("    No conversion needed\n");
                 break;
             }
 
@@ -625,14 +628,18 @@ IntVideoPortConfigCallback(
             if (IsLegacyConfigData(ConfigurationData, ConfigurationDataLength,
                                    sizeof(VIDEO_HARDWARE_CONFIGURATION_DATA)))
             {
+                DPRINT1("    Legacy Config data found\n");
                 break;
             }
             else
             /* If the data is of unknown format, do not convert */
             if (!IsNewConfigData(ConfigurationData, ConfigurationDataLength))
             {
+                DPRINT1("    Unknown Config data found\n");
                 break;
             }
+
+            DPRINT1("    New Config data found, do conversion to legacy\n");
 
             /* We should have a new-format configuration data,
              * convert it back to legacy format */
@@ -644,6 +651,8 @@ IntVideoPortConfigCallback(
             ConfigurationDataLength = sizeof(configData.video);
 #endif // __REACTOS__
 
+            DPRINT1("**  Legacy framebuffer address (32-bit only): 0x%x\n",
+                    configData.video.legacyConfigData.FrameBase);
             break;
         }
 

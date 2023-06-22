@@ -405,6 +405,8 @@ GenFbGetDeviceDataCallback(
                 /* Legacy configuration data, convert it into new format */
                 CM_PARTIAL_RESOURCE_DESCRIPTOR FrameBuffer;
 
+                DPRINT1("    GenFbVmp: Legacy Config data found\n");
+
                 ConvertLegacyVideoConfigDataToDeviceData(
                     ConfigurationData,
                 #if 0
@@ -420,6 +422,9 @@ GenFbGetDeviceDataCallback(
                 DeviceExtension->FrameBufData.BaseAddress = FrameBuffer.u.Memory.Start;
                 DeviceExtension->FrameBufData.BufferSize  = FrameBuffer.u.Memory.Length;
 
+                DPRINT1("**  GenFbVmp: Legacy framebuffer address (32-bit only): 0x%x\n",
+                        DeviceExtension->FrameBufData.BaseAddress);
+
                 /* The legacy video controller configuration data does not
                  * contain any information regarding framebuffer format, etc.
                  * We will later calculate default values. */
@@ -429,6 +434,8 @@ GenFbGetDeviceDataCallback(
                 /* New configuration data */
                 PCM_FULL_RESOURCE_DESCRIPTOR cmDescriptor = ConfigurationData;
                 PCM_PARTIAL_RESOURCE_DESCRIPTOR FrameBuffer, Descriptor;
+
+                DPRINT1("    GenFbVmp: New Config data found\n");
 
                 GetVideoData(&cmDescriptor->PartialResourceList,
                              NULL, // Interrupt
@@ -442,10 +449,14 @@ GenFbGetDeviceDataCallback(
                     /* Save the framebuffer base and size */
                     DeviceExtension->FrameBufData.BaseAddress = FrameBuffer->u.Memory.Start;
                     DeviceExtension->FrameBufData.BufferSize  = FrameBuffer->u.Memory.Length;
+
+                    DPRINT1("**  GenFbVmp: Got framebuffer address: 0x%p\n",
+                            DeviceExtension->FrameBufData.BaseAddress);
                 }
                 else
                 {
                     /* No framebuffer base?! Zero it out */
+                    DPRINT1("**  GenFbVmp: No framebuffer address?!\n");
                     DeviceExtension->FrameBufData.BaseAddress.QuadPart = 0;
                     DeviceExtension->FrameBufData.BufferSize = 0;
                 }
@@ -457,12 +468,15 @@ GenFbGetDeviceDataCallback(
                      * The actual device data follows the descriptor. */
                     PCM_FRAMEBUF_DEVICE_DATA VideoData = (PCM_FRAMEBUF_DEVICE_DATA)(Descriptor + 1);
                     DeviceExtension->VideoConfigData = *VideoData;
+
+                    DPRINT1("**  GenFbVmp: Framebuffer information data found\n");
                 }
                 else
                 {
                     /* The configuration data does not contain any
                      * information regarding framebuffer format, etc.
                      * We will later calculate default values. */
+                    DPRINT1("**  GenFbVmp: Framebuffer information data NOT FOUND\n");
                 }
             }
 

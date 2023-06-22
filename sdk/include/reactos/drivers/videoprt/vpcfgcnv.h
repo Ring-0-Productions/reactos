@@ -105,7 +105,10 @@ IsLegacyConfigData(
     PCM_PARTIAL_RESOURCE_LIST ResourceList;
 
     if (!ConfigurationData)
+    {
+        DPRINT1("IsLegacyConfigData:FALSE - ConfigurationData == NULL\n");
         return FALSE;
+    }
 
     /*
      * A valid legacy configuration data covers:
@@ -118,6 +121,8 @@ IsLegacyConfigData(
                                                 PartialResourceList.Count)) ||
         (ConfigurationDataLength != ExpectedConfigurationDataLength))
     {
+        DPRINT1("IsLegacyConfigData:FALSE - ConfigurationDataLength == %lu\n",
+                ConfigurationDataLength);
         return FALSE;
     }
 
@@ -130,9 +135,12 @@ IsLegacyConfigData(
     if ( (ResourceList->Version >  1) ||
         ((ResourceList->Version == 1) && (ResourceList->Revision > 1)) )
     {
+        DPRINT1("IsLegacyConfigData:FALSE - Version %lu, Revision %lu\n",
+                ResourceList->Version, ResourceList->Revision);
         return FALSE;
     }
 
+    DPRINT1("IsLegacyConfigData:TRUE\n");
     return TRUE;
 }
 
@@ -145,7 +153,10 @@ IsNewConfigData(
     PCM_PARTIAL_RESOURCE_LIST ResourceList;
 
     if (!ConfigurationData)
+    {
+        DPRINT1("IsNewConfigData:FALSE - ConfigurationData == NULL\n");
         return FALSE;
+    }
 
 #if 0
     if (ConfigurationDataLength < sizeof(CM_FULL_RESOURCE_DESCRIPTOR) -
@@ -155,6 +166,8 @@ IsNewConfigData(
                                                PartialResourceList.PartialDescriptors))
 #endif
     {
+        DPRINT1("IsNewConfigData:FALSE - ConfigurationDataLength == %lu\n",
+                ConfigurationDataLength);
         return FALSE;
     }
 
@@ -168,10 +181,13 @@ IsNewConfigData(
     if ( (ResourceList->Version <  1) ||
         ((ResourceList->Version == 1) && (ResourceList->Revision <= 1)) )
     {
+        DPRINT1("IsNewConfigData:FALSE - Version %lu, Revision %lu\n",
+                ResourceList->Version, ResourceList->Revision);
         return FALSE;
     }
 
     /* This should be a new configuration data */
+    DPRINT1("IsNewConfigData:TRUE\n");
     return TRUE;
 }
 
@@ -204,6 +220,8 @@ GetVideoData(
     *FrameBuffer = NULL;
     if (DeviceSpecific) *DeviceSpecific = NULL;
 
+    DPRINT1("GetVideoData\n");
+
     for (i = 0; i < ResourceList->Count; ++i)
     {
         Descriptor = &ResourceList->PartialDescriptors[i];
@@ -212,6 +230,7 @@ GetVideoData(
         {
             case CmResourceTypePort:
             {
+                DPRINT1("    CmResourceTypePort\n");
                 /* We only check for memory I/O ports */
                 // if (!(Descriptor->Flags & CM_RESOURCE_PORT_MEMORY))
                 if (Descriptor->Flags & CM_RESOURCE_PORT_IO)
@@ -241,6 +260,7 @@ GetVideoData(
 
             case CmResourceTypeInterrupt:
             {
+                DPRINT1("    CmResourceTypeInterrupt\n");
                 /* If more than one interrupt resource
                  * has been encountered, ignore them */
                 if (IntCount > 1)
@@ -255,6 +275,7 @@ GetVideoData(
 
             case CmResourceTypeMemory:
             {
+                DPRINT1("    CmResourceTypeMemory\n");
                 /* If more than one memory resource
                  * has been encountered, ignore them */
                 if (MemCount > 1)
@@ -275,6 +296,7 @@ GetVideoData(
 
             case CmResourceTypeDeviceSpecific:
             {
+                DPRINT1("    CmResourceTypeDeviceSpecific\n");
                 /* NOTE: This descriptor *MUST* be the last one.
                  * The actual device data follows the descriptor. */
                 ASSERT(i == ResourceList->Count - 1);
