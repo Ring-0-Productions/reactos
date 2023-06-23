@@ -35,9 +35,12 @@
 /* PSEH for SEH Support */
 #include <pseh/pseh2.h>
 
-#define TAG_VIDEO_PORT          'PDIV'
+#define TAG_VIDEO_PORT          'trpV'      // Internal allocation
 #define TAG_VIDEO_PORT_BUFFER   '\0mpV'
 #define TAG_REQUEST_PACKET      'qRpV'
+
+// VidL - videoprt.sys - VideoPort Allocation List (FDO_EXTENSION)
+// VidR - videoprt.sys - VideoPort Allocation on behalf of Miniport
 
 #define GUID_STRING_LENGTH (38 * sizeof(WCHAR))
 
