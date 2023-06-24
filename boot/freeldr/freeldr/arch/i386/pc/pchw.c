@@ -236,8 +236,8 @@ DetectBiosFloppyPeripheral(PCONFIGURATION_COMPONENT_DATA ControllerKey)
         }
 
         RtlZeroMemory(PartialResourceList, Size);
-        PartialResourceList->Version = 1;
-        PartialResourceList->Revision = 1;
+        PartialResourceList->Version  = ARC_VERSION;
+        PartialResourceList->Revision = ARC_REVISION;
         PartialResourceList->Count = 1;
 
         PartialDescriptor = &PartialResourceList->PartialDescriptors[0];
@@ -292,8 +292,8 @@ DetectBiosFloppyController(PCONFIGURATION_COMPONENT_DATA BusKey)
 
     /* Initialize resource descriptor */
     RtlZeroMemory(PartialResourceList, Size);
-    PartialResourceList->Version = 1;
-    PartialResourceList->Revision = 1;
+    PartialResourceList->Version  = ARC_VERSION;
+    PartialResourceList->Revision = ARC_REVISION;
     PartialResourceList->Count = 3;
 
     /* Set IO Port */
@@ -375,9 +375,10 @@ DetectBiosDisks(PCONFIGURATION_COMPONENT_DATA SystemKey,
 
     /* Initialize resource descriptor */
     RtlZeroMemory(PartialResourceList, Size);
-    PartialResourceList->Version = 1;
-    PartialResourceList->Revision = 1;
+    PartialResourceList->Version  = ARC_VERSION;
+    PartialResourceList->Revision = ARC_REVISION;
     PartialResourceList->Count = 1;
+
     PartialResourceList->PartialDescriptors[0].Type = CmResourceTypeDeviceSpecific;
     PartialResourceList->PartialDescriptors[0].ShareDisposition = 0;
     PartialResourceList->PartialDescriptors[0].Flags = 0;

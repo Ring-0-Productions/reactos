@@ -115,9 +115,10 @@ XboxGetHarddiskConfigurationData(UCHAR DriveNumber, ULONG* pSize)
     }
 
     RtlZeroMemory(PartialResourceList, Size);
-    PartialResourceList->Version = 1;
-    PartialResourceList->Revision = 1;
+    PartialResourceList->Version  = ARC_VERSION;
+    PartialResourceList->Revision = ARC_REVISION;
     PartialResourceList->Count = 1;
+
     PartialResourceList->PartialDescriptors[0].Type =
         CmResourceTypeDeviceSpecific;
 //  PartialResourceList->PartialDescriptors[0].ShareDisposition =
@@ -179,8 +180,8 @@ DetectDisplayController(PCONFIGURATION_COMPONENT_DATA BusKey)
 
     /* Initialize resource descriptor */
     RtlZeroMemory(PartialResourceList, Size);
-    PartialResourceList->Version = 1;
-    PartialResourceList->Revision = 1;
+    PartialResourceList->Version  = ARC_VERSION;
+    PartialResourceList->Revision = ARC_REVISION;
     PartialResourceList->Count = 1;
 
     /* Set Memory */
@@ -226,8 +227,8 @@ DetectIsaBios(
 
     /* Initialize resource descriptor */
     RtlZeroMemory(PartialResourceList, Size);
-    PartialResourceList->Version = 1;
-    PartialResourceList->Revision = 1;
+    PartialResourceList->Version  = ARC_VERSION;
+    PartialResourceList->Revision = ARC_REVISION;
     PartialResourceList->Count = 0;
 
     /* Create new bus key */
