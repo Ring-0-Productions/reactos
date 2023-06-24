@@ -101,7 +101,7 @@ ArmHwDetect(
 
     /* Create the root node */
     if (ArmHwDetectRan++) return RootNode;
-    FldrCreateSystemKey(&RootNode, "");
+    FldrCreateSystemKey(&RootNode, FALSE, "ARM processor family");
 
     /*
      * TODO:

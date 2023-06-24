@@ -131,39 +131,6 @@ FldrSetConfigurationData(
     ComponentData->ComponentEntry.ConfigurationDataLength = Size;
 }
 
-VOID
-FldrCreateSystemKey(
-    _Out_ PCONFIGURATION_COMPONENT_DATA* SystemNode,
-    _In_ PCSTR IdentifierString)
-{
-    PCONFIGURATION_COMPONENT Component;
-
-    /* Allocate the root */
-    FldrArcHwTreeRoot = FrLdrHeapAlloc(sizeof(CONFIGURATION_COMPONENT_DATA),
-                                       TAG_HW_COMPONENT_DATA);
-    if (!FldrArcHwTreeRoot) return;
-
-    /* Set it up */
-    Component = &FldrArcHwTreeRoot->ComponentEntry;
-    Component->Class = SystemClass;
-    Component->Type = MaximumType;
-    Component->ConfigurationDataLength = 0;
-    Component->Identifier = 0;
-    Component->IdentifierLength = 0;
-    Component->Flags = 0;
-    Component->Version = 0;
-    Component->Revision = 0;
-    Component->Key = 0;
-    Component->AffinityMask = 0xFFFFFFFF;
-
-    /* Set identifier */
-    if (IdentifierString)
-        FldrSetIdentifier(Component, IdentifierString);
-
-    /* Return the node */
-    *SystemNode = FldrArcHwTreeRoot;
-}
-
 static VOID
 FldrLinkToParent(
     _In_ PCONFIGURATION_COMPONENT_DATA Parent,
@@ -225,16 +192,22 @@ FldrCreateComponentKey(
     /* Set us up */
     Component = &ComponentData->ComponentEntry;
     Component->Class = Class;
-    Component->Type = Type;
+    Component->Type  = Type;
     Component->Flags = Flags;
+    Component->Version  = ARC_VERSION;
+    Component->Revision = ARC_REVISION;
     Component->Key = Key;
     Component->AffinityMask = Affinity;
 
     /* Set identifier */
+    Component->Identifier = NULL;
+    Component->IdentifierLength = 0;
     if (IdentifierString)
         FldrSetIdentifier(Component, IdentifierString);
 
     /* Set configuration data */
+    ComponentData->ConfigurationData = NULL;
+    Component->ConfigurationDataLength = 0;
     if (ResourceList)
         FldrSetConfigurationData(ComponentData, ResourceList, Size);
 
@@ -242,4 +215,27 @@ FldrCreateComponentKey(
 
     /* Return the child */
     *ComponentKey = ComponentData;
+}
+
+VOID
+FldrCreateSystemKey(
+    _Out_ PCONFIGURATION_COMPONENT_DATA* SystemNode,
+    _In_ BOOLEAN IsARCSystem,
+    _In_ PCSTR IdentifierString)
+{
+    /* Allocate the tree root */
+    FldrArcHwTreeRoot = NULL;
+    FldrCreateComponentKey(NULL,
+                           SystemClass,
+                           (IsARCSystem ? ArcSystem: MaximumType),
+                           0,
+                           0,
+                           0xFFFFFFFF,
+                           IdentifierString,
+                           NULL,
+                           0,
+                           &FldrArcHwTreeRoot);
+
+    /* Return the node */
+    *SystemNode = FldrArcHwTreeRoot;
 }

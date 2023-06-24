@@ -1191,7 +1191,7 @@ Pc98HwDetect(
     TRACE("DetectHardware()\n");
 
     /* Create the 'System' key */
-    FldrCreateSystemKey(&SystemKey, "NEC PC-98");
+    FldrCreateSystemKey(&SystemKey, FALSE, "NEC PC-98");
 
     GetHarddiskConfigurationData = Pc98GetHarddiskConfigurationData;
     FindPciBios = PcFindPciBios;

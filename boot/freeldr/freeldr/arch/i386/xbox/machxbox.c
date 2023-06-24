@@ -280,7 +280,7 @@ XboxHwDetect(
     TRACE("DetectHardware()\n");
 
     /* Create the 'System' key */
-    FldrCreateSystemKey(&SystemKey, "Original Xbox (PC/AT like)");
+    FldrCreateSystemKey(&SystemKey, FALSE, "Original Xbox (PC/AT like)");
 
     GetHarddiskConfigurationData = XboxGetHarddiskConfigurationData;
     FindPciBios = XboxFindPciBios;
