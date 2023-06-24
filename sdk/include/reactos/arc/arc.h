@@ -1,5 +1,25 @@
+/*
+ * PROJECT:     ReactOS Kernel
+ * LICENSE:     GPL-2.0-or-later (https://spdx.org/licenses/GPL-2.0-or-later)
+ * PURPOSE:     Advanced RISC Computing Specification Version 1.2
+ *              and NT OS Kernel Loader Block Definitions.
+ * COPYRIGHT:   Copyright 2005-2006 Alex Ionescu <alex.ionescu@reactos.org>
+ *              Copyright 2006-2008 Aleksey Bragin <aleksey@reactos.org>
+ *              Copyright 2008 Filip Navara <navaraf@reactos.org>
+ *              Copyright 2009 Hervé Poussineau <hpoussin@reactos.org>
+ *              Copyright 2015-2023 Hermès Bélusca-Maïto <hermes.belusca-maito@reactos.org>
+ *
+ * NOTE: This header implements the NT-compatible definitions of the
+ * Advanced RISC Computing Specification Version 1.2, as described in
+ * https://www.netbsd.org/docs/Hardware/Machines/ARC/riscspec.pdf
+ */
+
 #ifndef _ARC_
 #define _ARC_
+
+/* The supported ARC specification */
+#define ARC_VERSION     1
+#define ARC_REVISION    2
 
 typedef ULONG ARC_STATUS;
 
