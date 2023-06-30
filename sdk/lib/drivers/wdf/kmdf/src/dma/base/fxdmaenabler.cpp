@@ -25,6 +25,7 @@ Revision History:
 
 extern "C" {
 // #include "FxDmaEnabler.tmh"
+#define RtlSizeTToULong RtlULongPtrToULong
 }
 
 FxDmaEnabler::FxDmaEnabler(

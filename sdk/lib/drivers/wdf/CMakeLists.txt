@@ -103,13 +103,13 @@ list(APPEND SOURCE_SHARED
     shared/targets/general/fxiotargetapi.cpp
     shared/targets/general/fxiotargetremote.cpp
     shared/targets/general/fxiotargetself.cpp
-    # shared/targets/usb/fxusbdevice.cpp
-    # shared/targets/usb/fxusbdeviceapi.cpp
-    # shared/targets/usb/fxusbinterface.cpp
-    # shared/targets/usb/fxusbinterfaceapi.cpp
-    # shared/targets/usb/fxusbpipe.cpp
-    # shared/targets/usb/fxusbpipeapi.cpp
-    # shared/targets/usb/usbutil.cpp
+    shared/targets/usb/fxusbdevice.cpp
+    shared/targets/usb/fxusbdeviceapi.cpp
+    shared/targets/usb/fxusbinterface.cpp
+    shared/targets/usb/fxusbinterfaceapi.cpp
+    shared/targets/usb/fxusbpipe.cpp
+    shared/targets/usb/fxusbpipeapi.cpp
+    shared/targets/usb/usbutil.cpp
     )
 
 list(APPEND SOURCE_KM
@@ -122,12 +122,12 @@ list(APPEND SOURCE_KM
     kmdf/src/core/fxdpcapi.cpp
     kmdf/src/core/fxsystemthread.cpp
     kmdf/src/core/tracing.cpp
-    # kmdf/src/dma/base/fxcommonbuffer.cpp # requires DMA stuff
-    # kmdf/src/dma/base/fxcommonbufferapi.cpp # requires DMA stuff
-    # kmdf/src/dma/base/fxdmaenabler.cpp
-    # kmdf/src/dma/base/fxdmaenablerapi.cpp
-    # kmdf/src/dma/base/fxdmatransaction.cpp
-    # kmdf/src/dma/base/fxdmatransactionapi.cpp
+    kmdf/src/dma/base/fxcommonbuffer.cpp # requires DMA stuff
+    kmdf/src/dma/base/fxcommonbufferapi.cpp # requires DMA stuff
+    kmdf/src/dma/base/fxdmaenabler.cpp
+    kmdf/src/dma/base/fxdmaenablerapi.cpp
+    kmdf/src/dma/base/fxdmatransaction.cpp
+    kmdf/src/dma/base/fxdmatransactionapi.cpp
     kmdf/src/dynamic/version/version.cpp
     kmdf/src/fxtosharedinterface/fxobject/fxobjectinfokm.cpp
     # kmdf/src/irphandlers/wmi/fxwmiapi.cpp
@@ -178,6 +178,10 @@ list(APPEND SOURCE_KM
     shared/targets/general/km/fxiotargetapikm.cpp
     shared/targets/general/km/fxiotargetkm.cpp
     shared/targets/general/km/fxiotargetremotekm.cpp
+    # usb
+    shared/targets/usb/km/fxusbdeviceapikm.cpp
+    shared/targets/usb/km/fxusbdevicekm.cpp
+    shared/targets/usb/km/fxusbpipekm.cpp
     reactos_special.cpp
     )
 
@@ -211,7 +215,7 @@ target_include_directories(wdf01000
         shared/irphandlers/pnp/km # pnpprivkm.hpp
     )
 
-target_link_libraries(wdf01000 aux_klib ntoskrnl_vista ${PSEH_LIB})
+target_link_libraries(wdf01000 aux_klib usbdex ntoskrnl_vista ${PSEH_LIB})
 add_importlibs(wdf01000 wdfldr ntoskrnl hal)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
