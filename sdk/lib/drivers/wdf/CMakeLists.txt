@@ -50,7 +50,7 @@ list(APPEND SOURCE_SHARED
     shared/irphandlers/io/fxioqueueapi.cpp
     shared/irphandlers/io/fxpkgio.cpp
     shared/irphandlers/package/fxpackage.cpp
-    # shared/irphandlers/pnp/devicepwrreqstatemachine.cpp
+    shared/irphandlers/pnp/devicepwrreqstatemachine.cpp
     shared/irphandlers/pnp/eventqueue.cpp
     shared/irphandlers/pnp/fdopower.cpp
     shared/irphandlers/pnp/fxinterruptapi.cpp
@@ -130,10 +130,10 @@ list(APPEND SOURCE_KM
     kmdf/src/dma/base/fxdmatransactionapi.cpp
     kmdf/src/dynamic/version/version.cpp
     kmdf/src/fxtosharedinterface/fxobject/fxobjectinfokm.cpp
-    # kmdf/src/irphandlers/wmi/fxwmiapi.cpp
-    # kmdf/src/irphandlers/wmi/fxwmiinstance.cpp
-    # kmdf/src/irphandlers/wmi/fxwmiirphandler.cpp
-    # kmdf/src/irphandlers/wmi/fxwmiprovider.cpp
+    kmdf/src/irphandlers/wmi/fxwmiapi.cpp
+    kmdf/src/irphandlers/wmi/fxwmiinstance.cpp
+    kmdf/src/irphandlers/wmi/fxwmiirphandler.cpp
+    kmdf/src/irphandlers/wmi/fxwmiprovider.cpp
     kmdf/src/librarycommon/fxlibrarycommon.cpp
     kmdf/src/support/fxqueryinterface.cpp
     kmdf/src/support/fxqueryinterfaceapi.cpp
@@ -160,7 +160,7 @@ list(APPEND SOURCE_KM
     shared/irphandlers/pnp/km/pnpstatemachinekm.cpp
     shared/irphandlers/pnp/km/powerpolicystatemachinekm.cpp
     shared/irphandlers/pnp/km/powerstatemachinekm.cpp # stubs
-    # shared/irphandlers/pnp/km/poxinterfacekm.cpp
+    shared/irphandlers/pnp/km/poxinterfacekm.cpp
     shared/irphandlers/pnp/km/supportkm.cpp
     shared/object/km/fxobjectkm.cpp
     shared/object/km/globalskm.cpp
