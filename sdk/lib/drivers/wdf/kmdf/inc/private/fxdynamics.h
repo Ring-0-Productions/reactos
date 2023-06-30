@@ -394,30 +394,18 @@ typedef struct _WDFFUNCTIONS {
     PFN_WDFUSBINTERFACEGETNUMCONFIGUREDPIPES                  pfnWdfUsbInterfaceGetNumConfiguredPipes;
     PFN_WDFUSBINTERFACEGETCONFIGUREDPIPE                      pfnWdfUsbInterfaceGetConfiguredPipe;
     PFN_WDFUSBTARGETPIPEWDMGETPIPEHANDLE                      pfnWdfUsbTargetPipeWdmGetPipeHandle;
-    // PFN_WDFVERIFIERDBGBREAKPOINT                              pfnWdfVerifierDbgBreakPoint;
-    // PFN_WDFVERIFIERKEBUGCHECK                                 pfnWdfVerifierKeBugCheck;
-    // PFN_WDFWMIPROVIDERCREATE                                  pfnWdfWmiProviderCreate;
-    // PFN_WDFWMIPROVIDERGETDEVICE                               pfnWdfWmiProviderGetDevice;
-    // PFN_WDFWMIPROVIDERISENABLED                               pfnWdfWmiProviderIsEnabled;
-    // PFN_WDFWMIPROVIDERGETTRACINGHANDLE                        pfnWdfWmiProviderGetTracingHandle;
-    // PFN_WDFWMIINSTANCECREATE                                  pfnWdfWmiInstanceCreate;
-    // PFN_WDFWMIINSTANCEREGISTER                                pfnWdfWmiInstanceRegister;
-    // PFN_WDFWMIINSTANCEDEREGISTER                              pfnWdfWmiInstanceDeregister;
-    // PFN_WDFWMIINSTANCEGETDEVICE                               pfnWdfWmiInstanceGetDevice;
-    // PFN_WDFWMIINSTANCEGETPROVIDER                             pfnWdfWmiInstanceGetProvider;
-    // PFN_WDFWMIINSTANCEFIREEVENT                               pfnWdfWmiInstanceFireEvent;
     PFN_ROSWDFUNIMPLEMENTED                              pfnWdfVerifierDbgBreakPoint;
     PFN_ROSWDFUNIMPLEMENTED                                 pfnWdfVerifierKeBugCheck;
-    PFN_ROSWDFUNIMPLEMENTED                                  pfnWdfWmiProviderCreate;
-    PFN_ROSWDFUNIMPLEMENTED                               pfnWdfWmiProviderGetDevice;
-    PFN_ROSWDFUNIMPLEMENTED                               pfnWdfWmiProviderIsEnabled;
-    PFN_ROSWDFUNIMPLEMENTED                        pfnWdfWmiProviderGetTracingHandle;
-    PFN_ROSWDFUNIMPLEMENTED                                  pfnWdfWmiInstanceCreate;
-    PFN_ROSWDFUNIMPLEMENTED                                pfnWdfWmiInstanceRegister;
-    PFN_ROSWDFUNIMPLEMENTED                              pfnWdfWmiInstanceDeregister;
-    PFN_ROSWDFUNIMPLEMENTED                               pfnWdfWmiInstanceGetDevice;
-    PFN_ROSWDFUNIMPLEMENTED                             pfnWdfWmiInstanceGetProvider;
-    PFN_ROSWDFUNIMPLEMENTED                               pfnWdfWmiInstanceFireEvent;
+    PFN_WDFWMIPROVIDERCREATE                                  pfnWdfWmiProviderCreate;
+    PFN_WDFWMIPROVIDERGETDEVICE                               pfnWdfWmiProviderGetDevice;
+    PFN_WDFWMIPROVIDERISENABLED                               pfnWdfWmiProviderIsEnabled;
+    PFN_WDFWMIPROVIDERGETTRACINGHANDLE                        pfnWdfWmiProviderGetTracingHandle;
+    PFN_WDFWMIINSTANCECREATE                                  pfnWdfWmiInstanceCreate;
+    PFN_WDFWMIINSTANCEREGISTER                                pfnWdfWmiInstanceRegister;
+    PFN_WDFWMIINSTANCEDEREGISTER                              pfnWdfWmiInstanceDeregister;
+    PFN_WDFWMIINSTANCEGETDEVICE                               pfnWdfWmiInstanceGetDevice;
+    PFN_WDFWMIINSTANCEGETPROVIDER                             pfnWdfWmiInstanceGetProvider;
+    PFN_WDFWMIINSTANCEFIREEVENT                               pfnWdfWmiInstanceFireEvent;
 
     PFN_WDFWORKITEMCREATE                                     pfnWdfWorkItemCreate;
     PFN_WDFWORKITEMENQUEUE                                    pfnWdfWorkItemEnqueue;
@@ -470,13 +458,11 @@ typedef struct _WDFFUNCTIONS {
 
     PFN_WDFDEVICEWDMASSIGNPOWERFRAMEWORKSETTINGS              pfnWdfDeviceWdmAssignPowerFrameworkSettings;
     PFN_WDFDMATRANSACTIONSTOPSYSTEMTRANSFER                   pfnWdfDmaTransactionStopSystemTransfer;
-    // PFN_WDFCXVERIFIERKEBUGCHECK                               pfnWdfCxVerifierKeBugCheck;
     PFN_ROSWDFUNIMPLEMENTED                               pfnWdfCxVerifierKeBugCheck;
 
     PFN_WDFINTERRUPTREPORTACTIVE                              pfnWdfInterruptReportActive;
     PFN_WDFINTERRUPTREPORTINACTIVE                            pfnWdfInterruptReportInactive;
     PFN_WDFDEVICEINITSETRELEASEHARDWAREORDERONFAILURE         pfnWdfDeviceInitSetReleaseHardwareOrderOnFailure;
-    // PFN_WDFGETTRIAGEINFO                                      pfnWdfGetTriageInfo;
     PFN_ROSWDFUNIMPLEMENTED                                      pfnWdfGetTriageInfo;
 
     PFN_WDFDEVICEINITSETIOTYPEEX                              pfnWdfDeviceInitSetIoTypeEx;
@@ -7336,28 +7322,19 @@ WDFVERSION WdfVersion = {
         WDFEXPORT(WdfUsbTargetPipeWdmGetPipeHandle),
         // WDFEXPORT(WdfVerifierDbgBreakPoint),
         // WDFEXPORT(WdfVerifierKeBugCheck),
-        // WDFEXPORT(WdfWmiProviderCreate),
-        // WDFEXPORT(WdfWmiProviderGetDevice),
-        // WDFEXPORT(WdfWmiProviderIsEnabled),
-        // WDFEXPORT(WdfWmiProviderGetTracingHandle),
-        // WDFEXPORT(WdfWmiInstanceCreate),
-        // WDFEXPORT(WdfWmiInstanceRegister),
-        // WDFEXPORT(WdfWmiInstanceDeregister),
-        // WDFEXPORT(WdfWmiInstanceGetDevice),
-        // WDFEXPORT(WdfWmiInstanceGetProvider),
-        // WDFEXPORT(WdfWmiInstanceFireEvent),
         WdfApiNotImplemented,
         WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
+        
+        WDFEXPORT(WdfWmiProviderCreate),
+        WDFEXPORT(WdfWmiProviderGetDevice),
+        WDFEXPORT(WdfWmiProviderIsEnabled),
+        WDFEXPORT(WdfWmiProviderGetTracingHandle),
+        WDFEXPORT(WdfWmiInstanceCreate),
+        WDFEXPORT(WdfWmiInstanceRegister),
+        WDFEXPORT(WdfWmiInstanceDeregister),
+        WDFEXPORT(WdfWmiInstanceGetDevice),
+        WDFEXPORT(WdfWmiInstanceGetProvider),
+        WDFEXPORT(WdfWmiInstanceFireEvent),
 
         WDFEXPORT(WdfWorkItemCreate),
         WDFEXPORT(WdfWorkItemEnqueue),
