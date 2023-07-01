@@ -394,8 +394,8 @@ typedef struct _WDFFUNCTIONS {
     PFN_WDFUSBINTERFACEGETNUMCONFIGUREDPIPES                  pfnWdfUsbInterfaceGetNumConfiguredPipes;
     PFN_WDFUSBINTERFACEGETCONFIGUREDPIPE                      pfnWdfUsbInterfaceGetConfiguredPipe;
     PFN_WDFUSBTARGETPIPEWDMGETPIPEHANDLE                      pfnWdfUsbTargetPipeWdmGetPipeHandle;
-    PFN_ROSWDFUNIMPLEMENTED                              pfnWdfVerifierDbgBreakPoint;
-    PFN_ROSWDFUNIMPLEMENTED                                 pfnWdfVerifierKeBugCheck;
+    PFN_WDFVERIFIERDBGBREAKPOINT                              pfnWdfVerifierDbgBreakPoint;
+    PFN_WDFVERIFIERKEBUGCHECK                                 pfnWdfVerifierKeBugCheck;
     PFN_WDFWMIPROVIDERCREATE                                  pfnWdfWmiProviderCreate;
     PFN_WDFWMIPROVIDERGETDEVICE                               pfnWdfWmiProviderGetDevice;
     PFN_WDFWMIPROVIDERISENABLED                               pfnWdfWmiProviderIsEnabled;
@@ -458,12 +458,12 @@ typedef struct _WDFFUNCTIONS {
 
     PFN_WDFDEVICEWDMASSIGNPOWERFRAMEWORKSETTINGS              pfnWdfDeviceWdmAssignPowerFrameworkSettings;
     PFN_WDFDMATRANSACTIONSTOPSYSTEMTRANSFER                   pfnWdfDmaTransactionStopSystemTransfer;
-    PFN_ROSWDFUNIMPLEMENTED                               pfnWdfCxVerifierKeBugCheck;
+    PFN_WDFCXVERIFIERKEBUGCHECK                               pfnWdfCxVerifierKeBugCheck;
 
     PFN_WDFINTERRUPTREPORTACTIVE                              pfnWdfInterruptReportActive;
     PFN_WDFINTERRUPTREPORTINACTIVE                            pfnWdfInterruptReportInactive;
     PFN_WDFDEVICEINITSETRELEASEHARDWAREORDERONFAILURE         pfnWdfDeviceInitSetReleaseHardwareOrderOnFailure;
-    PFN_ROSWDFUNIMPLEMENTED                                      pfnWdfGetTriageInfo;
+    PFN_WDFGETTRIAGEINFO                                      pfnWdfGetTriageInfo;
 
     PFN_WDFDEVICEINITSETIOTYPEEX                              pfnWdfDeviceInitSetIoTypeEx;
     PFN_WDFDEVICEQUERYPROPERTYEX                              pfnWdfDeviceQueryPropertyEx;
@@ -7320,10 +7320,8 @@ WDFVERSION WdfVersion = {
         WDFEXPORT(WdfUsbInterfaceGetNumConfiguredPipes),
         WDFEXPORT(WdfUsbInterfaceGetConfiguredPipe),
         WDFEXPORT(WdfUsbTargetPipeWdmGetPipeHandle),
-        // WDFEXPORT(WdfVerifierDbgBreakPoint),
-        // WDFEXPORT(WdfVerifierKeBugCheck),
-        WdfApiNotImplemented,
-        WdfApiNotImplemented,
+        WDFEXPORT(WdfVerifierDbgBreakPoint),
+        WDFEXPORT(WdfVerifierKeBugCheck),
         
         WDFEXPORT(WdfWmiProviderCreate),
         WDFEXPORT(WdfWmiProviderGetDevice),
@@ -7387,14 +7385,12 @@ WDFVERSION WdfVersion = {
 
         WDFEXPORT(WdfDeviceWdmAssignPowerFrameworkSettings),
         WDFEXPORT(WdfDmaTransactionStopSystemTransfer),
-        // WDFEXPORT(WdfCxVerifierKeBugCheck),
-        WdfApiNotImplemented,
+        WDFEXPORT(WdfCxVerifierKeBugCheck),
 
         WDFEXPORT(WdfInterruptReportActive),
         WDFEXPORT(WdfInterruptReportInactive),
         WDFEXPORT(WdfDeviceInitSetReleaseHardwareOrderOnFailure),
-        // WDFEXPORT(WdfGetTriageInfo),
-        WdfApiNotImplemented,
+        WDFEXPORT(WdfGetTriageInfo),
 
         WDFEXPORT(WdfDeviceInitSetIoTypeEx),
         WDFEXPORT(WdfDeviceQueryPropertyEx),
