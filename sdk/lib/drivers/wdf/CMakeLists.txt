@@ -43,7 +43,7 @@ list(APPEND SOURCE_SHARED
     shared/core/fxtimerapi.cpp
     shared/core/fxworkitem.cpp
     shared/core/fxworkitemapi.cpp
-    # shared/core/verifierapi.cpp
+    shared/core/verifierapi.cpp
     shared/irphandlers/default/fxdefaultirphandler.cpp
     shared/irphandlers/general/fxpkggeneral.cpp
     shared/irphandlers/io/fxioqueue.cpp
