@@ -44,3 +44,15 @@ EtwUnregister(
 {
     return STATUS_NOT_IMPLEMENTED;
 }
+
+BOOLEAN
+NTKRNLVISTAAPI
+NTAPI
+EtwProviderEnabled(
+    _In_  REGHANDLE RegHandle,
+    _In_  UCHAR     Level,
+    _In_  ULONGLONG Keyword
+)
+{
+    return FALSE;
+}
