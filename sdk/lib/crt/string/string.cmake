@@ -8,6 +8,7 @@ list(APPEND LIBCNTPR_STRING_SOURCE
     string/scanf.c
     string/strcspn.c
     string/stricmp.c
+    string/string.c
     string/strnicmp.c
     string/strlwr.c
     string/strrev.c
@@ -95,7 +96,6 @@ list(APPEND CRT_STRING_SOURCE
     string/strcoll.c
     string/strdup.c
     string/strerror.c
-    string/string.c
     string/strncoll.c
     string/strtod.c
     string/strtok.c

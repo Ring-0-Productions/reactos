@@ -63,7 +63,18 @@ IoQueueWorkItemEx(
     newContext->WorkItemRoutineEx = WorkerRoutine;
     newContext->Context = Context;
 
-    IoQueueWorkItem(IoWorkItem, IopWorkItemExCallback, QueueType, Context);
+    IoQueueWorkItem(IoWorkItem, IopWorkItemExCallback, QueueType, newContext);
+}
+
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoSetActivityIdIrp(
+    _In_ PIRP    Irp,
+    _In_opt_ LPCGUID Guid
+)
+{
+    return STATUS_UNSUCCESSFUL;
 }
 
 _IRQL_requires_max_(PASSIVE_LEVEL)
