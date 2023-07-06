@@ -1,4 +1,4 @@
- 
+
 ;
 ; usbxhci.inf
 ;
@@ -88,7 +88,7 @@ ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
 StartType      = 0                  ; SERVICE_DEMAND_START
 ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
 ServiceBinary  = %12%\ucx01000.sys
-LoadOrderGroup = Base
+LoadOrderGroup = System Bus Extender
 AddReg         = UCX.AddService.AddReg
 
 [UCX.AddService.AddReg]
