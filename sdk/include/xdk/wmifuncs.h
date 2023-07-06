@@ -147,6 +147,15 @@ EtwWriteString(
 #endif /* (NTDDI_VERSION >= NTDDI_VISTA) */
 
 #if (NTDDI_VERSION >= NTDDI_WIN7)
+
+NTSTATUS
+NTKERNELAPI
+NTAPI
+EtwActivityIdControl(
+  _In_ ULONG ControlCode,
+  _Inout_ LPGUID ActivityId
+);
+
 _IRQL_requires_max_(HIGH_LEVEL)
 NTSTATUS
 NTKERNELAPI

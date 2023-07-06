@@ -27,6 +27,7 @@ list(APPEND INF_FILES
     usb.inf
     usbxhci.inf
     usbhub3.inf
+    uaspstor.inf
     usbport.inf
     volume.inf
     wdmaudio.inf
