@@ -13,7 +13,7 @@ PoFxRegisterDevice(
     _Out_ POHANDLE *Handle)
 {
     UNIMPLEMENTED;
-    return STATUS_NOT_IMPLEMENTED;
+    return STATUS_SUCCESS;
 }
 
 NTKRNLVISTAAPI
@@ -102,4 +102,46 @@ PoFxReportDevicePoweredOn(
     _In_ POHANDLE Handle)
 {
     UNIMPLEMENTED;
+}
+
+_IRQL_requires_max_(DISPATCH_LEVEL)
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+PoFxPowerControl(
+    _In_ POHANDLE Handle,
+    _In_ LPCGUID  PowerControlCode,
+    _In_opt_ PVOID    InBuffer,
+    _In_ SIZE_T   InBufferSize,
+    _Out_opt_ PVOID    OutBuffer,
+    _In_ SIZE_T   OutBufferSize,
+    _Out_opt_ PSIZE_T  BytesReturned
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+PoFxSetComponentLatency(
+    _In_ POHANDLE  Handle,
+    _In_ ULONG     Component,
+    _In_ ULONGLONG Latency
+)
+{
+    UNIMPLEMENTED;
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+PoFxSetComponentResidency(
+    _In_ POHANDLE  Handle,
+    _In_ ULONG     Component,
+    _In_ ULONGLONG Residency
+)
+{
+    UNIMPLEMENTED;;
 }

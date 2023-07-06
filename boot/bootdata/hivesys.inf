@@ -56,6 +56,9 @@ HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#Class_08&SubCl
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#Class_08&SubClass_05&Prot_50","Service",0x00000000,"usbstor"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#Class_08&SubClass_05&Prot_50","ClassGUID",0x00000000,"{36FC9E60-C465-11CF-8056-444553540000}"
 
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#Class_08&SubClass_06&Prot_62","Service",0x00000000,"uaspstor"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#Class_08&SubClass_06&Prot_62","ClassGUID",0x00000000,"{4D36E97B-E325-11CE-BFC1-08002BE10318}"
+
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#COMPOSITE","Service",0x00000000,"usbccgp"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#COMPOSITE","ClassGUID",0x00000000,"{36FC9E60-C465-11CF-8056-444553540000}"
 
@@ -1841,6 +1844,13 @@ HKLM,"SYSTEM\CurrentControlSet\Services\usbstor","Group",0x00000000,"Primary Dis
 HKLM,"SYSTEM\CurrentControlSet\Services\usbstor","ImagePath",0x00020000,"system32\drivers\usbstor.sys"
 HKLM,"SYSTEM\CurrentControlSet\Services\usbstor","Start",0x00010001,0x00000000
 HKLM,"SYSTEM\CurrentControlSet\Services\usbstor","Type",0x00010001,0x00000001
+
+; USB attached SCSI storage driver
+HKLM,"SYSTEM\CurrentControlSet\Services\uaspstor","ErrorControl",0x00010001,0x00000001
+HKLM,"SYSTEM\CurrentControlSet\Services\uaspstor","Group",0x00000000,"Primary Disk"
+HKLM,"SYSTEM\CurrentControlSet\Services\uaspstor","ImagePath",0x00020000,"system32\drivers\uaspstor.sys"
+HKLM,"SYSTEM\CurrentControlSet\Services\uaspstor","Start",0x00010001,0x00000000
+HKLM,"SYSTEM\CurrentControlSet\Services\uaspstor","Type",0x00010001,0x00000001
 
 ; USB composite generic parent
 HKLM,"SYSTEM\CurrentControlSet\Services\usbccgp","ErrorControl",0x00010001,0x00000001
