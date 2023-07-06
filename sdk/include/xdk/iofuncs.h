@@ -2648,6 +2648,21 @@ IoSetActivityIdIrp(
   _In_opt_ LPCGUID Guid
 );
 
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoHetActivityIdIrp(
+  _In_ PIRP    Irp,
+  _In_opt_ LPCGUID Guid
+);
+
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoCreateArcName(
+  _In_ PDEVICE_OBJECT DeviceObject
+);
+
 #endif /* (NTDDI_VERSION >= NTDDI_WIN8) */
 
 $if (_WDMDDK_)

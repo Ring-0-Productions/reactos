@@ -56,7 +56,7 @@ ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
 StartType      = 0               ; SERVICE_DEMAND_START 
 ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
 ServiceBinary  = %12%\UsbHub3.sys
-LoadOrderGroup = Base
+LoadOrderGroup = System Bus Extender
 AddReg         = Service_AddReg
 
 [LegacyHub.AddService]
@@ -65,7 +65,7 @@ ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
 StartType      = 0                  ; SERVICE_DEMAND_START
 ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
 ServiceBinary  = %12%\usbhub.sys
-LoadOrderGroup = Base
+LoadOrderGroup = System Bus Extender
 
 [Service_AddReg]
 HKR,               , BootFlags,  0x00010001, 16 ; CM_SERVICE_USB3_DISK_BOOT_LOAD
