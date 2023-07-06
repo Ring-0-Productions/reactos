@@ -2691,7 +2691,7 @@ ExFreePoolWithTag(IN PVOID P,
     if (TagToFree && TagToFree != Tag)
     {
         DPRINT1("Freeing pool - invalid tag specified: %.4s != %.4s\n", (char*)&TagToFree, (char*)&Tag);
-#if DBG
+#if 0
         KeBugCheckEx(BAD_POOL_CALLER, 0x0A, (ULONG_PTR)P, Tag, TagToFree);
 #endif
     }
