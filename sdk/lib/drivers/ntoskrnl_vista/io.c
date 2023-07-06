@@ -8,6 +8,7 @@
 
 #include <ntdef.h>
 #include <ntifs.h>
+#include <debug.h>
 
 typedef struct _EX_WORKITEM_CONTEXT
 {
@@ -17,6 +18,37 @@ typedef struct _EX_WORKITEM_CONTEXT
 } EX_WORKITEM_CONTEXT, *PEX_WORKITEM_CONTEXT;
 
 #define TAG_IOWI 'IWOI'
+
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoCreateArcName(
+  _In_ PDEVICE_OBJECT DeviceObject
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_SUCCESS;
+}
+
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoGetActivityIdIrp(
+    _In_ PIRP    Irp,
+    _Out_ LPCGUID Guid
+)
+{
+    return STATUS_NOT_FOUND;
+}
+
+NTSTATUS
+NTAPI
+IoGetAffinityInterrupt(
+  _In_ PKINTERRUPT InterruptObject,
+  _Out_ PGROUP_AFFINITY GroupAffinity)
+{
+    return STATUS_INVALID_PARAMETER;
+}
 
 NTKRNLVISTAAPI
 NTSTATUS
@@ -91,6 +123,7 @@ IoSetDevicePropertyData(
     _In_ ULONG Size,
     _In_opt_ PVOID Data)
 {
+    UNIMPLEMENTED;
     return STATUS_NOT_IMPLEMENTED;
 }
 
@@ -109,6 +142,7 @@ IoGetDevicePropertyData(
     _Out_ PULONG RequiredSize,
     _Out_ PDEVPROPTYPE Type)
 {
+    UNIMPLEMENTED;
     return STATUS_NOT_IMPLEMENTED;
 }
 
@@ -125,6 +159,7 @@ IoSetDeviceInterfacePropertyData(
     _In_ ULONG Size,
     _In_reads_bytes_opt_(Size) PVOID Data)
 {
+    UNIMPLEMENTED;
     return STATUS_NOT_IMPLEMENTED;
 }
 
