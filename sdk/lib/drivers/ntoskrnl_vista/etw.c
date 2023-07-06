@@ -8,6 +8,17 @@
 #include <ntdef.h>
 #include <ntifs.h>
 
+NTSTATUS
+NTKRNLVISTAAPI
+NTAPI
+EtwActivityIdControl(
+  _In_ ULONG ControlCode,
+  _Inout_ LPGUID ActivityId
+)
+{
+    return STATUS_NOT_IMPLEMENTED;
+}
+
 _IRQL_requires_max_(HIGH_LEVEL)
 NTSTATUS
 NTKRNLVISTAAPI
