@@ -43,6 +43,9 @@ PoQueryWatchdogTime(
     _Out_ PULONG SecondsRemaining)
 {
     UNIMPLEMENTED;
+    
+    *SecondsRemaining = 0;
+    
     return FALSE;
 }
 
