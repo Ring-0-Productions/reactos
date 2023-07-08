@@ -19,6 +19,7 @@ typedef struct _EX_WORKITEM_CONTEXT
 
 #define TAG_IOWI 'IWOI'
 
+<<<<<<< HEAD
 
 NTSTATUS
 NTAPI
@@ -30,6 +31,14 @@ IopSynchronousCompletionLoc(IN PDEVICE_OBJECT DeviceObject,
         KeSetEvent((PKEVENT)Context, IO_NO_INCREMENT, FALSE);
     return STATUS_MORE_PROCESSING_REQUIRED;
 }
+=======
+extern
+NTSTATUS
+NTAPI
+IopSynchronousCompletion(IN PDEVICE_OBJECT DeviceObject,
+                         IN PIRP Irp,
+                         IN PVOID Context);
+>>>>>>> 8c7f998438e ([SDK][NTOSKRNL_VISTA] Stubs for more storage drivers)
 
 NTKRNLVISTAAPI
 NTSTATUS
@@ -257,6 +266,7 @@ IoSetMasterIrpStatus(
     _Inout_ PIRP MasterIrp,
     _In_ NTSTATUS Status)
 {
+    UNIMPLEMENTED;
     NTSTATUS MasterStatus = MasterIrp->IoStatus.Status;
 
     if (Status == STATUS_FT_READ_FROM_COPY)
@@ -301,6 +311,7 @@ IoSynchronousCallDriver(_In_ PDEVICE_OBJECT DeviceObject,
     KEVENT Event;
     PIO_STACK_LOCATION IrpStack;
     NTSTATUS Status;
+<<<<<<< HEAD
 
     UNIMPLEMENTED;
 
@@ -312,6 +323,19 @@ IoSynchronousCallDriver(_In_ PDEVICE_OBJECT DeviceObject,
     IrpStack->CompletionRoutine = IopSynchronousCompletionLoc;
     IrpStack->Control = -1;
 
+=======
+    
+    UNIMPLEMENTED;
+    
+    /* Initialize the event */
+    KeInitializeEvent(&Event, SynchronizationEvent, FALSE);
+    
+    IrpStack = Irp->Tail.Overlay.CurrentStackLocation;
+    IrpStack->Context = &Event;
+    IrpStack->CompletionRoutine = IopSynchronousCompletion;
+    IrpStack->Control = -1;
+    
+>>>>>>> 8c7f998438e ([SDK][NTOSKRNL_VISTA] Stubs for more storage drivers)
     Status = IofCallDriver(DeviceObject, Irp);
     DPRINT1("IofCallDriver status: %x\n", Status);
     if (Status == STATUS_PENDING)
