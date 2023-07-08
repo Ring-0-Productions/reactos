@@ -69,3 +69,33 @@ PoGetSystemWake(
     UNIMPLEMENTED;
     return FALSE;
 }
+
+
+NTKERNELAPI
+VOID
+NTAPI
+PoSetDeviceBusyEx(
+    _Inout_ PULONG IdlePointer)
+{
+    UNIMPLEMENTED;
+    PoSetDeviceBusy(IdlePointer);
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+PoStartDeviceBusy(
+    _Inout_ PULONG IdlePointer)
+{
+    UNIMPLEMENTED;
+}
+
+NTKERNELAPI
+VOID
+NTAPI
+PoEndDeviceBusy(
+    _Inout_ PULONG IdlePointer)
+{
+    UNIMPLEMENTED;
+}
+    

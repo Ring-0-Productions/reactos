@@ -19,6 +19,13 @@ typedef struct _EX_WORKITEM_CONTEXT
 
 #define TAG_IOWI 'IWOI'
 
+extern
+NTSTATUS
+NTAPI
+IopSynchronousCompletion(IN PDEVICE_OBJECT DeviceObject,
+                         IN PIRP Irp,
+                         IN PVOID Context);
+
 NTKRNLVISTAAPI
 NTSTATUS
 NTAPI
@@ -38,6 +45,7 @@ IoGetActivityIdIrp(
     _Out_ LPCGUID Guid
 )
 {
+    UNIMPLEMENTED;
     return STATUS_NOT_FOUND;
 }
 
@@ -47,6 +55,7 @@ IoGetAffinityInterrupt(
   _In_ PKINTERRUPT InterruptObject,
   _Out_ PGROUP_AFFINITY GroupAffinity)
 {
+    UNIMPLEMENTED;
     return STATUS_INVALID_PARAMETER;
 }
 
@@ -56,6 +65,7 @@ NTAPI
 IoGetIrpExtraCreateParameter(IN PIRP Irp,
                              OUT PECP_LIST *ExtraCreateParameter)
 {
+    UNIMPLEMENTED;
     /* Check we have a create operation */
     if (!BooleanFlagOn(Irp->Flags, IRP_CREATE_OPERATION))
     {
@@ -90,6 +100,7 @@ IoQueueWorkItemEx(
     _In_ WORK_QUEUE_TYPE QueueType,
     _In_opt_ __drv_aliasesMem PVOID Context)
 {
+    UNIMPLEMENTED;
     PEX_WORKITEM_CONTEXT newContext = ExAllocatePoolWithTag(NonPagedPoolMustSucceed, sizeof(*newContext), TAG_IOWI);
     newContext->WorkItem = IoWorkItem;
     newContext->WorkItemRoutineEx = WorkerRoutine;
@@ -106,6 +117,7 @@ IoSetActivityIdIrp(
     _In_opt_ LPCGUID Guid
 )
 {
+    UNIMPLEMENTED;
     return STATUS_UNSUCCESSFUL;
 }
 
@@ -169,7 +181,41 @@ NTAPI
 IoGetIoPriorityHint(
     _In_ PIRP Irp)
 {
+    UNIMPLEMENTED;
     return IoPriorityNormal;
+}
+
+NTSTATUS
+NTAPI
+IoAllocateSfioStreamIdentifier(
+  _In_ PFILE_OBJECT FileObject,
+  _In_ ULONG Length,
+  _In_ PVOID Signature,
+  _Out_ PVOID *StreamIdentifier)
+{
+    *StreamIdentifier = NULL;
+    return STATUS_SUCCESS;
+}
+    
+
+PVOID
+NTAPI
+IoGetSfioStreamIdentifier(
+    _In_ PFILE_OBJECT FileObject,
+    _In_ PVOID Signature)
+{
+    UNIMPLEMENTED;
+    return NULL;
+}
+
+NTSTATUS
+NTAPI
+IoFreeSfioStreamIdentifier(
+    _In_ PFILE_OBJECT FileObject,
+    _In_ PVOID Signature)
+{
+    UNIMPLEMENTED;
+    return STATUS_SUCCESS;
 }
 
 NTKRNLVISTAAPI
@@ -178,6 +224,7 @@ IoSetMasterIrpStatus(
     _Inout_ PIRP MasterIrp,
     _In_ NTSTATUS Status)
 {
+    UNIMPLEMENTED;
     NTSTATUS MasterStatus = MasterIrp->IoStatus.Status;
 
     if (Status == STATUS_FT_READ_FROM_COPY)
@@ -191,4 +238,55 @@ IoSetMasterIrpStatus(
     {
         MasterIrp->IoStatus.Status = Status;
     }
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoReportInterruptActive(
+    _In_ PIO_REPORT_INTERRUPT_ACTIVE_STATE_PARAMETERS Parameters
+)
+{
+    UNIMPLEMENTED;
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoReportInterruptInactive(
+    _In_ PIO_REPORT_INTERRUPT_ACTIVE_STATE_PARAMETERS Parameters
+)
+{
+    UNIMPLEMENTED;
+}
+
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoSynchronousCallDriver(_In_ PDEVICE_OBJECT DeviceObject,
+                        _In_ PIRP Irp)
+{
+    KEVENT Event;
+    PIO_STACK_LOCATION IrpStack;
+    NTSTATUS Status;
+    
+    UNIMPLEMENTED;
+    
+    /* Initialize the event */
+    KeInitializeEvent(&Event, SynchronizationEvent, FALSE);
+    
+    IrpStack = Irp->Tail.Overlay.CurrentStackLocation;
+    IrpStack->Context = &Event;
+    IrpStack->CompletionRoutine = IopSynchronousCompletion;
+    IrpStack->Control = -1;
+    
+    Status = IofCallDriver(DeviceObject, Irp);
+    DPRINT1("IofCallDriver status: %x\n", Status);
+    if (Status == STATUS_PENDING)
+    {
+        /* Wait for it */
+        KeWaitForSingleObject(&Event, Executive, KernelMode, FALSE, NULL);
+        Status = Irp->IoStatus.Status;
+    }
+    return Status;
 }
