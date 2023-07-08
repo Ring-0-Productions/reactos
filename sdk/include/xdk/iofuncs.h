@@ -2663,6 +2663,27 @@ IoCreateArcName(
   _In_ PDEVICE_OBJECT DeviceObject
 );
 
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoReportInterruptActive(
+  _In_ PIO_REPORT_INTERRUPT_ACTIVE_STATE_PARAMETERS Parameters
+);
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoReportInterruptInactive(
+  _In_ PIO_REPORT_INTERRUPT_ACTIVE_STATE_PARAMETERS Parameters
+);
+
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoSynchronousCallDriver(
+  _In_ PDEVICE_OBJECT DeviceObject,
+  _In_ PIRP Irp);
+
 #endif /* (NTDDI_VERSION >= NTDDI_WIN8) */
 
 $if (_WDMDDK_)
