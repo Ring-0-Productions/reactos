@@ -1,3 +1,10 @@
+/*
+ * PROJECT:     ReactOS Boot Video Driver
+ * LICENSE:     GPL-2.0-or-later (https://spdx.org/licenses/GPL-2.0-or-later)
+ * PURPOSE:     Common ??
+ * COPYRIGHT:   ??
+ */
+
 #include "precomp.h"
 
 /* GLOBALS ********************************************************************/

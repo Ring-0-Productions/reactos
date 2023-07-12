@@ -61,7 +61,6 @@ ULONG_PTR VgaBase = 0;
 /* PRIVATE FUNCTIONS *********************************************************/
 
 static VOID
-NTAPI
 ReadWriteMode(
     _In_ UCHAR Mode)
 {
