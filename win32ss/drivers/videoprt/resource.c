@@ -625,15 +625,15 @@ IntVideoPortConfigCallback(
             }
 
             /* If the data is of legacy format, do not convert */
-            if (IsLegacyConfigData(ConfigurationData, ConfigurationDataLength,
-                                   sizeof(VIDEO_HARDWARE_CONFIGURATION_DATA)))
+            if (IsLegacyConfigDataFull(ConfigurationData, ConfigurationDataLength,
+                                       sizeof(VIDEO_HARDWARE_CONFIGURATION_DATA)))
             {
                 DPRINT1("    Legacy Config data found\n");
                 break;
             }
             else
             /* If the data is of unknown format, do not convert */
-            if (!IsNewConfigData(ConfigurationData, ConfigurationDataLength))
+            if (!IsNewConfigDataFull(ConfigurationData, ConfigurationDataLength))
             {
                 DPRINT1("    Unknown Config data found\n");
                 break;
@@ -681,14 +681,14 @@ IntVideoPortConfigCallback(
             }
 
             /* If the data is of legacy format, do not convert */
-            if (IsLegacyConfigData(ConfigurationData, ConfigurationDataLength,
-                                   sizeof(MONITOR_HARDWARE_CONFIGURATION_DATA)))
+            if (IsLegacyConfigDataFull(ConfigurationData, ConfigurationDataLength,
+                                       sizeof(MONITOR_HARDWARE_CONFIGURATION_DATA)))
             {
                 break;
             }
             else
             /* If the data is of unknown format, do not convert */
-            if (!IsNewConfigData(ConfigurationData, ConfigurationDataLength))
+            if (!IsNewConfigDataFull(ConfigurationData, ConfigurationDataLength))
             {
                 break;
             }
