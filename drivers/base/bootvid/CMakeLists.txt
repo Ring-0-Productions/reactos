@@ -40,3 +40,8 @@ add_importlibs(bootvid ntoskrnl hal)
 add_pch(bootvid precomp.h SOURCE)
 add_dependencies(bootvid psdk)
 add_cd_file(TARGET bootvid DESTINATION reactos/system32 NO_CAB FOR all)
+
+
+## TEMPORARY HACKISH WAY TO COMPILE A SEPARATE FBBVID.DLL ##
+## Used for UEFI or when (SARCH STREQUAL "xbox")
+include(fbbvid.cmake)

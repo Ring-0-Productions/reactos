@@ -5,8 +5,8 @@
  * COPYRIGHT:   Copyright 2023 Hermès Bélusca-Maïto <hermes.belusca-maito@reactos.org>
  */
 
-#ifndef _BOOTVID_XBOX_H_
-#define _BOOTVID_XBOX_H_
+#ifndef _FB_BOOTVID_H_
+#define _FB_BOOTVID_H_
 
 #pragma once
 
@@ -49,4 +49,4 @@ DisplayCharacter(
     _In_ ULONG TextColor,
     _In_ ULONG BackColor);
 
-#endif /* _BOOTVID_XBOX_H_ */
+#endif /* _FB_BOOTVID_H_ */

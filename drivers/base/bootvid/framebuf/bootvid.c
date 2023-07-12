@@ -7,12 +7,19 @@
 
 #include "precomp.h"
 
-//#include <drivers/bootvid/framebuf.h>
-//#include <drivers/videoprt/vpcfgcnv.h>
+#include <arc/arc.h>   // For MONITOR_CONFIGURATION_DATA
 
 #include <debug.h>
 
+#include <drivers/bootvid/framebuf.h>
+#define GET_DISPLAY_BY_LDR_BLOCK
+#include <drivers/bootvid/framebuf.c> // FIXME: Temporary HACK
+
 /* GLOBALS ********************************************************************/
+
+// FIXME: Those have been copied from xbox.h
+#define BB_OFFSET(x, y)    ((y) * SCREEN_WIDTH + (x))
+#define FB_OFFSET(x, y)    (((PanV + (y)) * FrameBufferWidth + PanH + (x)) * BytesPerPixel)
 
 static ULONG_PTR FrameBufferStart = 0;
 static ULONG FrameBufferWidth, FrameBufferHeight, PanH, PanV;
@@ -20,19 +27,19 @@ static UCHAR BytesPerPixel;
 static RGBQUAD CachedPalette[BV_MAX_COLORS];
 static PUCHAR BackBuffer = NULL;
 
-typedef struct _BOOT_FRAMEBUF_DATA
+typedef struct _BOOT_DISPLAY_INFO
 {
     PHYSICAL_ADDRESS BaseAddress; // ULONG_PTR
-    ULONG BufferSize;
-    ULONG ScreenWidth;
-    ULONG ScreenHeight;
-    ULONG PixelsPerScanLine;
-    ULONG PixelFormat;
-} BOOT_FRAMEBUF_DATA, *PBOOT_FRAMEBUF_DATA;
+    ULONG BufferSize; // SIZE_T ?
 
-BOOT_FRAMEBUF_DATA gBootFbData = {0};
+    PVOID FrameAddress; // Mapped framebuffer virtual address.
 
-CM_MONITOR_DEVICE_DATA gMonitorConfigData = {0};
+    /* Configuration data from hardware tree */
+    CM_FRAMEBUF_DEVICE_DATA VideoConfigData;
+
+} BOOT_DISPLAY_INFO, *PBOOT_DISPLAY_INFO;
+
+BOOT_DISPLAY_INFO gBootDisp = {0};
 
 /* PRIVATE FUNCTIONS *********************************************************/
 
@@ -45,7 +52,7 @@ ApplyPalette(VOID)
     /* Top panning */
     for (x = 0; x < PanV * FrameBufferWidth; x++)
     {
-        *Frame++ = CachedPalette[0];
+        *Frame++ = CachedPalette[BV_COLOR_BLACK];
     }
 
     /* Left panning */
@@ -55,7 +62,7 @@ ApplyPalette(VOID)
 
         for (x = 0; x < PanH; x++)
         {
-            *Frame++ = CachedPalette[0];
+            *Frame++ = CachedPalette[BV_COLOR_BLACK];
         }
     }
 
@@ -78,7 +85,7 @@ ApplyPalette(VOID)
 
         for (x = 0; x < PanH; x++)
         {
-            *Frame++ = CachedPalette[0];
+            *Frame++ = CachedPalette[BV_COLOR_BLACK];
         }
     }
 
@@ -86,256 +93,55 @@ ApplyPalette(VOID)
     Frame = (PULONG)(FrameBufferStart + FB_OFFSET(-PanH, SCREEN_HEIGHT));
     for (x = 0; x < PanV * FrameBufferWidth; x++)
     {
-        *Frame++ = CachedPalette[0];
+        *Frame++ = CachedPalette[BV_COLOR_BLACK];
     }
 }
 
 /* PUBLIC FUNCTIONS **********************************************************/
-
-/**
- * @brief
- * Caches configuration data for the boot-time display controller and monitor.
- *
- * This data is initialized by the NT bootloader and passed in the ARC tree
- * pointed by the loader block. It is available only for boot drivers and gets
- * freed later on.
- *
- * TODO: On Win8+, try to also read the BgContext structure.
- **/
-static NTSTATUS
-CaptureBootDisplayList(
-    _In_ PLOADER_PARAMETER_BLOCK LoaderBlock)
-{
-    PCONFIGURATION_COMPONENT_DATA ConfigurationRoot;
-    // ULONG ComponentKey = 0; // First controller.
-    PCONFIGURATION_COMPONENT_DATA Entry = NULL;
-    PCM_PARTIAL_RESOURCE_LIST ResourceList;
-    PCM_PARTIAL_RESOURCE_DESCRIPTOR Descriptor;
-    ULONG i;
-
-    RtlZeroMemory(&gBootFbData, sizeof(gBootFbData));
-    RtlZeroMemory(&gMonitorConfigData, sizeof(gMonitorConfigData));
-
-    ConfigurationRoot = (LoaderBlock ? LoaderBlock->ConfigurationRoot : NULL);
-    if (!ConfigurationRoot)
-        return STATUS_DEVICE_DOES_NOT_EXIST;
-
-    /* Enumerate and find the boot-time console display controller */
-    while (TRUE)
-    {
-        Entry = KeFindConfigurationNextEntry(ConfigurationRoot,
-                                             ControllerClass,
-                                             DisplayController,
-                                             NULL, // &ComponentKey
-                                             &Entry);
-        if (!Entry)
-            break;
-
-        if (Entry->ComponentEntry.Flags & (Output | ConsoleOut))
-        {
-            /* Found it */
-            break;
-        }
-    }
-
-    if (!Entry)
-        return STATUS_DEVICE_DOES_NOT_EXIST;
-
-    // Entry->ComponentEntry.IdentifierLength;
-    DPRINT1("Display: '%s'\n", Entry->ComponentEntry.Identifier);
-
-    if (!Entry->ConfigurationData ||
-        Entry->ComponentEntry.ConfigurationDataLength < sizeof(CM_PARTIAL_RESOURCE_LIST))
-    {
-        /* Invalid entry?! */
-        return STATUS_DEVICE_CONFIGURATION_ERROR;
-    }
-
-    ResourceList = Entry->ConfigurationData;
-    for (i = 0; i < ResourceList->Count; ++i)
-    {
-        Descriptor = &ResourceList->PartialDescriptors[i];
-
-        switch (Descriptor->Type)
-        {
-            case CmResourceTypePort:
-                DPRINT1("  CmResourceTypePort\n");
-                break;
-
-            case CmResourceTypeInterrupt:
-                DPRINT1("  CmResourceTypeInterrupt\n");
-                break;
-
-            case CmResourceTypeMemory:
-            {
-                DPRINT1("  CmResourceTypeMemory\n");
-
-                // or CM_RESOURCE_MEMORY_WRITE_ONLY ??
-                // if (!(Descriptor->Flags & CM_RESOURCE_MEMORY_READ_WRITE))
-                // {
-                //     /* Cannot use this framebuffer */
-                //     break;
-                // }
-
-                gBootFbData.BaseAddress = Descriptor->u.Memory.Start;
-                gBootFbData.BufferSize  = Descriptor->u.Memory.Length;
-                break;
-            }
-
-            case CmResourceTypeDeviceSpecific:
-            {
-                PCM_VIDEO_DEVICE_DATA VideoData; // PCM_FRAMEBUF_DEVICE_DATA
-
-                DPRINT1("  CmResourceTypeDeviceSpecific\n");
-                /* NOTE: This descriptor *MUST* be the last one */
-                if (Descriptor->u.DeviceSpecificData.DataSize < sizeof(CM_VIDEO_DEVICE_DATA))
-                {
-                    /* Not something we recognize */
-                    break;
-                }
-
-                /* The actual device data follows the descriptor */
-                VideoData = (PCM_VIDEO_DEVICE_DATA)(Descriptor + 1);
-                DBG_UNREFERENCED_PARAMETER(VideoData);
-                // VideoData->VideoClock; // ULONG
-
-                // VideoData->Version  = ARC_VERSION;
-                // VideoData->Revision = ARC_REVISION;
-
-                // gBootFbData.ScreenWidth  = HalContext.ScreenWidth;
-                // gBootFbData.ScreenHeight = HalContext.ScreenHeight;
-                // gBootFbData.PixelsPerScanLine = HalContext.PixelsPerScanLine;
-                // gBootFbData.PixelFormat       = HalContext.PixelFormat;
-                break;
-            }
-        }
-    }
-
-    /* Now find the MonitorPeripheral to obtain more information.
-     * It should be child of the display controller. */
-    Entry = Entry->Child;
-    /* Ignore if no monitor data is given */
-    if (!Entry)
-        return STATUS_SUCCESS;
-
-    // Entry->ComponentEntry.IdentifierLength;
-    DPRINT1("Monitor: '%s'\n", Entry->ComponentEntry.Identifier);
-
-    if ((Entry->ComponentEntry.Class != PeripheralClass)   ||
-        (Entry->ComponentEntry.Type  != MonitorPeripheral) ||
-       !(Entry->ComponentEntry.Flags & (Output | ConsoleOut)))
-    {
-        /* Ignore */
-        return STATUS_SUCCESS;
-    }
-    if (!Entry->ConfigurationData)
-    {
-        /* Ignore */
-        return STATUS_SUCCESS;
-    }
-
-    if (Entry->ComponentEntry.ConfigurationDataLength == sizeof(MONITOR_CONFIGURATION_DATA))
-    {
-        /* Convert to CM_MONITOR_DEVICE_DATA */
-        PMONITOR_CONFIGURATION_DATA MonitorData = Entry->ConfigurationData;
-
-        gMonitorConfigData.Version = MonitorData->Version;
-        gMonitorConfigData.Revision = MonitorData->Revision;
-        gMonitorConfigData.HorizontalScreenSize = MonitorData->HorizontalScreenSize;
-        gMonitorConfigData.VerticalScreenSize = MonitorData->VerticalScreenSize;
-        gMonitorConfigData.HorizontalResolution = MonitorData->HorizontalResolution;
-        gMonitorConfigData.VerticalResolution = MonitorData->VerticalResolution;
-        gMonitorConfigData.HorizontalDisplayTimeLow = 0;
-        gMonitorConfigData.HorizontalDisplayTime = MonitorData->HorizontalDisplayTime;
-        gMonitorConfigData.HorizontalDisplayTimeHigh = 0;
-        gMonitorConfigData.HorizontalBackPorchLow = 0;
-        gMonitorConfigData.HorizontalBackPorch = MonitorData->HorizontalBackPorch;
-        gMonitorConfigData.HorizontalBackPorchHigh = 0;
-        gMonitorConfigData.HorizontalFrontPorchLow = 0;
-        gMonitorConfigData.HorizontalFrontPorch = MonitorData->HorizontalFrontPorch;
-        gMonitorConfigData.HorizontalFrontPorchHigh = 0;
-        gMonitorConfigData.HorizontalSyncLow = 0;
-        gMonitorConfigData.HorizontalSync = MonitorData->HorizontalSync;
-        gMonitorConfigData.HorizontalSyncHigh = 0;
-        gMonitorConfigData.VerticalBackPorchLow = 0;
-        gMonitorConfigData.VerticalBackPorch = MonitorData->VerticalBackPorch;
-        gMonitorConfigData.VerticalBackPorchHigh = 0;
-        gMonitorConfigData.VerticalFrontPorchLow = 0;
-        gMonitorConfigData.VerticalFrontPorch = MonitorData->VerticalFrontPorch;
-        gMonitorConfigData.VerticalFrontPorchHigh = 0;
-        gMonitorConfigData.VerticalSyncLow = 0;
-        gMonitorConfigData.VerticalSync = MonitorData->VerticalSync;
-        gMonitorConfigData.VerticalSyncHigh = 0;
-    }
-    else if (Entry->ComponentEntry.ConfigurationDataLength == sizeof(CM_MONITOR_DEVICE_DATA))
-    {
-        /* Just copy the data */
-        RtlCopyMemory(&gMonitorConfigData,
-                      Entry->ConfigurationData,
-                      sizeof(CM_MONITOR_DEVICE_DATA));
-    }
-    else
-    {
-        /* Ignore */
-        NOTHING;
-    }
-
-    /* If the individual framebuffer screen sizes are not
-     * already initialized by now, use monitor data */
-    if (gBootFbData.ScreenWidth == 0 || gBootFbData.ScreenHeight == 0)
-    {
-        gBootFbData.ScreenWidth  = gMonitorConfigData.HorizontalResolution;
-        gBootFbData.ScreenHeight = gMonitorConfigData.VerticalResolution;
-    }
-    return STATUS_SUCCESS;
-}
 
 BOOLEAN
 NTAPI
 VidInitialize(
     _In_ BOOLEAN SetMode)
 {
-    BOOLEAN Result = FALSE;
+    NTSTATUS Status;
+    INTERFACE_TYPE Interface;
+    ULONG BusNumber;
 
-    PHYSICAL_ADDRESS PhysControlStart = {.QuadPart = 0xFD000000};
-    PHYSICAL_ADDRESS PhysFrameBufferStart = {.QuadPart = 0xF0000000};
-    ULONG ControlLength = 16 * 1024 * 1024;
-
-    // QUESTION: Get device MMIO ranges from PCI ?
-    if (!CaptureBootDisplayList(KeLoaderBlock));
+    RtlZeroMemory(&gBootDisp, sizeof(gBootDisp));
+    Status = FindBootDisplay(&gBootDisp.BaseAddress,
+                             &gBootDisp.BufferSize,
+                             &gBootDisp.VideoConfigData,
+                             NULL,
+                             &Interface,  // FIXME: Make it opt?
+                             &BusNumber); // FIXME: Make it opt?
+    if (!NT_SUCCESS(Status))
     {
         DPRINT1("Boot framebuffer does not exist!\n");
         return FALSE;
     }
 
 
-    ULONG_PTR ControlStart = (ULONG_PTR)MmMapIoSpace(PhysControlStart, ControlLength, MmNonCached);
-    if (!ControlStart)
-    {
-        DPRINT1("Out of memory!\n");
-        return FALSE;
-    }
-
-    ULONG_PTR FrameBuffer = gBootFbData.BaseAddress;
-    FrameBufferWidth  = gBootFbData.ScreenWidth;
-    FrameBufferHeight = gBootFbData.ScreenHeight;
+    PHYSICAL_ADDRESS FrameBuffer = gBootDisp.BaseAddress;
+    FrameBufferWidth  = gBootDisp.VideoConfigData.ScreenWidth;
+    FrameBufferHeight = gBootDisp.VideoConfigData.ScreenHeight;
 
     /* Verify that the framebuffer address is page-aligned */
-    ASSERT(FrameBuffer % PAGE_SIZE == 0);
+    ASSERT(FrameBuffer.QuadPart % PAGE_SIZE == 0);
 
     if (FrameBufferWidth < SCREEN_WIDTH || FrameBufferHeight < SCREEN_HEIGHT)
     {
         DPRINT1("Unsupported screen resolution!\n");
-        goto cleanup;
+        goto Failure;
     }
 
-    BytesPerPixel = gBootFbData.PixelFormat; // FIXME!
+    BytesPerPixel = (gBootDisp.VideoConfigData.BitsPerPixel / 8);
     ASSERT(BytesPerPixel >= 1 && BytesPerPixel <= 4);
 
     if (BytesPerPixel != 4)
     {
         DPRINT1("Unsupported BytesPerPixel = %d\n", BytesPerPixel);
-        goto cleanup;
+        goto Failure;
     }
 
     /* Calculate panning values */
@@ -344,49 +150,85 @@ VidInitialize(
 
     /* Verify that screen fits framebuffer size */
     ULONG FrameBufferSize = FrameBufferWidth * FrameBufferHeight * BytesPerPixel;
-    if (FrameBufferSize > gBootFbData.BufferSize)
+    if (FrameBufferSize > gBootDisp.BufferSize)
     {
         DPRINT1("Current screen resolution exceeds video memory bounds!\n");
-        goto cleanup;
+        goto Failure;
     }
+
+    /* Convert from bus-relative to physical address, and map it into system space */
+    PHYSICAL_ADDRESS TranslatedAddress;
+    ULONG AddressSpace = 0;
+    if (!HalTranslateBusAddress(Interface,
+                                BusNumber,
+                                FrameBuffer,
+                                &AddressSpace,
+                                &TranslatedAddress))
+    {
+        DPRINT1("Could not map 0x%p\n", FrameBuffer.QuadPart);
+        goto Failure;
+    }
+
+    if (AddressSpace == 0)
+    {
+        FrameBufferStart = (ULONG_PTR)MmMapIoSpace(TranslatedAddress,
+                                                   gBootDisp.BufferSize,
+                                                   MmNonCached);
+        if (!FrameBufferStart)
+        {
+            DPRINT1("Out of memory!\n");
+            goto Failure;
+        }
+    }
+    else
+    {
+        /* The base is the translated address, no need to map */
+        FrameBufferStart = (ULONG_PTR)TranslatedAddress.LowPart; // Yes, LowPart.
+    }
+
 
     /*
      * Reserve off-screen area for the backbuffer that contains
      * 8-bit indexed color screen image, plus preserved row data.
      */
-    ULONG BackBufferSize = SCREEN_WIDTH * (SCREEN_HEIGHT + BOOTCHAR_HEIGHT + 1);
+    ULONG BackBufferSize = SCREEN_WIDTH * (SCREEN_HEIGHT + (BOOTCHAR_HEIGHT + 1));
 
-    /* Make sure there is enough video memory for backbuffer */
-    if (gBootFbData.BufferSize - FrameBufferSize < BackBufferSize)
+    /* If there is enough video memory in the physical framebuffer,
+     * place the backbuffer in the hidden part of the framebuffer,
+     * otherwise allocate a zone for the backbuffer. */
+    if (gBootDisp.BufferSize >= FrameBufferSize + BackBufferSize)
     {
-        DPRINT1("Out of memory!\n");
-        goto cleanup;
+        /* Place backbuffer in the hidden part of framebuffer */
+        BackBuffer = (PUCHAR)(FrameBufferStart + gBootDisp.BufferSize - BackBufferSize);
     }
-
-    /* Return the address back to GPU memory mapped I/O */
-    PhysFrameBufferStart.QuadPart += FrameBuffer;
-    FrameBufferStart = (ULONG_PTR)MmMapIoSpace(PhysFrameBufferStart, gBootFbData.BufferSize, MmNonCached);
-    if (!FrameBufferStart)
+    else // if (gBootDisp.BufferSize - FrameBufferSize < BackBufferSize)
     {
-        DPRINT1("Out of memory!\n");
-        goto cleanup;
+        /* Allocate framebuffer. 600kb works out to 640x480@16bpp */
+        SIZE_T BackBufferSize = 600 * 1024;
+        // PHYSICAL_ADDRESS PhysicalAddress;
+        // PhysicalAddress.QuadPart = -1;
+        // BackBuffer = MmAllocateContiguousMemory(BackBufferSize, PhysicalAddress);
+        BackBuffer = ExAllocatePoolWithTag(NonPagedPool, BackBufferSize, 'bfGB');
+        if (!BackBuffer)
+        {
+            DPRINT1("Out of memory!\n");
+            goto Failure;
+        }
     }
-
-    Result = TRUE;
-
-    /* Place backbuffer in the hidden part of framebuffer */
-    BackBuffer = (PUCHAR)(FrameBufferStart + gBootFbData.BufferSize - BackBufferSize);
 
     /* Now check if we have to set the mode */
     if (SetMode)
         VidResetDisplay(TRUE);
 
-cleanup:
-    if (ControlStart)
-        MmUnmapIoSpace((PVOID)ControlStart, ControlLength);
-
     /* Video is ready */
-    return Result;
+    return TRUE;
+
+Failure:
+    /* We failed somewhere. Unmap the I/O space if we mapped it */
+    if (FrameBufferStart && (AddressSpace == 0))
+        MmUnmapIoSpace((PVOID)FrameBufferStart, gBootDisp.BufferSize);
+
+    return FALSE;
 }
 
 VOID
@@ -411,7 +253,7 @@ VidResetDisplay(
         HalResetDisplay();
 
     /* Re-initialize the palette and fill the screen black */
-    RtlZeroMemory((PVOID)FrameBufferStart, gBootFbData.BufferSize);
+    RtlZeroMemory((PVOID)FrameBufferStart, gBootDisp.BufferSize);
     InitializePalette();
     VidSolidColorFill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BV_COLOR_BLACK);
 }
@@ -605,7 +447,7 @@ VidScreenToBufferBlt(
     RtlZeroMemory(Buffer, Delta * Height);
 
     /* Start the outer Y height loop */
-    for (ULONG y = 0; y < Height; y++)
+    for (y = 0; y < Height; y++)
     {
         /* Set current scanline */
         PUCHAR Back = BackBuffer + BB_OFFSET(Left, Top + y);
@@ -621,3 +463,5 @@ VidScreenToBufferBlt(
         }
     }
 }
+
+/* EOF */
