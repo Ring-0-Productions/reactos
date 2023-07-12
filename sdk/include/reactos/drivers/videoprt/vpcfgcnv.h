@@ -101,9 +101,41 @@ typedef struct _VIDEO_CONFIGURATION_DATA
 } VIDEO_CONFIGURATION_DATA, *PVIDEO_CONFIGURATION_DATA;
 
 #ifdef __VIDEO_H__
+
 /* Verify these two structures are compatible */
 C_ASSERT(sizeof(VIDEO_HARDWARE_CONFIGURATION_DATA) ==
          FIELD_OFFSET(VIDEO_HARDWARE_CONFIGURATION_DATA, Version) + sizeof(VIDEO_CONFIGURATION_DATA));
+
+#else
+
+// FIXME: Should not be needed here, but add it anyway for the time being...
+
+/**
+ * @brief
+ * Data returned with VpControllerData by a call to VideoPortGetDeviceData().
+ *
+ * - The first two fields, InterfaceType and BusNumber, are common with
+ *   the CM_FULL_RESOURCE_DESCRIPTOR header;
+ * - The Version and Revision fields correspond to the first two fields
+ *   of CM_PARTIAL_RESOURCE_LIST;
+ * - The other fields are of legacy layout.
+ **/
+typedef struct _VIDEO_HARDWARE_CONFIGURATION_DATA
+{
+    INTERFACE_TYPE InterfaceType;
+    ULONG BusNumber;
+    USHORT Version;
+    USHORT Revision;
+    USHORT Irql;
+    USHORT Vector;
+    ULONG ControlBase;
+    ULONG ControlSize;
+    ULONG CursorBase;
+    ULONG CursorSize;
+    ULONG FrameBase;
+    ULONG FrameSize;
+} VIDEO_HARDWARE_CONFIGURATION_DATA, *PVIDEO_HARDWARE_CONFIGURATION_DATA;
+
 #endif
 
 /**
