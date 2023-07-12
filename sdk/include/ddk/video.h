@@ -551,15 +551,16 @@ typedef enum _DMA_FLAGS {
   VideoPortDmaInitOnly
 } DMA_FLAGS;
 
-/*
- * Data returned with VpControllerData.
+/**
+ * @brief
+ * Data returned with VpControllerData by a call to VideoPortGetDeviceData().
  *
- * - The first two fields, InterfaceType and BusNumber, are
- *   common with the CM_FULL_RESOURCE_DESCRIPTOR header;
- * - The Version and Revision fields correspond to the first
- *   two fields of CM_PARTIAL_RESOURCE_LIST;
+ * - The first two fields, InterfaceType and BusNumber, are common with
+ *   the CM_FULL_RESOURCE_DESCRIPTOR header;
+ * - The Version and Revision fields correspond to the first two fields
+ *   of CM_PARTIAL_RESOURCE_LIST;
  * - The other fields are of legacy layout.
- */
+ **/
 typedef struct _VIDEO_HARDWARE_CONFIGURATION_DATA {
   INTERFACE_TYPE InterfaceType;
   ULONG BusNumber;
