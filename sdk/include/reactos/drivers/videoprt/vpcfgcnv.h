@@ -56,11 +56,11 @@
  * The ReactOS loader specifies this configuration data in the
  * new format. In order to ensure backward compatibility with
  * _legacy_ Windows video miniports that could use this data
- * (typically NT <= 4 or 5, mostly for MIPS machines but also
- * few x86 ones), and for interoperability of our code with the
- * Windows NT loader, we define a set of conversion functions
- * that can translate between legacy (ARC Rev.1.00) and newer
- * (ARC Rev.1.2) configuration data structures.
+ * (typically on NT <= 4 or 5, mostly for MIPS-based machines
+ * but also few x86 ones), and for interoperability of our code
+ * with the Windows NT loader, we define a set of conversion
+ * functions that can translate between legacy (ARC Rev.1.00)
+ * and newer (ARC Rev.1.2) configuration data structures.
  **/
 
 #pragma once
@@ -71,19 +71,58 @@ extern "C" {
 
 /**
  * @brief
- * Data returned with VpMonitorData.
+ * Legacy ARC Rev.1.00 video display controller configuration data.
+ *
+ * This is the configuration data structure exposed by DisplayController
+ * CONFIGURATION_COMPONENT nodes in the NT loader block ConfigurationRoot
+ * ARC hardware tree, if they do not use CM_PARTIAL_RESOURCE_LIST's.
+ *
+ * Once stored in the \Registry\Machine\Hardware\Description configuration
+ * tree, the data is described by a VIDEO_HARDWARE_CONFIGURATION_DATA
+ * structure.
+ *
+ * Note that the Version and Revision fields correspond to the first
+ * two fields of CM_PARTIAL_RESOURCE_LIST.
+ *
+ * @see VIDEO_HARDWARE_CONFIGURATION_DATA defined in DDK video.h
+ **/
+typedef struct _VIDEO_CONFIGURATION_DATA
+{
+    USHORT Version;
+    USHORT Revision;
+    USHORT Irql;
+    USHORT Vector;
+    ULONG ControlBase;
+    ULONG ControlSize;
+    ULONG CursorBase;
+    ULONG CursorSize;
+    ULONG FrameBase;
+    ULONG FrameSize;
+} VIDEO_CONFIGURATION_DATA, *PVIDEO_CONFIGURATION_DATA;
+
+#ifdef __VIDEO_H__
+/* Verify these two structures are compatible */
+C_ASSERT(sizeof(VIDEO_HARDWARE_CONFIGURATION_DATA) ==
+         FIELD_OFFSET(VIDEO_HARDWARE_CONFIGURATION_DATA, Version) + sizeof(VIDEO_CONFIGURATION_DATA));
+#endif
+
+/**
+ * @brief
+ * Data returned with VpMonitorData by a call to VideoPortGetDeviceData().
  *
  * This structure describes the legacy ARC Rev.1.00 monitor peripheral
  * configuration data, as stored in the \Registry\Machine\Hardware\Description
- * configuration tree and reported by VideoPortGetDeviceData().
+ * configuration tree.
  *
  * It has a similar layout as the display controller DDK video.h
  * VIDEO_HARDWARE_CONFIGURATION_DATA structure, where:
- * - The first two fields, InterfaceType and BusNumber, are
- *   common with the CM_FULL_RESOURCE_DESCRIPTOR header;
- * - The Version and Revision fields correspond to the first
- *   two fields of CM_PARTIAL_RESOURCE_LIST;
+ * - The first two fields, InterfaceType and BusNumber, are common with
+ *   the CM_FULL_RESOURCE_DESCRIPTOR header;
+ * - The Version and Revision fields correspond to the first two fields
+ *   of CM_PARTIAL_RESOURCE_LIST;
  * - The other fields are of legacy layout.
+ *
+ * @see MONITOR_CONFIGURATION_DATA defined in arc.h
  **/
 #include <pshpack1.h>
 typedef struct _MONITOR_HARDWARE_CONFIGURATION_DATA
@@ -95,6 +134,22 @@ typedef struct _MONITOR_HARDWARE_CONFIGURATION_DATA
 #include <poppack.h>
 
 
+/*
+ * From a (VIDEO|MONITOR)_HARDWARE_CONFIGURATION_DATA structure, retrieve
+ * where the actual legacy data starts from. Based from the fact that the
+ * first two fields, InterfaceType and BusNumber, are common with the
+ * CM_FULL_RESOURCE_DESCRIPTOR header, and the actual data starts where
+ * the CM_FULL_RESOURCE_DESCRIPTOR::PartialResourceList member would start.
+ */
+#define GET_LEGACY_DATA(fullConfigData) \
+    ((PVOID)&(((PCM_FULL_RESOURCE_DESCRIPTOR)fullConfigData)->PartialResourceList))
+
+#define GET_LEGACY_DATA_LEN(fullConfigDataLen) \
+    ((fullConfigDataLen >= FIELD_OFFSET(CM_FULL_RESOURCE_DESCRIPTOR, PartialResourceList)) \
+   ? (fullConfigDataLen  - FIELD_OFFSET(CM_FULL_RESOURCE_DESCRIPTOR, PartialResourceList)) \
+   : 0)
+
+
 FORCEINLINE
 BOOLEAN
 IsLegacyConfigData(
@@ -102,8 +157,50 @@ IsLegacyConfigData(
     _In_ ULONG ConfigurationDataLength,
     _In_ ULONG ExpectedConfigurationDataLength)
 {
-    PCM_PARTIAL_RESOURCE_LIST ResourceList;
+    /* Cast to PCM_PARTIAL_RESOURCE_LIST to access
+     * the common Version and Revision fields. */
+    PCM_PARTIAL_RESOURCE_LIST ResourceList =
+        (PCM_PARTIAL_RESOURCE_LIST)ConfigurationData;
 
+    if (!ConfigurationData)
+    {
+        DPRINT1("IsLegacyConfigData:FALSE - ConfigurationData == NULL\n");
+        return FALSE;
+    }
+
+    /*
+     * A valid legacy configuration data covers the first two fields,
+     * Version and Revision, of CM_PARTIAL_RESOURCE_LIST.
+     */
+    if ((ConfigurationDataLength < FIELD_OFFSET(CM_PARTIAL_RESOURCE_LIST, Count)) ||
+        (ConfigurationDataLength != ExpectedConfigurationDataLength))
+    {
+        DPRINT1("IsLegacyConfigData:FALSE - ConfigurationDataLength == %lu\n",
+                ConfigurationDataLength);
+        return FALSE;
+    }
+
+    /* If Version/Revision is larger or equal to 1.2,
+     * this cannot be a legacy configuration data */
+    if ( (ResourceList->Version >  1) ||
+        ((ResourceList->Version == 1) && (ResourceList->Revision > 1)) )
+    {
+        DPRINT1("IsLegacyConfigData:FALSE - Version %lu, Revision %lu\n",
+                ResourceList->Version, ResourceList->Revision);
+        return FALSE;
+    }
+
+    DPRINT1("IsLegacyConfigData:TRUE\n");
+    return TRUE;
+}
+
+FORCEINLINE
+BOOLEAN
+IsLegacyConfigDataFull(
+    _In_ PVOID ConfigurationData,
+    _In_ ULONG ConfigurationDataLength,
+    _In_ ULONG ExpectedConfigurationDataLength)
+{
     if (!ConfigurationData)
     {
         DPRINT1("IsLegacyConfigData:FALSE - ConfigurationData == NULL\n");
@@ -126,23 +223,13 @@ IsLegacyConfigData(
         return FALSE;
     }
 
-    /* Cast to PCM_PARTIAL_RESOURCE_LIST to access
-     * the common Version and Revision fields. */
-    ResourceList = &((PCM_FULL_RESOURCE_DESCRIPTOR)ConfigurationData)->PartialResourceList;
-
-    /* If Version/Revision is larger or equal to 1.2,
-     * this cannot be a legacy configuration data */
-    if ( (ResourceList->Version >  1) ||
-        ((ResourceList->Version == 1) && (ResourceList->Revision > 1)) )
-    {
-        DPRINT1("IsLegacyConfigData:FALSE - Version %lu, Revision %lu\n",
-                ResourceList->Version, ResourceList->Revision);
-        return FALSE;
-    }
-
-    DPRINT1("IsLegacyConfigData:TRUE\n");
-    return TRUE;
+    /* Verify the actual legacy configuration data */
+    return IsLegacyConfigData(
+                GET_LEGACY_DATA(ConfigurationData),
+                GET_LEGACY_DATA_LEN(ConfigurationDataLength),
+                GET_LEGACY_DATA_LEN(ExpectedConfigurationDataLength));
 }
+
 
 FORCEINLINE
 BOOLEAN
@@ -150,8 +237,46 @@ IsNewConfigData(
     _In_ PVOID ConfigurationData,
     _In_ ULONG ConfigurationDataLength)
 {
-    PCM_PARTIAL_RESOURCE_LIST ResourceList;
+    /* Cast to PCM_PARTIAL_RESOURCE_LIST to access
+     * the common Version and Revision fields. */
+    PCM_PARTIAL_RESOURCE_LIST ResourceList =
+        (PCM_PARTIAL_RESOURCE_LIST)ConfigurationData;
 
+    if (!ConfigurationData)
+    {
+        DPRINT1("IsNewConfigData:FALSE - ConfigurationData == NULL\n");
+        return FALSE;
+    }
+
+    if (ConfigurationDataLength < FIELD_OFFSET(CM_PARTIAL_RESOURCE_LIST, PartialDescriptors))
+    {
+        DPRINT1("IsNewConfigData:FALSE - ConfigurationDataLength == %lu\n",
+                ConfigurationDataLength);
+        return FALSE;
+    }
+
+    /* If Version/Revision is strictly lower than 1.2, this cannot be
+     * a new configuration data (even if the length appears to match
+     * a CM_FULL_RESOURCE_DESCRIPTOR with zero or more descriptors). */
+    if ( (ResourceList->Version <  1) ||
+        ((ResourceList->Version == 1) && (ResourceList->Revision <= 1)) )
+    {
+        DPRINT1("IsNewConfigData:FALSE - Version %lu, Revision %lu\n",
+                ResourceList->Version, ResourceList->Revision);
+        return FALSE;
+    }
+
+    /* This should be a new configuration data */
+    DPRINT1("IsNewConfigData:TRUE\n");
+    return TRUE;
+}
+
+FORCEINLINE
+BOOLEAN
+IsNewConfigDataFull(
+    _In_ PVOID ConfigurationData,
+    _In_ ULONG ConfigurationDataLength)
+{
     if (!ConfigurationData)
     {
         DPRINT1("IsNewConfigData:FALSE - ConfigurationData == NULL\n");
@@ -171,24 +296,15 @@ IsNewConfigData(
         return FALSE;
     }
 
-    /* Cast to PCM_PARTIAL_RESOURCE_LIST to access
-     * the common Version and Revision fields. */
-    ResourceList = &((PCM_FULL_RESOURCE_DESCRIPTOR)ConfigurationData)->PartialResourceList;
+    /* Verify the actual new configuration data */
 
-    /* If Version/Revision is strictly lower than 1.2, this cannot be
-     * a new configuration data (even if the length appears to match
-     * a CM_FULL_RESOURCE_DESCRIPTOR with zero or more descriptors). */
-    if ( (ResourceList->Version <  1) ||
-        ((ResourceList->Version == 1) && (ResourceList->Revision <= 1)) )
-    {
-        DPRINT1("IsNewConfigData:FALSE - Version %lu, Revision %lu\n",
-                ResourceList->Version, ResourceList->Revision);
-        return FALSE;
-    }
+    // /* Cast to PCM_PARTIAL_RESOURCE_LIST to access
+    //  * the common Version and Revision fields. */
+    // ResourceList = &((PCM_FULL_RESOURCE_DESCRIPTOR)ConfigurationData)->PartialResourceList;
 
-    /* This should be a new configuration data */
-    DPRINT1("IsNewConfigData:TRUE\n");
-    return TRUE;
+    return IsNewConfigData(
+                GET_LEGACY_DATA(ConfigurationData),
+                GET_LEGACY_DATA_LEN(ConfigurationDataLength));
 }
 
 
@@ -313,7 +429,7 @@ GetVideoData(
 /*static*/ inline
 VOID
 DoConvertVideoDataToLegacyConfigData(
-    _Inout_ PVIDEO_HARDWARE_CONFIGURATION_DATA configData,
+    _Out_ PVIDEO_CONFIGURATION_DATA configData,
     _In_opt_ PCM_PARTIAL_RESOURCE_DESCRIPTOR Interrupt,
     _In_opt_ PCM_PARTIAL_RESOURCE_DESCRIPTOR ControlPort,
     _In_opt_ PCM_PARTIAL_RESOURCE_DESCRIPTOR CursorPort,
@@ -395,7 +511,7 @@ ConvertVideoDataToLegacyConfigData(
                  &FrameBuffer,
                  NULL);
 
-    DoConvertVideoDataToLegacyConfigData(configData,
+    DoConvertVideoDataToLegacyConfigData(GET_LEGACY_DATA(configData),
                                          Interrupt,
                                          ControlPort,
                                          CursorPort,
@@ -409,7 +525,7 @@ ConvertVideoDataToLegacyConfigData(
 FORCEINLINE
 VOID
 ConvertLegacyVideoConfigDataToDeviceData(
-    _In_ PVIDEO_HARDWARE_CONFIGURATION_DATA configData,
+    _In_ PVIDEO_CONFIGURATION_DATA configData,
 #if 0
     _Out_opt_ PUSHORT Version,
     _Out_opt_ PUSHORT Revision,
@@ -419,9 +535,6 @@ ConvertLegacyVideoConfigDataToDeviceData(
     _Out_opt_ PCM_PARTIAL_RESOURCE_DESCRIPTOR CursorPort,
     _Out_ PCM_PARTIAL_RESOURCE_DESCRIPTOR FrameBuffer)
 {
-    // cmDescriptor->InterfaceType = configData->InterfaceType;
-    // cmDescriptor->BusNumber     = configData->BusNumber;
-
 #if 0
     /* The new configuration data is from ARC Specification Revision 1.2 */
     if (Version)  *Version  = 1; // configData->Version;
@@ -512,7 +625,7 @@ GetMonitorData(
 /*static*/ inline
 VOID
 DoConvertMonitorDataToLegacyConfigData(
-    _Inout_ PMONITOR_HARDWARE_CONFIGURATION_DATA configData,
+    _Out_ PMONITOR_CONFIGURATION_DATA configData,
     _In_ PCM_MONITOR_DEVICE_DATA MonitorData)
 {
     configData->HorizontalResolution = MonitorData->HorizontalResolution;
@@ -614,7 +727,7 @@ ConvertMonitorDataToLegacyConfigData(
         /* NOTE: This descriptor *MUST* be the last one.
          * The actual device data follows the descriptor. */
         PCM_MONITOR_DEVICE_DATA MonitorData = (PCM_MONITOR_DEVICE_DATA)(Descriptor + 1);
-        DoConvertMonitorDataToLegacyConfigData(configData, MonitorData);
+        DoConvertMonitorDataToLegacyConfigData(GET_LEGACY_DATA(configData), MonitorData);
     }
 }
 
@@ -625,12 +738,9 @@ ConvertMonitorDataToLegacyConfigData(
 FORCEINLINE
 VOID
 ConvertLegacyMonitorConfigDataToDeviceData(
-    _In_ PMONITOR_HARDWARE_CONFIGURATION_DATA configData,
+    _In_ PMONITOR_CONFIGURATION_DATA configData,
     _Out_ PCM_MONITOR_DEVICE_DATA MonitorData)
 {
-    // cmDescriptor->InterfaceType = configData->InterfaceType;
-    // cmDescriptor->BusNumber     = configData->BusNumber;
-
 #if 0
     /* The new configuration data is from ARC Specification Revision 1.2 */
     MonitorData->Version  = 1; // configData->Version;
