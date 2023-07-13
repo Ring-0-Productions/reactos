@@ -418,6 +418,7 @@
 @ stdcall MapGenericMask(ptr ptr) ntdll.RtlMapGenericMask
 @ stdcall NotifyBootConfigStatus(long)
 @ stdcall NotifyChangeEventLog(long long)
+@ stdcall -version=0x600+ NotifyServiceStatusChangeW(long long ptr)
 @ stdcall ObjectCloseAuditAlarmA(str ptr long)
 @ stdcall ObjectCloseAuditAlarmW(wstr ptr long)
 @ stdcall ObjectDeleteAuditAlarmA(str ptr long)
