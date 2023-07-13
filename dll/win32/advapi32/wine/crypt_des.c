@@ -27,6 +27,7 @@
 #include "windef.h"
 #include "crypt.h"
 #endif
+#include <winsvc.h>
 
 static const unsigned char InitialPermuteMap[64] =
 {
@@ -254,6 +255,14 @@ static void xor( unsigned char *dst, const unsigned char *a, const unsigned char
 
     for (i = 0; i < count; i++)
         dst[i] = a[i] ^ b[i];
+}
+
+DWORD
+WINAPI
+NotifyServiceStatusChangeW( SC_HANDLE service, DWORD mask,
+                            SERVICE_NOTIFYW *notify_buffer )
+{
+    return ERROR_SUCCESS;
 }
 
 unsigned char *CRYPT_DEShash( unsigned char *dst, const unsigned char *key, const unsigned char *src )
