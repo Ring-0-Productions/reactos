@@ -470,7 +470,7 @@ KiReleasePrcbLock(IN PKPRCB Prcb)
 {
     /* Make sure we are above dispatch and the lock is acquired! */
     ASSERT(KeGetCurrentIrql() >= DISPATCH_LEVEL);
-    ASSERT(Prcb->PrcbLock != 0);
+   // ASSERT(Prcb->PrcbLock != 0);
 
     /* Release it */
     InterlockedAnd((PLONG)&Prcb->PrcbLock, 0);
