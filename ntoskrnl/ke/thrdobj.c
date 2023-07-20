@@ -503,7 +503,7 @@ KeStartThread(IN OUT PKTHREAD Thread)
     PKPRCB NodePrcb;
     ULONG Set, Mask;
 #endif
-    UCHAR IdealProcessor = 0;
+    UCHAR IdealProcessor = KeGetCurrentProcessorNumber();
     PKPROCESS Process = Thread->ApcState.Process;
 
     /* Setup static fields from parent */
@@ -782,7 +782,11 @@ KeInitThread(IN OUT PKTHREAD Thread,
     Thread->Header.ThreadControlFlags = 0;
     Thread->Header.DebugActive = FALSE;
     Thread->Header.SignalState = 0;
-    InitializeListHead(&(Thread->Header.WaitListHead));
+
+    if (KeGetCurrentProcessorNumber() == 0)
+    {
+        InitializeListHead(&(Thread->Header.WaitListHead));
+    }
 
     /* Initialize the Mutant List */
     InitializeListHead(&Thread->MutantListHead);
@@ -796,7 +800,7 @@ KeInitThread(IN OUT PKTHREAD Thread,
 
     /* Set swap settings */
     Thread->EnableStackSwap = TRUE;
-    Thread->IdealProcessor = 1;
+    Thread->IdealProcessor = KeGetCurrentProcessorNumber();
     Thread->SwapBusy = FALSE;
     Thread->KernelStackResident = TRUE;
     Thread->AdjustReason = AdjustNone;

@@ -613,8 +613,11 @@ KiInitializeKernel(IN PKPROCESS InitProcess,
     /* Raise to Dispatch */
     KeRaiseIrql(DISPATCH_LEVEL, &DummyIrql);
 
-    /* Set the Idle Priority to 0. This will jump into Phase 1 */
-    KeSetPriorityThread(InitThread, 0);
+    if (!Number)
+    {
+        /* Set the Idle Priority to 0. This will jump into Phase 1 */
+        KeSetPriorityThread(InitThread, 0);
+    }
 
     /* If there's no thread scheduled, put this CPU in the Idle summary */
     KiAcquirePrcbLock(Prcb);
@@ -836,7 +839,8 @@ AppCpuInit:
     __writefsdword(KPCR_SET_MEMBER_COPY, 1 << Cpu);
     __writefsdword(KPCR_PRCB_SET_MEMBER, 1 << Cpu);
 
-    KiVerifyCpuFeatures(Pcr->Prcb);
+    if (!Cpu)
+        KiVerifyCpuFeatures(Pcr->Prcb);
 
     /* Initialize the Processor with HAL */
     HalInitializeProcessor(Cpu, KeLoaderBlock);

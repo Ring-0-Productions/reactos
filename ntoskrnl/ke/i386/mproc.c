@@ -40,9 +40,10 @@ KeStartAllProcessors(VOID)
     PVOID KernelStack, DPCStack;
     SIZE_T ProcessorCount = 0;
     PAPINFO APInfo;
-
+#if 0
     while (TRUE)
     {
+#endif
         ProcessorCount++;
         KernelStack = NULL;
         DPCStack = NULL;
@@ -130,7 +131,7 @@ KeStartAllProcessors(VOID)
         DPRINT("Attempting to Start a CPU with number: %u\n", ProcessorCount);
         if (!HalStartNextProcessor(KeLoaderBlock, ProcessorState))
         {
-            break;
+         //   break;
         }
 
         // And wait for it to start
@@ -140,8 +141,12 @@ KeStartAllProcessors(VOID)
             KeMemoryBarrier();
             YieldProcessor();
         }
-    }
 
+    
+
+       // DPRINT("CPU Startup sucessfull!\n");
+  //  }
+#if 0
     // The last CPU didn't start - clean the data
     ProcessorCount--;
 
@@ -151,6 +156,6 @@ KeStartAllProcessors(VOID)
         MmDeleteKernelStack(KernelStack, FALSE);
     if (DPCStack)
         MmDeleteKernelStack(DPCStack, FALSE);
-
+#endif
     DPRINT1("KeStartAllProcessors: Sucessful AP startup count is %u\n", ProcessorCount);
 }
