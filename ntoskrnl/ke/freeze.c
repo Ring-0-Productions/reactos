@@ -26,18 +26,30 @@ NTAPI
 KiFreezeTargetExecution(_In_ PKTRAP_FRAME TrapFrame,
                         _In_ PKEXCEPTION_FRAME ExceptionFrame)
 {
+    EXCEPTION_RECORD ExceptionRecord;
     PKPRCB Prcb;
     Prcb = KeGetCurrentPrcb();
 
+    if (TrapFrame)
+        KiSaveProcessorState(TrapFrame, ExceptionFrame);
     /* Multiple processors can write this value */
     InterlockedExchange((LONG*)&Prcb->IpiFrozen, IPI_FROZEN_HALTED);
 
     /* Wait for triggering AP to give the go ahead to thaw */
     while (Prcb->IpiFrozen != IPI_FROZEN_THAWING)
     {
-        /* Do nothing */
+        /* We only continue on if we are thawing, otherwise something else has happened! */
+        if (Prcb->IpiFrozen == IPI_FROZEN_RUNNING)
+        {
+            RtlZeroMemory(&ExceptionRecord, sizeof(EXCEPTION_RECORD));
+            ExceptionRecord.ExceptionAddress = (PVOID)Prcb->ProcessorState.ContextFrame.Eip;
+            KdpSwitchProcessor(&ExceptionRecord,
+                               (PCONTEXT)&Prcb->ProcessorState, FALSE);
+        }
     }
-
+    //if (TrapFrame)
+        //KiRestoreProcessorControlState(TrapFrame, ExceptionFrame);
+    KeFlushCurrentTb();
     /* Notify AP we're running once again */
     InterlockedExchange((LONG*)&Prcb->IpiFrozen, IPI_FROZEN_RUNNING);
 }

@@ -1262,12 +1262,34 @@ KdpNotSupported(IN PDBGKD_MANIPULATE_STATE64 State)
 
 KCONTINUE_STATUS
 NTAPI
+KeSwitchFrozenProcessor(IN USHORT ProcessorNumber)
+{
+    PKPRCB Prcb, TargetPrcb;
+    Prcb = KeGetCurrentPrcb();
+
+    if (ProcessorNumber <= KeNumberProcessors)
+    {
+        KdpDprintf("Processor Switch triggered Procesor: %d\n", ProcessorNumber);
+        TargetPrcb = KiProcessorBlock[ProcessorNumber];
+        InterlockedExchange((LONG*)&TargetPrcb->IpiFrozen, IPI_FROZEN_RUNNING);
+        InterlockedExchange((LONG*)&Prcb->IpiFrozen, IPI_FROZEN_HALTED);
+        return ContinueSuccess;
+    }
+    else
+    {
+        return ContinueProcessorReselected;
+    }
+}
+
+KCONTINUE_STATUS
+NTAPI
 KdpSendWaitContinue(IN ULONG PacketType,
                     IN PSTRING SendHeader,
                     IN PSTRING SendData OPTIONAL,
                     IN OUT PCONTEXT Context)
 {
     STRING Data, Header;
+    KCONTINUE_STATUS StatusCheck;
     DBGKD_MANIPULATE_STATE64 ManipulateState;
     ULONG Length;
     KDSTATUS RecvCode;
@@ -1469,10 +1491,10 @@ SendPacket:
                 break;
 
             case DbgKdSwitchProcessor:
-
-                /* TODO */
-                KdpDprintf("Processor Switch support is unimplemented!\n");
-                KdpNotSupported(&ManipulateState);
+                KdRestore(FALSE);
+                StatusCheck = KeSwitchFrozenProcessor(ManipulateState.Processor);
+                KdSave(FALSE);
+                return StatusCheck;
                 break;
 
             case DbgKdPageInApi:
