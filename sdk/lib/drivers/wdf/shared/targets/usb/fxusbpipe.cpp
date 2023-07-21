@@ -5,11 +5,11 @@
 
 extern "C" {
 #if defined(EVENT_TRACING)
-#include "FxUsbPipe.tmh"
+#include "fxusbpipe.tmh"
 #endif
 }
 
-#include "Fxglobals.h"
+#include "fxglobals.h"
 //
 //  NOTE: There are 3 different paths Requests could be sent to the lower driver
 //  1) In case of reposting a successfully completed Request use the Dpc which calls SendIo.

@@ -2,15 +2,13 @@
 //    Copyright (C) Microsoft.  All rights reserved.
 //
 
-#include "../FxTargetsShared.hpp"
+#include "../fxtargetsshared.hpp"
 
-#include "FxUsbDevice.hpp"
-#include "FxUsbInterface.hpp"
-#include "FxUsbPipe.hpp"
+#include "fxusbdevice.hpp"
+#include "fxusbinterface.hpp"
+#include "usbutil.hpp"
 
-#include "UsbUtil.hpp"
-
-#include "FxNPagedLookasideList.hpp"
-#include "FxPagedLookasideList.hpp"
+#include "fxnpagedlookasidelist.hpp"
+#include "fxpagedlookasidelist.hpp"
 
 
