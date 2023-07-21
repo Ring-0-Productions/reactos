@@ -191,6 +191,9 @@ set_module_type(wdf01000 kernelmodedriver)
 
 add_cd_file(TARGET wdf01000 DESTINATION reactos/system32/drivers NO_CAB FOR all)
 add_registry_inf(wdf01000_reg.inf)
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(wdf01000 PRIVATE -fpermissive) # Our favourite compiler :)
+endif()
 
 target_compile_definitions(wdf01000
     PUBLIC WDF_DEVICE_NO_WDMSEC_H _WIN32_WINNT=0x603 NTDDI_VERSION=0x06030000 # NTDDI_WINBLUE
