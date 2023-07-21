@@ -967,4 +967,30 @@ KeRemoveSystemServiceTable(IN ULONG Index)
     /* Return success */
     return TRUE;
 }
+
+/* UNIMPLEMENTED */
+ULONG
+NTAPI
+KeQueryActiveProcessorCount(OUT PKAFFINITY ActiveProcessors OPTIONAL)
+{
+    RTL_BITMAP Bitmap;
+    KAFFINITY ActiveMap = KeQueryActiveProcessors();
+
+    if (ActiveProcessors != NULL)
+    {
+        *ActiveProcessors = ActiveMap;
+    }
+
+    RtlInitializeBitMap(&Bitmap, (PULONG)&ActiveMap,  sizeof(ActiveMap) * 8);
+    return RtlNumberOfSetBits(&Bitmap);
+}
+/* UNIMPLEMENTED */
+ULONG
+NTAPI
+KeQueryActiveProcessorCountEx(_In_ USHORT GroupNumber)
+{
+    //HACK: Return one to make drivers happy
+    return 1;
+}
+
 /* EOF */

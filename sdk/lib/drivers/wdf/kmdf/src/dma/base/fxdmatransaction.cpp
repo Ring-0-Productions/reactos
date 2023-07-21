@@ -1800,7 +1800,7 @@ FxDmaPacketTransaction::StageTransfer(
     PSCATTER_GATHER_LIST sgList;
 
     PFX_DRIVER_GLOBALS pFxDriverGlobals;
-    UCHAR_MEMORY_ALIGNED sgListBuffer[sizeof(SCATTER_GATHER_LIST)
+    UCHAR sgListBuffer[sizeof(SCATTER_GATHER_LIST)
                             + sizeof(SCATTER_GATHER_ELEMENT)];
     WDFDMATRANSACTION dmaTransaction;
 
