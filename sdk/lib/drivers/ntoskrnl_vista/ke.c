@@ -30,22 +30,6 @@ KeQueryActiveGroupCount(VOID)
     return 1;
 }
 
-NTKRNLVISTAAPI
-ULONG
-NTAPI
-KeQueryActiveProcessorCount(OUT PKAFFINITY ActiveProcessors OPTIONAL)
-{
-    RTL_BITMAP Bitmap;
-    KAFFINITY ActiveMap = KeQueryActiveProcessors();
-
-    if (ActiveProcessors != NULL)
-    {
-        *ActiveProcessors = ActiveMap;
-    }
-
-    RtlInitializeBitMap(&Bitmap, (PULONG)&ActiveMap,  sizeof(ActiveMap) * 8);
-    return RtlNumberOfSetBits(&Bitmap);
-}
 
 NTKRNLVISTAAPI
 NTSTATUS
@@ -64,14 +48,6 @@ KeQueryDpcWatchdogInformation(
     return STATUS_UNSUCCESSFUL;
 }
 
-NTKRNLVISTAAPI
-ULONG
-NTAPI
-KeQueryActiveProcessorCountEx(_In_ USHORT GroupNumber)
-{
-    //UNIMPLEMENTED;
-	return 1;
-}
 
 NTKRNLVISTAAPI
 KAFFINITY
@@ -134,7 +110,7 @@ KeGetCurrentNodeNumber()
     //UNIMPLEMENTED;
 	return 0;
 }
-
+#if 1
 _IRQL_requires_max_(DISPATCH_LEVEL)
 NTKRNLVISTAAPI
 BOOLEAN
@@ -149,7 +125,7 @@ KeSetCoalescableTimer(
     UNIMPLEMENTED;
     return KeSetTimerEx(Timer, DueTime, Period, Dpc);
 }
-
+#endif
 NTKRNLVISTAAPI
 NTSTATUS
 NTAPI
