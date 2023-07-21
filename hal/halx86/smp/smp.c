@@ -211,7 +211,11 @@ HalStartNextProcessor(
             .SpecialRegisters = ProcessorState->SpecialRegisters,
         };
 #endif
-
+        if (HalpProcessorIdentity->ProcessorId > 2 &&
+            HalpProcessorIdentity[StartedProcessorCount].LapicId == 0)
+        {
+            return FALSE;
+        }
         ApicStartApplicationProcessor(HalpProcessorIdentity[StartedProcessorCount].LapicId,
                                       HalpLowStubPhysicalAddress);
 

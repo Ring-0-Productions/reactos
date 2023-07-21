@@ -781,8 +781,10 @@ KeInitThread(IN OUT PKTHREAD Thread,
     Thread->Header.Type = ThreadObject;
     Thread->Header.ThreadControlFlags = 0;
     Thread->Header.DebugActive = FALSE;
-    Thread->Header.SignalState = 0;
-
+    if (KeGetCurrentProcessorNumber() == 0)
+    {
+        Thread->Header.SignalState = 0;
+    }
     if (KeGetCurrentProcessorNumber() == 0)
     {
         InitializeListHead(&(Thread->Header.WaitListHead));

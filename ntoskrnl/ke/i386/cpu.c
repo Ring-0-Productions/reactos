@@ -735,7 +735,7 @@ KiGetCacheInformation(VOID)
 
     /* Set the cache line */
     if (CacheLine > KeLargestCacheLine) KeLargestCacheLine = CacheLine;
-    DPRINT1("Prefetch Cache: %lu bytes\tL2 Cache: %lu bytes\tL2 Cache Line: %lu bytes\tL2 Cache Associativity: %lu\n",
+    DPRINT("Prefetch Cache: %lu bytes\tL2 Cache: %lu bytes\tL2 Cache Line: %lu bytes\tL2 Cache Associativity: %lu\n",
             KePrefetchNTAGranularity,
             Pcr->SecondLevelCacheSize,
             KeLargestCacheLine,

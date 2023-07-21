@@ -45,11 +45,11 @@ NTAPI
 KiIpiGenericCallTarget(_In_ PKIPI_CONTEXT PacketContext,
                        _In_ PKIPI_BROADCAST_WORKER Function,
                        _In_ PULONG Argument,
-                       _In_ PULONG Count)
+                       _Inout_ PULONG Count)
 {
-  //  DPRINT1("generic call target enter");
-    /* A CPU has entered, decrement */
-    *Count -= 1;
+    #if 0
+    Count--;
+    InterlockedDecrement(Count);
 
     /* Loop until all processors are synched */
     while (Count != 0);
@@ -59,6 +59,7 @@ KiIpiGenericCallTarget(_In_ PKIPI_CONTEXT PacketContext,
 
     /* we're done! */
     KiIpiSignalPacketDone(PacketContext);
+    #endif
 }
 
 VOID
@@ -226,6 +227,8 @@ ULONG_PTR
 NTAPI
 KeIpiGenericCall(IN PKIPI_BROADCAST_WORKER Function, IN ULONG_PTR Argument)
 {
+    #if 0
+    //DPRINT1("KeIpiGenericCall\n");
     ULONG_PTR Status;
     KIRQL OldIrql, OldIrql2;
 #ifdef CONFIG_SMP
@@ -246,7 +249,6 @@ KeIpiGenericCall(IN PKIPI_BROADCAST_WORKER Function, IN ULONG_PTR Argument)
     /* Exclude ourselves */
     Affinity &= ~Prcb->SetMember;
 #endif
-
     /* Acquire the IPI lock */
     KeAcquireSpinLockAtDpcLevel(&KiReverseStallIpiLock);
 
@@ -255,7 +257,12 @@ KeIpiGenericCall(IN PKIPI_BROADCAST_WORKER Function, IN ULONG_PTR Argument)
     if (Affinity)
     {
         /* Send an IPI */
-        KiIpiSendPacket(Affinity, KiIpiGenericCallTarget, Function, Argument, &Count);
+       KiIpiSendPacket(Affinity, KiIpiGenericCallTarget, Function, Argument, &Count);
+       while (Count != 1)
+       {
+          /* Wait */
+       }
+       DPRINT1("Freedom\n");
     }
 
 #endif
@@ -265,7 +272,7 @@ KeIpiGenericCall(IN PKIPI_BROADCAST_WORKER Function, IN ULONG_PTR Argument)
 
 #ifdef CONFIG_SMP
     /* Let the other processors know it is time */
-    Count = 0;
+    InterlockedExchange((LONG*)&Count, 0);
 #endif
     /* Call the function */
     Status = Function(Argument);
@@ -289,6 +296,8 @@ KeIpiGenericCall(IN PKIPI_BROADCAST_WORKER Function, IN ULONG_PTR Argument)
     KeLowerIrql(OldIrql);
 
     return Status;
+    #endif
+    return 0;
 }
 
 /**

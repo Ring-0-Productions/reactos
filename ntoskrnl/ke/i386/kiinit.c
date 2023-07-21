@@ -535,6 +535,7 @@ KiInitializeKernel(IN PKPROCESS InitProcess,
     }
     else
     {
+
         KeLowerIrql(DISPATCH_LEVEL);
     }
 
@@ -812,13 +813,13 @@ KiSystemStartup(IN PLOADER_PARAMETER_BLOCK LoaderBlock)
     RtlCopyMemory(&Idt[2], &NmiEntry, sizeof(KIDTENTRY));
     RtlCopyMemory(&Idt[8], &DoubleFaultEntry, sizeof(KIDTENTRY));
 
-AppCpuInit:
     /* Loop until we can release the freeze lock */
     do
     {
         /* Loop until execution can continue */
         while (*(volatile PKSPIN_LOCK*)&KiFreezeExecutionLock == (PVOID)1);
     } while(InterlockedBitTestAndSet((PLONG)&KiFreezeExecutionLock, 0));
+AppCpuInit:
 
     /* Setup CPU-related fields */
     __writefsdword(KPCR_NUMBER, Cpu);

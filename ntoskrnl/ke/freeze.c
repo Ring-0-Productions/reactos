@@ -47,8 +47,8 @@ KiFreezeTargetExecution(_In_ PKTRAP_FRAME TrapFrame,
                                (PCONTEXT)&Prcb->ProcessorState, FALSE);
         }
     }
-    //if (TrapFrame)
-        //KiRestoreProcessorControlState(TrapFrame, ExceptionFrame);
+    if (TrapFrame)
+        KiRestoreProcessorControlState(&Prcb->ProcessorState);
     KeFlushCurrentTb();
     /* Notify AP we're running once again */
     InterlockedExchange((LONG*)&Prcb->IpiFrozen, IPI_FROZEN_RUNNING);

@@ -234,7 +234,7 @@ ExRefreshTimeZoneInformation(IN PLARGE_INTEGER CurrentBootTime)
     Status = RtlQueryTimeZoneInformation(&ExpTimeZoneInfo);
     if (!NT_SUCCESS(Status))
     {
-        DPRINT1("RtlQueryTimeZoneInformation() failed (Status 0x%08lx)\n", Status);
+       /// DPRINT1("RtlQueryTimeZoneInformation() failed (Status 0x%08lx)\n", Status);
         return FALSE;
     }
 
