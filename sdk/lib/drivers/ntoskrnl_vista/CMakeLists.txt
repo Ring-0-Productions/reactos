@@ -9,7 +9,6 @@ list(APPEND SOURCE
     etw.c
     fsrtl.c
     io.c
-    ob.c
     po.c
     pofx.c
     ke.c

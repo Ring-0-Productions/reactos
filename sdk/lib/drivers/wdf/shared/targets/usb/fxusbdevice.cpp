@@ -1000,6 +1000,7 @@ FxUsbDevice::CreateInterfaces(
     RtlZeroMemory(descCountBitMap, sizeof(descCountBitMap));
     iInterface = 0;
     numFound = 0;
+    UNREFERENCED_PARAMETER(numFound);
 
     pInterfaceDescriptor = (PUSB_INTERFACE_DESCRIPTOR) FxUsbFindDescriptorType(
         m_ConfigDescriptor,

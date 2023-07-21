@@ -11,7 +11,7 @@ extern "C" {
 #define RtlSizeTToULong RtlULongPtrToULong
 }
 
-#include "Fxglobals.h"
+#include "fxglobals.h"
 
 VOID
 FxUsbPipeTransferContext::StoreAndReferenceMemory(
