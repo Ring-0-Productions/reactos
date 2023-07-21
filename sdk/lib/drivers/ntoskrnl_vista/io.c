@@ -19,12 +19,17 @@ typedef struct _EX_WORKITEM_CONTEXT
 
 #define TAG_IOWI 'IWOI'
 
-extern
+
 NTSTATUS
 NTAPI
-IopSynchronousCompletion(IN PDEVICE_OBJECT DeviceObject,
+IopSynchronousCompletionLoc(IN PDEVICE_OBJECT DeviceObject,
                          IN PIRP Irp,
-                         IN PVOID Context);
+                         IN PVOID Context)
+{
+    if (Irp->PendingReturned)
+        KeSetEvent((PKEVENT)Context, IO_NO_INCREMENT, FALSE);
+    return STATUS_MORE_PROCESSING_REQUIRED;
+}
 
 NTKRNLVISTAAPI
 NTSTATUS
@@ -224,7 +229,6 @@ IoSetMasterIrpStatus(
     _Inout_ PIRP MasterIrp,
     _In_ NTSTATUS Status)
 {
-    UNIMPLEMENTED;
     NTSTATUS MasterStatus = MasterIrp->IoStatus.Status;
 
     if (Status == STATUS_FT_READ_FROM_COPY)
@@ -277,7 +281,7 @@ IoSynchronousCallDriver(_In_ PDEVICE_OBJECT DeviceObject,
     
     IrpStack = Irp->Tail.Overlay.CurrentStackLocation;
     IrpStack->Context = &Event;
-    IrpStack->CompletionRoutine = IopSynchronousCompletion;
+    IrpStack->CompletionRoutine = IopSynchronousCompletionLoc;
     IrpStack->Control = -1;
     
     Status = IofCallDriver(DeviceObject, Irp);
