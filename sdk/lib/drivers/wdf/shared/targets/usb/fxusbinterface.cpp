@@ -885,6 +885,7 @@ Return Value:
     pInterfaceDesc = NULL;
     curEndpointIndex = 0;
     endPointFound = FALSE;
+    UNREFERENCED_PARAMETER(endPointFound);
 
     //
     // Extract the interface descriptor for the alternate setting for the interface
