@@ -68,6 +68,19 @@ ClasspCanSendPollingIrp(
 }
 
 BOOLEAN
+NTAPI
+KeSetCoalescableTimerLoc(
+    _Inout_ PKTIMER Timer,
+    _In_ LARGE_INTEGER DueTime,
+    _In_ ULONG Period,
+    _In_ ULONG TolerableDelay,
+    _In_opt_ PKDPC Dpc)
+{
+    return KeSetTimerEx(Timer, DueTime, Period, Dpc);
+}
+
+
+BOOLEAN
 ClasspIsMediaChangeDisabledDueToHardwareLimitation(
     IN PFUNCTIONAL_DEVICE_EXTENSION FdoExtension,
     IN PUNICODE_STRING RegistryPath
@@ -3923,7 +3936,7 @@ ClasspEnableTimer(
         {
             LARGE_INTEGER timeout;
             timeout.QuadPart = TICK_TIMER_PERIOD_IN_MSEC * (10 * 1000) * (-1);
-            KeSetCoalescableTimer(&fdoData->TickTimer,
+            KeSetCoalescableTimerLoc(&fdoData->TickTimer,
                                   timeout, TICK_TIMER_PERIOD_IN_MSEC, TICK_TIMER_DELAY_IN_MSEC,
                                   &fdoData->TickTimerDpc);
             fdoData->TickTimerEnabled = TRUE;
