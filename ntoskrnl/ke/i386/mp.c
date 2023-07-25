@@ -19,7 +19,7 @@ typedef struct _APINFO
     ETHREAD Thread;
     KTSS TssDoubleFault;
     KTSS TssNMI;
-    DECLSPEC_ALIGN(16) UINT8 DoubleFaultStack[DOUBLE_FAULT_STACK_SIZE];
+    DECLSPEC_ALIGN(16) UINT8 DoubleFaultStack[0x3000];
     DECLSPEC_ALIGN(PAGE_SIZE) KGDTENTRY Gdt[128];/* TODO: Soften these hardcodes up */
     DECLSPEC_ALIGN(PAGE_SIZE) KIDTENTRY Idt[256];
 } APINFO, *PAPINFO;
@@ -77,7 +77,7 @@ KeStartAllProcessors()
     PVOID KernelStack, DPCStack;
     SIZE_T ProcessorCount = 0;
     PAPINFO APInfo;
-    while (TRUE)
+    while(TRUE)
     {
         ProcessorCount++;
         KernelStack = NULL;
@@ -88,17 +88,17 @@ KeStartAllProcessors()
         if (!APInfo)
         {
 
-           // break;
+            break;
         }
         KernelStack = MmCreateKernelStack(FALSE, 0);
         if (!KernelStack)
         {
-            //break;
+            break;
         }
         DPCStack = MmCreateKernelStack(FALSE, 0);
         if (!DPCStack)
         {
-           // break;
+            break;
         }
 
         /* Initalize a new PCR for the specific AP */
@@ -173,23 +173,14 @@ KeStartAllProcessors()
             break;
         }
 
-       // DPRINT("Waiting for init confirmation from AP CPU: #%u\n", ProcessorCount);
         while (KeLoaderBlock->Prcb != 0)
         {
-           //KeMemoryBarrier();
-           //YieldProcessor();
+            YieldProcessor();
+            KeMemoryBarrier();
         }
-
-       // DPRINT("CPU Startup sucessfull!\n");
     }
     // The last CPU didn't start - clean the data
     ProcessorCount--;
 
-    if (APInfo)
-        ExFreePoolWithTag(APInfo, TAG_KERNEL);
-    if (KernelStack)
-        MmDeleteKernelStack(KernelStack, FALSE);
-    if (DPCStack)
-        MmDeleteKernelStack(DPCStack, FALSE);
     DPRINT1("KeStartAllProcessors: Sucessful AP startup count is %u\n", ProcessorCount);
 }

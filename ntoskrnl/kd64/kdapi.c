@@ -1269,7 +1269,6 @@ KeSwitchFrozenProcessor(IN USHORT ProcessorNumber)
 
     if (ProcessorNumber <= KeNumberProcessors)
     {
-        KdpDprintf("Processor Switch triggered Procesor: %d\n", ProcessorNumber);
         TargetPrcb = KiProcessorBlock[ProcessorNumber];
         InterlockedExchange((LONG*)&TargetPrcb->IpiFrozen, IPI_FROZEN_RUNNING);
         InterlockedExchange((LONG*)&Prcb->IpiFrozen, IPI_FROZEN_HALTED);

@@ -13,6 +13,11 @@
 #define NDEBUG
 #include <debug.h>
 
+#ifdef NDEBUG
+#define KdpDprintf(...)
+#endif
+
+
 /* GLOBALS ********************************************************************/
 
 /* Freeze data */
@@ -38,6 +43,7 @@ KiFreezeTargetExecution(_In_ PKTRAP_FRAME TrapFrame,
     /* Wait for triggering AP to give the go ahead to thaw */
     while (Prcb->IpiFrozen != IPI_FROZEN_THAWING)
     {
+        YieldProcessor();
         /* We only continue on if we are thawing, otherwise something else has happened! */
         if (Prcb->IpiFrozen == IPI_FROZEN_RUNNING)
         {
@@ -47,6 +53,7 @@ KiFreezeTargetExecution(_In_ PKTRAP_FRAME TrapFrame,
                                (PCONTEXT)&Prcb->ProcessorState, FALSE);
         }
     }
+
     if (TrapFrame)
         KiRestoreProcessorControlState(&Prcb->ProcessorState);
     KeFlushCurrentTb();
@@ -108,7 +115,7 @@ KeFreezeExecution(IN PKTRAP_FRAME TrapFrame,
                 /* Await for this processor to be frozen*/
                 while (TargetPrcb->IpiFrozen != IPI_FROZEN_HALTED)
                 {
-                    /* Do nothing, we're trying to synch */
+                    YieldProcessor();
                 }
             }
         }
@@ -148,7 +155,7 @@ KeThawExecution(IN BOOLEAN Enable)
             InterlockedExchange((LONG*)&TargetPrcb->IpiFrozen, IPI_FROZEN_THAWING);
             while (Prcb->IpiFrozen != IPI_FROZEN_RUNNING)
             {
-                /* Do nothing we're waiting for ready */
+                YieldProcessor();
             }
         }
     }
