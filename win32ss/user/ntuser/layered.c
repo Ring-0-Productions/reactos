@@ -370,8 +370,8 @@ NtUserUpdateLayeredWindow(
    {
       if (pptDst)
       {
-         ProbeForRead(pptDst, sizeof(POINT), 1);
-         Dst = *pptDst;
+        ProbeForRead(pptDst, sizeof(POINT), 1);
+        Dst = *pptDst;
       }
       if (pptSrc)
       {
@@ -379,7 +379,7 @@ NtUserUpdateLayeredWindow(
          Src = *pptSrc;
       }
       ProbeForRead(psize, sizeof(SIZE), 1);
-      Size = *psize;
+      //Size = *psize;
       if (pblend)
       {
          ProbeForRead(pblend, sizeof(BLENDFUNCTION), 1);

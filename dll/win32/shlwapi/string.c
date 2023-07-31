@@ -2967,3 +2967,65 @@ BOOL WINAPI IsCharSpaceW(WCHAR wc)
 
     return GetStringTypeW(CT_CTYPE1, &wc, 1, &CharType) && (CharType & C1_SPACE);
 }
+
+
+
+static BOOL path_match_maskW(const WCHAR *name, const WCHAR *mask)
+{
+    while (*name && *mask && *mask != ';')
+    {
+        if (*mask == '*')
+        {
+            do
+            {
+                if (path_match_maskW(name, mask + 1))
+                    return TRUE;  /* try substrings */
+            } while (*name++);
+            return FALSE;
+        }
+
+        if (towupper(*mask) != towupper(*name) && *mask != '?')
+            return FALSE;
+
+        name++;
+        mask++;
+    }
+
+    if (!*name)
+    {
+        while (*mask == '*')
+            mask++;
+        if (!*mask || *mask == ';')
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+
+HRESULT WINAPI PathMatchSpecExW(const WCHAR *path, const WCHAR *mask, DWORD flags)
+{
+    //TRACE("%s, %s\n", wine_dbgstr_w(path), wine_dbgstr_w(mask));
+
+
+
+    if (!lstrcmpW(mask, L"*.*"))
+        return S_OK; /* Matches every path */
+
+    while (*mask)
+    {
+        while (*mask == ' ')
+            mask++; /* Eat leading spaces */
+
+        if (path_match_maskW(path, mask))
+            return S_OK; /* Matches the current path */
+
+        while (*mask && *mask != ';')
+            mask++; /* masks separated by ';' */
+
+        if (*mask == ';')
+            mask++;
+    }
+
+    return S_FALSE;
+}

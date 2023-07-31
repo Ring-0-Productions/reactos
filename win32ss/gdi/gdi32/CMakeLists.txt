@@ -16,6 +16,7 @@ endif()
 
 list(APPEND SOURCE
     main/dllmain.c
+    misc/dwm.c
     misc/heap.c
     misc/gdientry.c
     misc/historic.c

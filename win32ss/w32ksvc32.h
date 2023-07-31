@@ -694,3 +694,11 @@
 // For Wine DX
     SVC_(GdiDdDDICreateDCFromMemory, 1)
     SVC_(GdiDdDDIDestroyDCFromMemory, 1)
+//DwmSpecific
+    SVC_(GdiDwmGetDirtyRgn, 5)
+    SVC_(GdiDwmGetSurfaceData, 2)
+    SVC_(UserDwmGetDxRgn, 3)
+    SVC_(UserDwmHintDxUpdate, 2)
+    SVC_(UserDwmStartRedirection, 1)
+    SVC_(UserDwmStopRedirection, 0)
+    SVC_(UserRegisterSessionPort, 1)

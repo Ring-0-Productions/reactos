@@ -731,6 +731,8 @@
 @ stdcall -version=0x600+ RegDeleteTreeA(long str)
 @ stdcall -version=0x600+ RegDeleteTreeW(long wstr)
 
+@ stdcall -version=0x600+ RegCopyTreeW(ptr wstr ptr)
+
 @ stub -version=0x600+ CheckAppInitBlockedServiceIdentity
 @ stub UsePinForEncryptedFilesW
 @ stub SetUserFileEncryptionKeyEx
@@ -740,3 +742,4 @@
 @ stdcall -stub RegLoadAppKeyW(ptr)
 @ stdcall RegDeleteKeyValueW(ptr wstr wstr)
 @ stdcall RegDeleteKeyValueA(ptr str str)
+@ stdcall -version=0x600+ InitiateShutdownW(wstr wstr long long long)

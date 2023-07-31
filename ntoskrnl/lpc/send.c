@@ -42,7 +42,7 @@ LpcRequestPort(IN PVOID PortObject,
         if ((MessageType < LPC_DATAGRAM) || (MessageType > LPC_CLIENT_DIED))
         {
             /* Fail */
-            return STATUS_INVALID_PARAMETER;
+          //  return STATUS_INVALID_PARAMETER;
         }
 
         /* Mark this as a kernel-mode message only if we really came from it */
