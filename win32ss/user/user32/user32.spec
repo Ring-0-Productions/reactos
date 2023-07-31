@@ -755,28 +755,46 @@
 739 varargs wsprintfW(ptr wstr)
 740 stdcall wvsprintfA(ptr str ptr)
 741 stdcall wvsprintfW(ptr wstr ptr)
-@ stdcall -version=0x600+ RegisterPowerSettingNotification(ptr ptr long)
-@ stdcall -version=0x600+ UnregisterPowerSettingNotification(ptr)
-
-@ stdcall -version=0x600+ ChangeWindowMessageFilter(long long)
-@ stdcall -stub -version=0x600+ ShutdownBlockReasonDestroy(ptr)
-@ stub -version=0x600+ PaintMonitor
-@ stub IsWindowRedirectedForPrint
-
-; More vista:
-@ stdcall -version=0x600+ CheckDesktopByThreadId(ptr)
-@ stdcall -version=0x600+ DwmStartRedirection(ptr)
-@ stdcall -version=0x600+ DwmStopRedirection()
-@ stdcall -version=0x600+ InternalGetWindowIcon(ptr long)
-@ stdcall -version=0x600+ LogicalToPhysicalPoint(ptr ptr)
-@ stdcall -version=0x600+ OpenThreadDesktop(long long long long)
-@ stdcall -version=0x600+ RegisterErrorReportingDialog(ptr long)
-@ stdcall -version=0x600+ RegisterFrostWindow(ptr long)
-@ stdcall -version=0x600+ RegisterGhostWindow(ptr long)
-@ stdcall -version=0x600+ RegisterSessionPort( ptr ptr)
-@ stdcall -version=0x600+ UnregisterSessionPort()
-@ stdcall -version=0x600+ DwmHintDxUpdate(ptr long)
-@ stdcall -version=0x600+ GetWindowRgnEx(ptr long long)
-@ stdcall -version=0x600+ UpdateWindowTransform(ptr ptr long)
-@ stdcall -version=0x600+ SetWindowRgnEx(ptr long long)
+@ stdcall -version=0x600+ GetWindowRgnEx(ptr ptr long)
+@   stdcall -version=0x600+ ShutdownBlockReasonDestroy(ptr)
+@   stdcall -version=0x600+ DwmGetDxRgn(ptr ptr ptr) ;user32_vista.DwmGetDxRgn
+@   stdcall -version=0x600+ DwmHintDxUpdate(ptr ptr) ;user32_vista.DwmHintDxUpdate
+@   stdcall -version=0x600+ DwmStopRedirection() ;user32_vista.DwmStopRedirection
+@   stdcall -version=0x600+ DwmStartRedirection(ptr) ;user32_vista.DwmStartRedirection
+@   stdcall -version=0x600+ ChangeWindowMessageFilter(long long) ;user32_vista.ChangeWindowMessageFilter
+@   stdcall -version=0x600+ ChangeWindowMessageFilterEx(long long long ptr) ;user32_vista.ChangeWindowMessageFilterEx
+@   stdcall -version=0x600+ UnregisterPowerSettingNotification(ptr) ;user32_vista.UnregisterPowerSettingNotification
+@   stdcall -version=0x600+ SetWindowCompositionAttribute(ptr ptr) ;user32_vista.SetWindowCompositionAttribute
+@   stdcall -version=0x600+ CalculatePopupWindowPosition(ptr long long ptr ptr) ;user32_vista.CalculatePopupWindowPosition
+@   stdcall -version=0x600+ DwmGetDxSharedSurface(ptr ptr ptr ptr ptr ptr) ;user32_vista.DwmGetDxSharedSurface
+@   stdcall -version=0x600+ InternalGetWindowIcon(ptr long) ;user32_vista.InternalGetWindowIcon
+@   stdcall -version=0x601+ IsTopLevelWindow(ptr) ;user32_vista.IsTopLevelWindow
+@   stdcall -version=0x601+ IsTouchWindow(ptr long) ;user32_vista.IsTouchWindow
+@   stdcall -version=0x600+ IsWindowRedirectedForPrint(ptr) ;user32_vista.IsWindowRedirectedForPrint
+@   stdcall -version=0x600+ LogicalToPhysicalPoint(ptr ptr) ;user32_vista.LogicalToPhysicalPoint
+@   stdcall -version=0x600+ OpenThreadDesktop(long long long long) ;user32_vista.OpenThreadDesktop
+@   stdcall -version=0x600+ PaintMonitor() ;user32_vista.PaintMonitor
+@   stdcall -version=0x601+ -stub QueryDisplayConfig() ;user32_vista.QueryDisplayConfig
+@   stdcall -version=0x601+ -stub SetDisplayConfig() ;user32_vista.SetDisplayConfig
+@   stdcall -version=0x600+ RegisterErrorReportingDialog(long long) ;user32_vista.RegisterErrorReportingDialog
+@   stdcall -version=0x600+ RegisterFrostWindow(long long) ;user32_vista.RegisterFrostWindow
+@   stdcall -version=0x600+ RegisterGhostWindow(long long) ;user32_vista.RegisterGhostWindow
+@   stdcall -version=0x600+ RegisterTouchWindow(ptr long) ;user32_vista.RegisterTouchWindow
+@   stdcall -version=0x600+ CloseTouchInputHandle(ptr) ;user32_vista.CloseTouchInputHandle
+@   stdcall -version=0x600+ RegisterPowerSettingNotification() ;user32_vista.RegisterPowerSettingNotification
+@   stdcall -version=0x600+ AddClipboardFormatListener(ptr) ;user32_vista.AddClipboardFormatListener
+@   stdcall -version=0x600+ RemoveClipboardFormatListener(ptr) ;user32_vista.RemoveClipboardFormatListener
+@   stdcall -version=0x600+ GetProcessDpiAwarenessInternal(ptr ptr) ;user32_vista.GetProcessDpiAwarenessInternal
+@   stdcall -version=0x600+ SetProcessDpiAwarenessInternal(long) ;user32_vista.SetProcessDpiAwarenessInternal
+@   stdcall -version=0x600+ GetDpiForMonitorInternal(ptr long ptr ptr) ;user32_vista.GetDpiForMonitorInternal
+@   stdcall -stub SetWindowDisplayAffinity(ptr)
+;used by dwm
+@ stdcall -version=0x600+ UnregisterSessionPort() ;user32_vista.UnregisterSessionPort
+@ stdcall -version=0x600+ RegisterSessionPort(long) ;user32_vista.RegisterSessionPort
 @ stdcall -version=0x600+ GetWindowMinimizeRect(ptr ptr)
+@ stdcall -version=0x600+ SetWindowRgnEx(ptr long long)
+@ stdcall -version=0x600+ UpdateWindowTransform(ptr ptr long)
+@ stdcall -version=0x600+ CheckDesktopByThreadId(ptr)
+@ stdcall DwmGetSurfaceData(ptr long)
+@ stdcall DwmStartup(ptr)
+@ stdcall DwmShutdown()

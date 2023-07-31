@@ -16,10 +16,10 @@ UINT WINAPI GetDpiForWindow(HWND hWnd)
 
 BOOL WINAPI IsProcessDPIAware()
 {
-    return FALSE;
+    return TRUE;
 }
 
 BOOL WINAPI SetProcessDPIAware()
 {
-    return FALSE;
+    return TRUE;
 }

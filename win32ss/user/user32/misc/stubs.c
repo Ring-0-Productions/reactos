@@ -520,6 +520,7 @@ NTSTATUS
 WINAPI
 DeviceEventWorker(HWND hwnd, WPARAM wParam, LPARAM lParam, DWORD Data, ULONG_PTR *uResult)
 {
+  return 1;
     USER_API_MESSAGE ApiMessage;
     PUSER_DEVICE_EVENT_MSG pusem = &ApiMessage.Data.DeviceEventMsg;
 
@@ -669,13 +670,6 @@ NTSTATUS WINAPI DwmHintDxUpdate(HANDLE window, DWORD option){
 	return STATUS_SUCCESS;
 }
 
-DWORD WINAPI RegisterSessionPort(HANDLE a1, HANDLE a2)
-{
-	DbgPrint("RegisterSessionPort is UNIMPLEMENTED\n"); 
-	return 0;
-}
-
-
 DWORD 
 WINAPI 
 RegisterGhostWindow(HWND a1, DWORD a2)
@@ -700,21 +694,7 @@ DWORD WINAPI RegisterErrorReportingDialog(HWND a1, DWORD a2)
 
 HDESK WINAPI OpenThreadDesktop(DWORD desktop, BOOL verification, DWORD mask, ACCESS_MASK access)
 {
-  HDESK result;
-  PCSR_API_MESSAGE message = NULL;
-  NTSTATUS NtStatus = STATUS_SUCCESS;
-
-  CsrClientCallServer(message, 0, 197637, 8);
-  if ( NtStatus < 0 )
-  {
-    SetLastError(NtStatus);
-    result = 0;
-  }
-  else
-  {
-    result = GetThreadDesktop(desktop);
-  }
-  return result;
+  return NULL;
 }
 
 BOOL
@@ -728,6 +708,15 @@ LogicalToPhysicalPoint(_In_     HWND hWnd,
 	return TRUE;
 }
 
+
+
+BOOLEAN
+APIENTRY
+NtUserDwmStartRedirection(HANDLE Handle);
+
+UINT32
+APIENTRY
+NtUserRegisterSessionPort(HANDLE Handle);
 
 INT WINAPI InternalGetWindowIcon(HWND hWnd, UINT iconType )
 {
@@ -754,9 +743,7 @@ BOOLEAN
 WINAPI
 DwmStartRedirection(HANDLE Handle)
 {
-  __debugbreak();
-  return 0;
-   // return NtUserDwmStartRedirection(Handle);
+    return NtUserDwmStartRedirection(Handle);
 }
 
 DWORD
@@ -764,5 +751,246 @@ WINAPI
 DwmStopRedirection()
 {
 	DbgPrint("DwmStopRedirection is UNIMPLEMENTED\n");	
+	return 0;
+}
+
+/*
+ * @unimplemented
+ */
+BOOL
+WINAPI
+ChangeWindowMessageFilter(
+    UINT  message,
+    DWORD dwFlag)
+{
+    UNIMPLEMENTED;
+   // __debugbreak();
+    return TRUE;
+}
+
+/*
+ * @unimplemented
+ */
+BOOL WINAPI
+ChangeWindowMessageFilterEx(HWND hwnd,
+                            UINT message,
+                            DWORD action,
+                            PVOID pChangeFilterStruct)
+{
+    return TRUE;
+}
+
+BOOL
+WINAPI
+ShutdownBlockReasonCreate(HWND hWnd, LPCWSTR pwszReason)
+{
+    UNIMPLEMENTED;
+    return 1;
+}
+
+BOOL
+WINAPI
+ShutdownBlockReasonQuery( HWND   hWnd,
+  LPWSTR pwszBuff,
+  DWORD  *pcchBuff)
+{
+    UNIMPLEMENTED;
+    return 1;
+}
+
+BOOL
+WINAPI
+ShutdownBlockReasonDestroy(HWND hWnd)
+{
+    UNIMPLEMENTED;
+    return 1;
+}
+
+BOOL
+WINAPI
+CalculatePopupWindowPosition(const POINT *anchorPoint,
+                             const SIZE *windowSize,
+                             UINT flags,
+                             RECT *excludeRect,
+                             RECT *popupWindowPosition)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+BOOL
+WINAPI
+DwmGetDxSharedSurface(HWND hwnd,
+                      HANDLE* phSurface,
+                      LUID* pAdapterLuid,
+                      ULONG* pFmtWindow,
+                      ULONG* pPresentFlags,
+                      ULONGLONG* pWin32kUpdateId)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+HWND
+WINAPI
+GhostWindowFromHungWindow(HWND hwndGhost)
+{
+    UNIMPLEMENTED;
+    return NULL;
+}
+
+HWND
+WINAPI
+HungWindowFromGhostWindow(HWND hwndGhost)
+{
+    UNIMPLEMENTED;
+    return NULL;
+}
+
+BOOL
+WINAPI
+IsTouchWindow(HWND hwnd,
+              PULONG pulFlags)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+BOOL
+WINAPI
+IsThreadDesktopComposited(VOID)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+} 
+
+BOOL
+WINAPI
+IsTopLevelWindow(IN HWND hWnd)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+BOOL
+WINAPI
+IsWindowRedirectedForPrint(IN HWND hWnd)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+BOOL
+WINAPI
+GetWindowCompositionAttribute(HWND hwnd,
+                              PVOID pAttrData) // WINCOMPATTRDATA
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+BOOL
+WINAPI
+RegisterTouchWindow(HWND  hwnd,
+                    ULONG ulFlags)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+BOOL
+WINAPI
+SetWindowCompositionAttribute(HWND hwnd,
+                              PVOID pAttrData) // WINCOMPATTRDATA
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+LONG 
+WINAPI
+DisplayConfigGetDeviceInfo(
+  PVOID *requestPacket
+)
+{
+    return 0;
+}
+
+BOOL WINAPI PaintMonitor(HMONITOR monnitor, HDC hdc, RECT rcDst)
+{
+	return PaintDesktop(hdc);	
+}
+
+BOOL 
+WINAPI
+CloseTouchInputHandle(
+  PVOID hTouchInput
+)
+{
+    return 1;
+}
+
+BOOL
+WINAPI
+GetProcessDpiAwarenessInternal(HANDLE handle,DPI_AWARENESS* dpi )
+{
+    return FALSE;
+}
+BOOL
+WINAPI
+SetProcessDpiAwarenessInternal(DPI_AWARENESS dpi)
+{
+    return FALSE;
+}
+BOOL
+WINAPI
+GetDpiForMonitorInternal(HMONITOR monitor ,UINT one,UINT* two,UINT* three)
+{
+    return FALSE;
+}
+
+UINT32
+WINAPI
+DwmGetDxRgn(PVOID x1, PVOID x2, PVOID x3)
+{
+    __debugbreak();
+    return 0;
+}
+
+NTSTATUS
+WINAPI
+RegisterSessionPort(UINT32 x1)
+{
+    NTSTATUS Status;
+    Status = NtUserRegisterSessionPort((HANDLE)x1);
+    DbgPrint("status %X\n", GetLastError());
+    SetLastError(0);
+    __debugbreak();
+    return Status;
+}
+
+
+
+BOOL 
+DwmGetSurfaceData(
+	PVOID Object, 
+	int a2
+)
+{
+	return TRUE;
+}
+
+NTSTATUS
+DwmStartup(
+	HANDLE hwnd
+){
+  NtUserDwmStartRedirection(hwnd);
+	return 0;
+}
+
+NTSTATUS
+DwmShutdown()
+{
+  __debugbreak();
 	return 0;
 }

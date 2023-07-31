@@ -1623,6 +1623,16 @@ HKLM,"SYSTEM\CurrentControlSet\Services\BITS","Start",0x00010001,0x00000003
 HKLM,"SYSTEM\CurrentControlSet\Services\BITS","Type",0x00010001,0x00000020
 HKLM,"SYSTEM\CurrentControlSet\Services\BITS\Parameters","ServiceDll",0x00020000,"%SystemRoot%\system32\qmgr.dll"
 
+;Your mom
+HKLM,"SYSTEM\CurrentControlSet\Services\UxSms","DisplayName",0x00000000,%UXSMS_SERVICE%
+HKLM,"SYSTEM\CurrentControlSet\Services\UxSms","Description",0x00000000,%UXSMS_SERVICE_DESCRIPTION%
+HKLM,"SYSTEM\CurrentControlSet\Services\UxSms","ErrorControl",0x00010001,0x00000001
+HKLM,"SYSTEM\CurrentControlSet\Services\UxSms","ImagePath",0x00020000,"%SystemRoot%\system32\svchost.exe -k LocalSystemNetworkRestricted"
+HKLM,"SYSTEM\CurrentControlSet\Services\UxSms","ObjectName",0x00000000,"LocalSystem"
+HKLM,"SYSTEM\CurrentControlSet\Services\UxSms","Start",0x00010001,0x00000002
+HKLM,"SYSTEM\CurrentControlSet\Services\UxSms","Type",0x00010001,0x00000020
+HKLM,"SYSTEM\CurrentControlSet\Services\UxSms\Parameters","ServiceDll",0x00020000,"%SystemRoot%\system32\UxSms.dll"
+
 ; BlueScreen device driver
 HKLM,"SYSTEM\CurrentControlSet\Services\Blue","ErrorControl",0x00010001,0x00000000
 HKLM,"SYSTEM\CurrentControlSet\Services\Blue","Group",0x00000000,"Video Init"
@@ -2294,6 +2304,9 @@ HKLM,"SYSTEM\CurrentControlSet\Services\Disk","Type",0x00010001,0x00000001
 [Strings]
 
 ; Services names and descriptions
+UXSMS_SERVICE="Desktop Window Manager Session Manager"
+UXSMS_SERVICE_DESCRIPTION="Provides Deskop Window Manager startup and maintenance services"
+
 AUDIO_SERVICE="Audio Service"
 AUDIO_SERVICE_DESCRIPTION="Provides audio facilities to applications"
 

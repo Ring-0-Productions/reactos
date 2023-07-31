@@ -110,7 +110,7 @@ BOOL WINAPI Imm32IsImcAnsi(HIMC hIMC);
  * Unexpected Condition Checkers
  * --- Examine the condition, and then generate trace log if necessary.
  */
-#ifdef NDEBUG /* on Release */
+#if 1//NDEBUG /* on Release */
 #define FAILED_UNEXPECTEDLY(hr) (FAILED(hr))
 #define IS_NULL_UNEXPECTEDLY(p) (!(p))
 #define IS_ZERO_UNEXPECTEDLY(p) (!(p))

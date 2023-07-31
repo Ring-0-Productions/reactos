@@ -3923,4 +3923,17 @@ NtGdiGetCurrentDpiInfo(
 
 #endif /* PRIVATE_DWM_INTERFACE */
 
+//TODO: fix these, they aren't correct
+__kernel_entry
+W32KAPI
+PVOID
+APIENTRY
+NtGdiDwmGetDirtyRgn(PVOID x1, PVOID x2, PVOID x3, PVOID x4, PVOID x5);
+
+__kernel_entry
+W32KAPI
+BOOLEAN
+APIENTRY
+NtGdiDwmGetSurfaceData(PVOID x1, PVOID x2);
+
 #endif /* _NTGDI_ */

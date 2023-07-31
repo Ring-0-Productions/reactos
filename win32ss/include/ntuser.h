@@ -3594,6 +3594,29 @@ DWORD
 NTAPI
 NtUserYieldTask(VOID);
 
+/* DWM Specific
+ * ReactOS Early dwm implementation
+ */
+UINT32
+APIENTRY
+NtUserDwmGetDxRgn(PVOID x1, PVOID x2, PVOID x3);
+
+UINT32
+APIENTRY
+NtUserDwmHintDxUpdate(PVOID x1, PVOID x2);
+
+BOOLEAN
+APIENTRY
+NtUserDwmStartRedirection(HANDLE Handle);
+
+BOOLEAN
+APIENTRY
+NtUserDwmStopRedirection(VOID);
+
+UINT32
+APIENTRY
+NtUserRegisterSessionPort(HANDLE Handle);
+
 /* NtUserBad
  * ReactOS-specific NtUser calls and their related structures, both which shouldn't exist.
  */

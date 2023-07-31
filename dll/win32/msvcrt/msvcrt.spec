@@ -970,7 +970,7 @@
 @ stub -version=0x600+ _snwprintf_s_l
 @ varargs _snwscanf(wstr long wstr)
 @ stub -version=0x600+ _snwscanf_l
-@ stub -version=0x600+ _snwscanf_s
+@ cdecl -stub -version=0x600+ _snwscanf_s(wstr long wstr)
 @ stub -version=0x600+ _snwscanf_s_l
 @ varargs _sopen(str long long)
 @ cdecl -version=0x600+ _sopen_s(ptr str long long long)
