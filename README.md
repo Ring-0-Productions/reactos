@@ -17,7 +17,7 @@
 
 ## Quick Links
 ;
-[Community Discord](https://discord.gg/7knjvhT) &bull;
+[Community Discord](https://discord.gg/UQfTzpMzZ) &bull;
 
 ## What is ReactOS Longhorn?
 
