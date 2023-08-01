@@ -1,6 +1,6 @@
 <p align=center>
   <a href="https://reactos.org/">
-    <img alt="ReactOS" src="server_icon.png">
+    <img alt="ReactOS" src="server-icon.png">
   </a>
 </p>
 
