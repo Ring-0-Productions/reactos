@@ -29,8 +29,10 @@ PELDR_IMPORTDLL_LOAD_CALLBACK PeLdrImportDllLoadCallback = NULL;
 
 #ifdef _WIN64
 #define DEFAULT_SECURITY_COOKIE 0x00002B992DDFA232ll
+#define COOKIE_FIXUP 16
 #else
 #define DEFAULT_SECURITY_COOKIE 0xBB40E64E
+#define COOKIE_FIXUP 0
 #endif
 
 
@@ -99,7 +101,7 @@ PeLdrpInitSecurityCookie(PLDR_DATA_TABLE_ENTRY LdrEntry)
             }
 
             /* Set the new cookie value */
-            *Cookie = NewCookie;
+            *Cookie = NewCookie >> COOKIE_FIXUP;
         }
     }
 
