@@ -2861,9 +2861,6 @@ LdrpFetchAddressOfSecurityCookie(PVOID BaseAddress, ULONG SizeOfImage)
     ULONG DirSize;
     PVOID Cookie = NULL;
 
-    /* Check NT header first */
-    if (!RtlImageNtHeader(BaseAddress)) return NULL;
-
     /* Get the pointer to the config directory */
     ConfigDir = RtlImageDirectoryEntryToData(BaseAddress,
                                              TRUE,
@@ -2873,7 +2870,7 @@ LdrpFetchAddressOfSecurityCookie(PVOID BaseAddress, ULONG SizeOfImage)
     /* Check for sanity */
     if (!ConfigDir ||
         DirSize < FIELD_OFFSET(IMAGE_LOAD_CONFIG_DIRECTORY, SEHandlerTable) ||  /* SEHandlerTable is after SecurityCookie */
-        (ConfigDir->Size != DirSize))
+        (ConfigDir->Size < 0x48))
     {
         /* Invalid directory*/
         return NULL;
