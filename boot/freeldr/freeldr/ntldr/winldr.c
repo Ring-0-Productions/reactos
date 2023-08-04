@@ -342,6 +342,9 @@ WinLdrLoadDeviceDriver(PLIST_ENTRY LoadOrderListHead,
         return FALSE;
     }
 
+    /* Init security cookie */
+    PeLdrInitSecurityCookie(*DriverDTE);
+
     // Modify any flags, if needed
     (*DriverDTE)->Flags |= Flags;
 
