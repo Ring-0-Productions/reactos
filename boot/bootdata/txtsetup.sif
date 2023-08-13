@@ -176,6 +176,7 @@ ROOT\SWENUM = swenum
 *PNP0303 = i8042prt,{4D36E96B-E325-11CE-BFC1-08002BE10318}
 PCI\VEN_104B&CC_0100 = buslogic
 PCI\CC_0101 = pciide
+PCI\CC_010802=nvme
 PCI\CC_0106 = storahci
 ;PCI\CC_0106 = storahci
 *PNP0600 = atapi
@@ -221,6 +222,7 @@ storahci = storahci.sys
 
 [SCSI.Load]
 atapi = atapi.sys
+nvme = nvme.sys
 storahci = storahci.sys
 buslogic = buslogic.sys
 disk = disk.sys
