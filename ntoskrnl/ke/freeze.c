@@ -41,11 +41,11 @@ KiFreezeTargetExecution(_In_ PKTRAP_FRAME TrapFrame,
     InterlockedExchange((LONG*)&Prcb->IpiFrozen, IPI_FROZEN_HALTED);
 
     /* Wait for triggering AP to give the go ahead to thaw */
-    while (Prcb->IpiFrozen != IPI_FROZEN_THAWING)
+    while ((Prcb->IpiFrozen & 0xF) == IPI_FROZEN_HALTED)
     {
         YieldProcessor();
         /* We only continue on if we are thawing, otherwise something else has happened! */
-        if (Prcb->IpiFrozen == IPI_FROZEN_RUNNING)
+        if ((Prcb->IpiFrozen & 0x20) != 0 )
         {
             RtlZeroMemory(&ExceptionRecord, sizeof(EXCEPTION_RECORD));
             ExceptionRecord.ExceptionAddress = (PVOID)Prcb->ProcessorState.ContextFrame.Eip;
