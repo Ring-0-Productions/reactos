@@ -699,8 +699,8 @@ static const struct ID3D11ShaderReflectionVtbl d3dcompiler_shader_reflection_vtb
     d3dcompiler_shader_reflection_GetNumInterfaceSlots,
     d3dcompiler_shader_reflection_GetMinFeatureLevel,
     d3dcompiler_shader_reflection_GetThreadGroupSize,
-    d3dcompiler_shader_reflection_GetRequiresFlags,
 };
+
 
 /* ID3D11ShaderReflectionConstantBuffer methods */
 
