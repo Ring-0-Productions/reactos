@@ -383,7 +383,6 @@ static void surface_blt_fbo(const struct wined3d_device *device,
     RECT src_rect, dst_rect;
     GLenum gl_filter;
     GLenum buffer;
-    int i;
 
     TRACE("device %p, filter %s,\n", device, debug_d3dtexturefiltertype(filter));
     TRACE("src_surface %p, src_location %s, src_rect %s,\n",
@@ -481,8 +480,10 @@ static void surface_blt_fbo(const struct wined3d_device *device,
     context_invalidate_state(context, STATE_FRAMEBUFFER);
 
     gl_info->gl_ops.gl.p_glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    for (i = 0; i < MAX_RENDER_TARGETS; ++i)
-        context_invalidate_state(context, STATE_RENDER(WINED3D_RS_COLORWRITE(i)));
+    context_invalidate_state(context, STATE_RENDER(WINED3D_RS_COLORWRITEENABLE));
+    context_invalidate_state(context, STATE_RENDER(WINED3D_RS_COLORWRITEENABLE1));
+    context_invalidate_state(context, STATE_RENDER(WINED3D_RS_COLORWRITEENABLE2));
+    context_invalidate_state(context, STATE_RENDER(WINED3D_RS_COLORWRITEENABLE3));
 
     gl_info->gl_ops.gl.p_glDisable(GL_SCISSOR_TEST);
     context_invalidate_state(context, STATE_RENDER(WINED3D_RS_SCISSORTESTENABLE));
@@ -1290,126 +1291,6 @@ static void convert_yuy2_r5g6b5(const BYTE *src, BYTE *dst,
     }
 }
 
-static void convert_dxt1_a8r8g8b8(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8A8_UNORM, w, h);
-}
-
-static void convert_dxt1_x8r8g8b8(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8X8_UNORM, w, h);
-}
-
-static void convert_dxt1_a4r4g4b4(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B4G4R4A4_UNORM, w, h);
-}
-
-static void convert_dxt1_x4r4g4b4(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B4G4R4X4_UNORM, w, h);
-}
-
-static void convert_dxt1_a1r5g5b5(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B5G5R5A1_UNORM, w, h);
-}
-
-static void convert_dxt1_x1r5g5b5(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B5G5R5X1_UNORM, w, h);
-}
-
-static void convert_dxt3_a8r8g8b8(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt3_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8A8_UNORM, w, h);
-}
-
-static void convert_dxt3_x8r8g8b8(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt3_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8X8_UNORM, w, h);
-}
-
-static void convert_dxt3_a4r4g4b4(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt3_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B4G4R4A4_UNORM, w, h);
-}
-
-static void convert_dxt3_x4r4g4b4(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt3_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B4G4R4X4_UNORM, w, h);
-}
-
-static void convert_dxt5_a8r8g8b8(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt5_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8A8_UNORM, w, h);
-}
-
-static void convert_dxt5_x8r8g8b8(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt5_decode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8X8_UNORM, w, h);
-}
-
-static void convert_a8r8g8b8_dxt1(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_encode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8A8_UNORM, w, h);
-}
-
-static void convert_x8r8g8b8_dxt1(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_encode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8X8_UNORM, w, h);
-}
-
-static void convert_a1r5g5b5_dxt1(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_encode(src, dst, pitch_in, pitch_out, WINED3DFMT_B5G5R5A1_UNORM, w, h);
-}
-
-static void convert_x1r5g5b5_dxt1(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt1_encode(src, dst, pitch_in, pitch_out, WINED3DFMT_B5G5R5X1_UNORM, w, h);
-}
-
-static void convert_a8r8g8b8_dxt3(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt3_encode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8A8_UNORM, w, h);
-}
-
-static void convert_x8r8g8b8_dxt3(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt3_encode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8X8_UNORM, w, h);
-}
-
-static void convert_a8r8g8b8_dxt5(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt5_encode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8A8_UNORM, w, h);
-}
-
-static void convert_x8r8g8b8_dxt5(const BYTE *src, BYTE *dst,
-        DWORD pitch_in, DWORD pitch_out, unsigned int w, unsigned int h)
-{
-    wined3d_dxt5_encode(src, dst, pitch_in, pitch_out, WINED3DFMT_B8G8R8X8_UNORM, w, h);
-}
-
 struct d3dfmt_converter_desc
 {
     enum wined3d_format_id from, to;
@@ -1426,33 +1307,6 @@ static const struct d3dfmt_converter_desc converters[] =
     {WINED3DFMT_YUY2,           WINED3DFMT_B5G6R5_UNORM,    convert_yuy2_r5g6b5},
 };
 
-static const struct d3dfmt_converter_desc dxtn_converters[] =
-{
-    /* decode DXT */
-    {WINED3DFMT_DXT1,           WINED3DFMT_B8G8R8A8_UNORM,  convert_dxt1_a8r8g8b8},
-    {WINED3DFMT_DXT1,           WINED3DFMT_B8G8R8X8_UNORM,  convert_dxt1_x8r8g8b8},
-    {WINED3DFMT_DXT1,           WINED3DFMT_B4G4R4A4_UNORM,  convert_dxt1_a4r4g4b4},
-    {WINED3DFMT_DXT1,           WINED3DFMT_B4G4R4X4_UNORM,  convert_dxt1_x4r4g4b4},
-    {WINED3DFMT_DXT1,           WINED3DFMT_B5G5R5A1_UNORM,  convert_dxt1_a1r5g5b5},
-    {WINED3DFMT_DXT1,           WINED3DFMT_B5G5R5X1_UNORM,  convert_dxt1_x1r5g5b5},
-    {WINED3DFMT_DXT3,           WINED3DFMT_B8G8R8A8_UNORM,  convert_dxt3_a8r8g8b8},
-    {WINED3DFMT_DXT3,           WINED3DFMT_B8G8R8X8_UNORM,  convert_dxt3_x8r8g8b8},
-    {WINED3DFMT_DXT3,           WINED3DFMT_B4G4R4A4_UNORM,  convert_dxt3_a4r4g4b4},
-    {WINED3DFMT_DXT3,           WINED3DFMT_B4G4R4X4_UNORM,  convert_dxt3_x4r4g4b4},
-    {WINED3DFMT_DXT5,           WINED3DFMT_B8G8R8A8_UNORM,  convert_dxt5_a8r8g8b8},
-    {WINED3DFMT_DXT5,           WINED3DFMT_B8G8R8X8_UNORM,  convert_dxt5_x8r8g8b8},
-
-    /* encode DXT */
-    {WINED3DFMT_B8G8R8A8_UNORM, WINED3DFMT_DXT1,            convert_a8r8g8b8_dxt1},
-    {WINED3DFMT_B8G8R8X8_UNORM, WINED3DFMT_DXT1,            convert_x8r8g8b8_dxt1},
-    {WINED3DFMT_B5G5R5A1_UNORM, WINED3DFMT_DXT1,            convert_a1r5g5b5_dxt1},
-    {WINED3DFMT_B5G5R5X1_UNORM, WINED3DFMT_DXT1,            convert_x1r5g5b5_dxt1},
-    {WINED3DFMT_B8G8R8A8_UNORM, WINED3DFMT_DXT3,            convert_a8r8g8b8_dxt3},
-    {WINED3DFMT_B8G8R8X8_UNORM, WINED3DFMT_DXT3,            convert_x8r8g8b8_dxt3},
-    {WINED3DFMT_B8G8R8A8_UNORM, WINED3DFMT_DXT5,            convert_a8r8g8b8_dxt5},
-    {WINED3DFMT_B8G8R8X8_UNORM, WINED3DFMT_DXT5,            convert_x8r8g8b8_dxt5}
-};
-
 static inline const struct d3dfmt_converter_desc *find_converter(enum wined3d_format_id from,
         enum wined3d_format_id to)
 {
@@ -1462,12 +1316,6 @@ static inline const struct d3dfmt_converter_desc *find_converter(enum wined3d_fo
     {
         if (converters[i].from == from && converters[i].to == to)
             return &converters[i];
-    }
-
-    for (i = 0; i < (sizeof(dxtn_converters) / sizeof(*dxtn_converters)); ++i)
-    {
-        if (dxtn_converters[i].from == from && dxtn_converters[i].to == to)
-            return wined3d_dxtn_supported() ? &dxtn_converters[i] : NULL;
     }
 
     return NULL;
@@ -2522,11 +2370,7 @@ static BOOL surface_load_texture(struct wined3d_surface *surface,
     /* Don't use PBOs for converted surfaces. During PBO conversion we look at
      * WINED3D_TEXTURE_CONVERTED but it isn't set (yet) in all cases it is
      * getting called. */
-#if !defined(STAGING_CSMT)
     if ((format.conv_byte_count || conversion) && texture->sub_resources[sub_resource_idx].buffer_object)
-#else  /* STAGING_CSMT */
-    if ((format.conv_byte_count || conversion) && texture->sub_resources[sub_resource_idx].buffer)
-#endif /* STAGING_CSMT */
     {
         TRACE("Removing the pbo attached to surface %p.\n", surface);
 
@@ -3430,8 +3274,7 @@ static HRESULT surface_cpu_blt(struct wined3d_texture *dst_texture, unsigned int
             && (src_width != dst_width || src_height != dst_height))
     {
         /* Can happen when d3d9 apps do a StretchRect() call which isn't handled in GL. */
-        static int once;
-        if (!once++) FIXME("Filter %s not supported in software blit.\n", debug_d3dtexturefiltertype(filter));
+        FIXME("Filter %s not supported in software blit.\n", debug_d3dtexturefiltertype(filter));
     }
 
     xinc = (src_width << 16) / dst_width;
@@ -4056,16 +3899,6 @@ HRESULT wined3d_surface_blt(struct wined3d_surface *dst_surface, const RECT *dst
         goto cpu;
     }
 
-    /* We want to avoid invalidating the sysmem location for converted
-     * surfaces, since otherwise we'd have to convert the data back when
-     * locking them. */
-    if (dst_texture->flags & WINED3D_TEXTURE_CONVERTED || dst_texture->resource.format->conv_byte_count
-            || wined3d_format_get_color_key_conversion(dst_texture, TRUE))
-    {
-        WARN_(d3d_perf)("Converted surface, using CPU blit.\n");
-        goto cpu;
-    }
-
     if (flags & ~simple_blit)
     {
         WARN_(d3d_perf)("Using fallback for complex blit (%#x).\n", flags);
@@ -4195,7 +4028,7 @@ HRESULT wined3d_surface_blt(struct wined3d_surface *dst_surface, const RECT *dst
         /* Set the swap effect to COPY, we don't want the backbuffer to become
          * undefined. */
         dst_swapchain->desc.swap_effect = WINED3D_SWAP_EFFECT_COPY;
-        wined3d_swapchain_present(dst_swapchain, NULL, NULL, dst_swapchain->win_handle, 0, 0);
+        wined3d_swapchain_present(dst_swapchain, NULL, NULL, dst_swapchain->win_handle, 0);
         dst_swapchain->desc.swap_effect = swap_effect;
 
         return WINED3D_OK;
