@@ -125,3 +125,57 @@ WSASetLastError(IN INT iError)
     /* Let the Windows Function do the work */
     SetLastError(iError);
 }
+
+/*
+ * @unimplemented
+ */
+PCSTR
+WSAAPI
+inet_ntop(INT Family,
+          const VOID *pAddr,
+          PSTR pStringBuf,
+          size_t StringBufSize)
+{
+   // UNIMPLEMENTED;
+    return NULL;
+}
+
+/*
+ * @unimplemented
+ */
+INT
+WSAAPI
+inet_pton(INT Family,
+          PCSTR pszAddrString,
+          PVOID pAddrBuf)
+{
+   // UNIMPLEMENTED;
+    return 1;
+}
+
+/*
+ * @unimplemented
+ */
+PCWSTR
+WSAAPI
+InetNtopW(INT Family,
+          const VOID *pAddr,
+          PWSTR pStringBuf,
+          size_t StringBufSize)
+{
+    //UNIMPLEMENTED;
+    return NULL;
+}
+
+/*
+ * @unimplemented
+ */
+INT
+WSAAPI
+InetPtonW(INT Family,
+          PCWSTR pszAddrString,
+          PVOID pAddrBuf)
+{
+    //UNIMPLEMENTED;
+    return 1;
+}
