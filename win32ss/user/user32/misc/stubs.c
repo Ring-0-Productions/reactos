@@ -42,6 +42,23 @@ SetDebugErrorLevel( DWORD dwLevel )
     FIXME("(%lu): stub\n", dwLevel);
 }
 
+BOOL
+WINAPI
+UnregisterPowerSettingNotification(HANDLE Handle) // HPOWERNOTIFY
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+PVOID // HPOWERNOTIFY
+WINAPI
+RegisterPowerSettingNotification(HANDLE hRecipient,
+                                 LPCGUID PowerSettingGuid,
+                                 DWORD Flags)
+{
+    UNIMPLEMENTED;
+    return NULL;
+}
 
 /*
  * @implemented
