@@ -1202,6 +1202,8 @@
 @ stdcall RtlTraceDatabaseLock(ptr)
 @ stdcall RtlTraceDatabaseUnlock(ptr)
 @ stdcall RtlTraceDatabaseValidate(ptr)
+@ stdcall RtlTryAcquireSRWLockExclusive(ptr)
+@ stdcall RtlTryAcquireSRWLockShared(ptr)
 @ stub -version=0x600+ RtlTryAcquirePebLock
 @ stdcall RtlTryEnterCriticalSection(ptr)
 @ stdcall RtlUnhandledExceptionFilter2(ptr long)
