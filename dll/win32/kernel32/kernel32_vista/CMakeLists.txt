@@ -11,6 +11,7 @@ list(APPEND SOURCE
     GetTickCount64.c
     InitOnce.c
     sync.c
+    k32.c
     vista.c)
 
 # These functions are not exported from kernel32_vista (yet).
