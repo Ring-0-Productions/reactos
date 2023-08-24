@@ -4011,8 +4011,6 @@ void find_ps_compile_args(const struct wined3d_state *state, const struct wined3
 
     args->render_offscreen = shader->reg_maps.vpos && gl_info->supported[ARB_FRAGMENT_COORD_CONVENTIONS]
             ? context->render_offscreen : 0;
-
-    args->dual_source_blend = wined3d_dualblend_enabled(state, gl_info);
 }
 
 static HRESULT pixel_shader_init(struct wined3d_shader *shader, struct wined3d_device *device,
