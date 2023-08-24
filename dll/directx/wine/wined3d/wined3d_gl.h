@@ -28,8 +28,8 @@
 
 #define GL_COMPRESSED_LUMINANCE_ALPHA_3DC_ATI 0x8837  /* not in the gl spec */
 
-extern void (WINE_GLAPI *glDisableWINE)(GLenum cap) DECLSPEC_HIDDEN;
-extern void (WINE_GLAPI *glEnableWINE)(GLenum cap) DECLSPEC_HIDDEN;
+void (WINE_GLAPI *glDisableWINE)(GLenum cap) DECLSPEC_HIDDEN;
+void (WINE_GLAPI *glEnableWINE)(GLenum cap) DECLSPEC_HIDDEN;
 
 /* OpenGL extensions. */
 enum wined3d_gl_extension
@@ -55,7 +55,6 @@ enum wined3d_gl_extension
     ARB_CULL_DISTANCE,
     ARB_DEBUG_OUTPUT,
     ARB_DEPTH_BUFFER_FLOAT,
-    ARB_DEPTH_CLAMP,
     ARB_DEPTH_TEXTURE,
     ARB_DERIVATIVE_CONTROL,
     ARB_DRAW_BUFFERS,
@@ -163,7 +162,6 @@ enum wined3d_gl_extension
     EXT_PACKED_DEPTH_STENCIL,
     EXT_PACKED_FLOAT,
     EXT_POINT_PARAMETERS,
-    EXT_POLYGON_OFFSET_CLAMP,
     EXT_PROVOKING_VERTEX,
     EXT_SECONDARY_COLOR,
     EXT_STENCIL_TWO_SIDE,
@@ -202,7 +200,6 @@ enum wined3d_gl_extension
     NV_VERTEX_PROGRAM2,
     NV_VERTEX_PROGRAM2_OPTION,
     NV_VERTEX_PROGRAM3,
-    NVX_GPU_MEMORY_INFO,
     /* WGL extensions */
     WGL_ARB_PIXEL_FORMAT,
     WGL_EXT_SWAP_CONTROL,

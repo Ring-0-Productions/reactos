@@ -227,12 +227,10 @@
 @ cdecl wined3d_resource_get_parent(ptr)
 @ cdecl wined3d_resource_get_priority(ptr)
 @ cdecl wined3d_resource_map(ptr long ptr ptr long)
-@ cdecl wined3d_resource_map_info(ptr long ptr long)
 @ cdecl wined3d_resource_preload(ptr)
 @ cdecl wined3d_resource_set_parent(ptr ptr)
 @ cdecl wined3d_resource_set_priority(ptr long)
 @ cdecl wined3d_resource_unmap(ptr long)
-@ cdecl wined3d_resource_update_info(ptr long ptr long long)
 
 @ cdecl wined3d_rendertarget_view_create(ptr ptr ptr ptr ptr)
 @ cdecl wined3d_rendertarget_view_create_from_sub_resource(ptr long ptr ptr ptr)
@@ -272,8 +270,6 @@
 @ cdecl wined3d_stateblock_decref(ptr)
 @ cdecl wined3d_stateblock_incref(ptr)
 
-@ cdecl wined3d_strictdrawing_set(long)
-
 @ cdecl wined3d_swapchain_create(ptr ptr ptr ptr ptr)
 @ cdecl wined3d_swapchain_decref(ptr)
 @ cdecl wined3d_swapchain_get_back_buffer(ptr long)
@@ -285,7 +281,7 @@
 @ cdecl wined3d_swapchain_get_desc(ptr ptr)
 @ cdecl wined3d_swapchain_get_raster_status(ptr ptr)
 @ cdecl wined3d_swapchain_incref(ptr)
-@ cdecl wined3d_swapchain_present(ptr ptr ptr ptr long long)
+@ cdecl wined3d_swapchain_present(ptr ptr ptr ptr long)
 @ cdecl wined3d_swapchain_resize_buffers(ptr long long long long long long)
 @ cdecl wined3d_swapchain_resize_target(ptr ptr)
 @ cdecl wined3d_swapchain_set_fullscreen(ptr ptr ptr)
@@ -326,11 +322,3 @@
 @ cdecl wined3d_vertex_declaration_decref(ptr)
 @ cdecl wined3d_vertex_declaration_get_parent(ptr)
 @ cdecl wined3d_vertex_declaration_incref(ptr)
-
-@ cdecl wined3d_dxtn_supported()
-@ cdecl wined3d_dxt1_decode(ptr ptr long long long long long)
-@ cdecl wined3d_dxt1_encode(ptr ptr long long long long long)
-@ cdecl wined3d_dxt3_decode(ptr ptr long long long long long)
-@ cdecl wined3d_dxt3_encode(ptr ptr long long long long long)
-@ cdecl wined3d_dxt5_decode(ptr ptr long long long long long)
-@ cdecl wined3d_dxt5_encode(ptr ptr long long long long long)

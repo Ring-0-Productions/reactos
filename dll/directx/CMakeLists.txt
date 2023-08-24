@@ -10,3 +10,4 @@ add_subdirectory(ksuser)
 #add_subdirectory(msdvbnp) #disabled in trunk
 #add_subdirectory(msvidctl) #disabled in trunk
 add_subdirectory(wine)
+add_subdirectory(wine_vista)
