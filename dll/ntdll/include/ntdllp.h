@@ -29,6 +29,33 @@ typedef struct _LDRP_TLS_DATA
     IMAGE_TLS_DIRECTORY TlsDirectory;
 } LDRP_TLS_DATA, *PLDRP_TLS_DATA;
 
+
+typedef struct _TLS_VECTOR
+{
+    union
+    {
+        ULONG Length;
+        HANDLE ThreadId;
+    };
+
+    struct _TLS_VECTOR* PreviousDeferredTlsVector;
+    PVOID ModuleTlsData[ANYSIZE_ARRAY];
+} TLS_VECTOR, *PTLS_VECTOR;
+
+typedef struct _TLS_RECLAIM_TABLE_ENTRY
+{
+    PTLS_VECTOR TlsVector;
+    RTL_SRWLOCK Lock;
+} TLS_RECLAIM_TABLE_ENTRY, *PTLS_RECLAIM_TABLE_ENTRY;
+
+typedef struct _TLS_ENTRY
+{
+    LIST_ENTRY TlsEntryLinks;
+    IMAGE_TLS_DIRECTORY TlsDirectory;
+    PLDR_DATA_TABLE_ENTRY ModuleEntry;
+} TLS_ENTRY, *PTLS_ENTRY;
+
+
 typedef
 NTSTATUS
 (NTAPI* PLDR_APP_COMPAT_DLL_REDIRECTION_CALLBACK_FUNCTION)(
@@ -79,7 +106,8 @@ NTSTATUS NTAPI LdrpInitializeProcess(IN PCONTEXT Context, IN PVOID SystemArgumen
 VOID NTAPI LdrpInitFailure(NTSTATUS Status);
 VOID NTAPI LdrpValidateImageForMp(IN PLDR_DATA_TABLE_ENTRY LdrDataTableEntry);
 VOID NTAPI LdrpEnsureLoaderLockIsHeld(VOID);
-
+NTSTATUS
+LdrpGrowTlsBitmap(IN ULONG newLength);
 /* ldrpe.c */
 NTSTATUS
 NTAPI
@@ -219,6 +247,8 @@ NTAPI
 LdrpFinalizeAndDeallocateDataTableEntry(IN PLDR_DATA_TABLE_ENTRY Entry);
 
 
+#define LDR_LOADCOUNT_MAX 0xFFFFFFFFul
+
 /* path.c */
 BOOLEAN
 NTAPI
@@ -231,4 +261,23 @@ NTAPI
 RtlpInitializeKeyedEvent(
     VOID);
 
+/* TLS Reworking - WIP */
+#define LDRP_BITMAP_BITALIGN (sizeof(ULONG)*8)
+#define LDRP_BITMAP_CALC_ALIGN(x, base) (((x) + (base) - 1) / (base))
+
+#define PTR_ADD_OFFSET(Pointer, Offset) ((PVOID)((ULONG_PTR)(Pointer) + (ULONG_PTR)(Offset)))
+#define PTR_SUB_OFFSET(Pointer, Offset) ((PVOID)((ULONG_PTR)(Pointer) - (ULONG_PTR)(Offset)))
+
+#define TLS_BITMAP_GROW_INCREMENT 8u
+VOID LdrpReleaseTlsIndex(ULONG TlsIndex);
+NTSTATUS LdrpAcquireTlsIndex(PULONG TlsIndex, PBOOLEAN AllocatedBitmap);
+NTSTATUS LdrpAllocateTlsEntry(PIMAGE_TLS_DIRECTORY TlsDirectory, PLDR_DATA_TABLE_ENTRY ModuleEntry, PULONG TlsIndex, PBOOLEAN AllocatedBitmap, PTLS_ENTRY* TlsEntry);
+PTLS_ENTRY __fastcall LdrpFindTlsEntry(PLDR_DATA_TABLE_ENTRY ModuleEntry);
+NTSTATUS LdrpReleaseTlsEntry(PLDR_DATA_TABLE_ENTRY ModuleEntry);
+PVOID* __fastcall LdrpGetNewTlsVector(ULONG TlsBitmapLength);
+VOID LdrpQueueDeferredTlsData(PVOID TlsVector, PVOID ThreadId);
+NTSTATUS ManualHandleTlsData(PLDR_DATA_TABLE_ENTRY ModuleEntry);
+NTSTATUS
+NTAPI
+LdrpHandleTlsData(IN OUT PLDR_DATA_TABLE_ENTRY ModuleEntry);
 /* EOF */

@@ -1097,6 +1097,774 @@ NtQueryInformationProcess(
     return Status;
 }
 
+
+NTSTATUS
+_xxxHandleProcessTlsInformation(
+	__in HANDLE ProcessHandle,
+	__in KPROCESSOR_MODE ProcessorMode,
+	__in PVOID ProcessInformation,
+	__in ULONG ProcessInformationLength
+	)
+{
+	PPROCESS_TLS_INFORMATION   TlsInfo;
+	PPROCESS_TLS_INFORMATION   UserTlsInfo;
+	PROCESS_TLS_INFORMATION    OneThreadTlsInfo;
+	ULONG                      ThreadCount;
+	ULONG                      ThreadIndex;
+	PEPROCESS                  ThreadsProcess;
+	PETHREAD                   Thread;
+	NTSTATUS                   Status;
+	PVOID                    **AddrOfCurrentTlsBlock;
+	PVOID                      OldModuleTlsData;
+	PVOID                     *CurrentTlsBlock;
+	PVOID                     *ThreadTlsVector;
+	//HANDLE                     UniqueThread;
+
+	//
+	// Wow, what a hack - should open it...
+	//
+
+	if (ProcessHandle != NtCurrentProcess())
+		return STATUS_INVALID_PARAMETER;
+
+	//
+	// Hack again - ugh ...
+	//
+
+	if (ProcessorMode != UserMode)
+		return STATUS_UNSUCCESSFUL;
+
+	//
+	// We must be at least able to contain a PROCESS_TLS_INFORMATION object.
+	//
+
+	if (ProcessInformationLength < sizeof( PROCESS_TLS_INFORMATION ))
+		return STATUS_INFO_LENGTH_MISMATCH;
+
+	//
+	// We need to have an integral number of THREAD_TLS_INFORMATION entries.
+	//
+
+	ThreadCount = ProcessInformationLength - RTL_SIZEOF_THROUGH_FIELD( PROCESS_TLS_INFORMATION, TlsIndex ) /
+		sizeof( THREAD_TLS_INFORMATION );
+
+	if (ProcessInformationLength - RTL_SIZEOF_THROUGH_FIELD( PROCESS_TLS_INFORMATION, TlsIndex ) %
+		sizeof( THREAD_TLS_INFORMATION ) != 0)
+		return STATUS_INFO_LENGTH_MISMATCH;
+
+	//
+	// Copy the caller's buffer into kernel storage.  We'll use the stack if
+	// there happens to be just one thread.
+	//
+
+	if (ProcessInformationLength == sizeof( OneThreadTlsInfo ))
+	{
+		TlsInfo = &OneThreadTlsInfo;
+	}
+	else
+	{
+		TlsInfo = (PPROCESS_TLS_INFORMATION)ExAllocatePoolWithQuotaTag(
+			(POOL_TYPE)(PagedPool | POOL_QUOTA_FAIL_INSTEAD_OF_RAISE),
+			ProcessInformationLength,
+			'slTP'
+			);
+
+		if (!TlsInfo)
+			return STATUS_INSUFFICIENT_RESOURCES;
+	}
+
+	__try
+	{
+		memcpy(
+			TlsInfo,
+			ProcessInformation,
+			ProcessInformationLength
+			);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		//
+		// Assumed, didn't check for sure.
+		//
+
+		if (TlsInfo != &OneThreadTlsInfo)
+			ExFreePool(TlsInfo);
+
+		return (NTSTATUS)GetExceptionCode();
+	}
+
+	//
+	// Perform further validation...
+	//
+
+	//
+	// Well that's the totally wrong status code to return, but oh well.
+	//
+
+	if (TlsInfo->OperationType > MaxProcessTlsOperation)
+	{
+		if (TlsInfo != &OneThreadTlsInfo)
+			ExFreePool(TlsInfo);
+
+		return STATUS_INFO_LENGTH_MISMATCH;
+	}
+
+	if (TlsInfo->Reserved & ~0x1)
+	{
+		if (TlsInfo != &OneThreadTlsInfo)
+			ExFreePool(TlsInfo);
+
+		return STATUS_INFO_LENGTH_MISMATCH;
+	}
+
+	if (TlsInfo->ThreadDataCount < 1)
+	{
+		if (TlsInfo != &OneThreadTlsInfo)
+			ExFreePool(TlsInfo);
+
+		return STATUS_INFO_LENGTH_MISMATCH;
+	}
+
+	//
+	// Make sure that the thread count field matches the count that we derived
+	// from the (trusted) buffer length.
+	//
+
+	if (TlsInfo->ThreadDataCount != ThreadCount)
+	{
+		if (TlsInfo != &OneThreadTlsInfo)
+			ExFreePool(TlsInfo);
+
+		return STATUS_INFO_LENGTH_MISMATCH;
+	}
+
+	//
+	// Flags must be zero on the call.  Validate the flags field on each thread
+	// data entry now.
+	//
+
+	for (ThreadIndex = 0;
+	     ThreadIndex < TlsInfo->ThreadDataCount;
+	     ThreadIndex += 1)
+	{
+		if (TlsInfo->ThreadData[ ThreadIndex ].Flags != 0)
+		{
+			if (TlsInfo != &OneThreadTlsInfo)
+				ExFreePool(TlsInfo);
+
+			return STATUS_INVALID_PARAMETER;
+		}
+	}
+
+	ThreadsProcess = PsGetCurrentProcess();
+
+	//
+	// Bizzare.  We check for ~1 and then 1.  Why not just check for nonzereo?
+	//
+
+	if (TlsInfo->Reserved & 0x1)
+	{
+		if (TlsInfo != &OneThreadTlsInfo)
+			ExFreePool(TlsInfo);
+
+		return STATUS_INVALID_PARAMETER;
+	}
+
+	Status             = STATUS_SUCCESS;
+	UserTlsInfo        = (PPROCESS_TLS_INFORMATION)ProcessInformation;
+	Thread             = 0;
+
+	for (Thread = PsGetNextProcessThread( ThreadsProcess, Thread );
+	     Thread != 0;
+	     Thread = PsGetNextProcessThread( ThreadsProcess, Thread )
+	     )
+	{
+		if (ThreadIndex >= TlsInfo->ThreadDataCount)
+			break;
+
+		if (!ExAcquireRundownProtection( &Thread->RundownProtect ))
+			continue;
+
+		//
+		// Get the current thread's TLS block.
+		//
+
+		__try
+		{
+			AddrOfCurrentTlsBlock   = (PVOID**)&Thread->Tcb.Teb->ThreadLocalStoragePointer;
+			OldModuleTlsData        = (PVOID)&Thread->Tcb.Teb->ThreadLocalStoragePointer;
+			CurrentTlsBlock         = Thread->Tcb.Teb->ThreadLocalStoragePointer; 
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			// XXX: CHECK ME!! important!!!! - scope 0x17
+
+			//
+			// Assumed, didn't check for sure.
+			//
+
+			Status = (NTSTATUS)GetExceptionCode();
+		}
+
+		//
+		// If we had an exception occur or we got a null TLS block, then we'll
+		// need to either bail out or continue on to the next entry.
+		//
+
+		if (!NT_SUCCESS( Status ) || !CurrentTlsBlock)
+		{
+			ExReleaseRundownProtection( &Thread->RundownProtect );
+
+			if (NT_SUCCESS( Status ))
+				continue;
+
+			ObDereferenceObject( Thread );
+
+			if (TlsInfo != &OneThreadTlsInfo)
+				ExFreePool(TlsInfo);
+
+			return Status;
+		}
+
+		if (TlsInfo->OperationType != ProcessTlsReplaceVector)
+		{
+			//
+			// This thread didn't expand the TLS bitmap.
+			//
+
+			__try
+			{
+				UserTlsInfo->ThreadData[ ThreadIndex ].Flags |= 0x1;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER)
+			{
+				Status = (NTSTATUS)GetExceptionCode();
+
+				goto checkstatus1; // Ugh
+			}
+
+			__try
+			{
+				ProbeForRead(
+					&CurrentTlsBlock[ TlsInfo->TlsIndex ],
+					sizeof( PVOID ),
+					0
+					);
+
+				//
+				// Get the old TLS pointer.
+				//
+
+				OldModuleTlsData = CurrentTlsBlock[ TlsInfo->TlsIndex ];
+
+				ProbeForWrite(
+					&CurrentTlsBlock[ TlsInfo->TlsIndex ],
+					sizeof( PVOID ),
+					0
+					);
+
+				//
+				// Store the new module TLS pointer.
+				//
+
+				CurrentTlsBlock[ TlsInfo->TlsIndex ] =
+					TlsInfo->ThreadData[ ThreadIndex ].TlsModulePointer;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER)
+			{
+				// XXX: CHECK ME!! important!!!! - scope 0x1E ( 0x1D )
+
+				//
+				// Assumed, didn't check for sure.
+				//
+
+				Status = (NTSTATUS)GetExceptionCode();
+
+				goto checkstatus1; // Ugh
+			}
+
+checkstatus1:
+			if (!NT_SUCCESS( Status ))
+			{
+				//
+				// If we failed, unset the successful-for-not-TLS-bitmap flag.
+				//
+
+				__try
+				{
+					UserTlsInfo->ThreadData[ ThreadIndex ].Flags &= ~0x1;
+				}
+				__except (EXCEPTION_EXECUTE_HANDLER)
+				{
+					Status = (NTSTATUS)GetExceptionCode();
+
+					goto checkstatus1a; // Ugh
+				}
+			}
+			else
+			{
+				//
+				// Otherwise, tell the user the old TLS vector pointer and note
+				// that we were successful.  (Hooray.)
+				//
+
+				__try
+				{
+					UserTlsInfo->ThreadData[ ThreadIndex ].TlsVector  = (PVOID *)OldModuleTlsData;
+					UserTlsInfo->ThreadData[ ThreadIndex ].Flags     ^= 0x3;
+
+					ThreadIndex += 1;
+				}
+				__except (EXCEPTION_EXECUTE_HANDLER)
+				{
+					Status = (NTSTATUS)GetExceptionCode();
+
+					goto checkstatus1a; // Ugh
+				}
+			}
+
+checkstatus1a:
+			ExReleaseRundownProtection( &Thread->RundownProtect );
+
+			if (!NT_SUCCESS( Status ))
+				break;
+
+			//
+			// Next loop iteration continues...
+			//
+		}
+		else
+		{
+			if (CurrentTlsBlock == (PVOID *)&Thread->Tcb.Teb->ThreadLocalStoragePointer)
+			{
+				CurrentTlsBlock = 0;
+			}
+			else
+			{
+				//
+				// We need to copy over the TLS bitmap.  (Ugh.)
+				//
+
+				if (TlsInfo->TlsVectorLength)
+				{
+					__try
+					{
+						ProbeForRead(
+							CurrentTlsBlock,
+							TlsInfo->TlsVectorLength * 4,
+							TYPE_ALIGNMENT( ULONG )
+							);
+					}
+					__except (EXCEPTION_EXECUTE_HANDLER)
+					{
+						Status = (NTSTATUS)GetExceptionCode();
+
+						goto checkstatus2; // Ugh
+					}
+				}
+
+				//
+				// The actual implementation saves the address, but I see
+				// no reason to dereference it again.
+				//
+
+				ThreadTlsVector = TlsInfo->ThreadData[ ThreadIndex ].TlsVector;
+
+				__try
+				{
+					ProbeForWrite(
+						ThreadTlsVector,
+						TlsInfo->TlsVectorLength * sizeof( PVOID ),
+						TYPE_ALIGNMENT( PVOID )
+						);
+
+					memcpy(
+						ThreadTlsVector,
+						CurrentTlsBlock,
+						TlsInfo->TlsVectorLength * sizeof( PVOID )
+						);
+				}
+				__except (EXCEPTION_EXECUTE_HANDLER)
+				{
+					Status = (NTSTATUS)GetExceptionCode();
+
+					goto checkstatus2;
+				}
+			}
+
+			//
+			// Set flags accordingly as we're going to set the vector for this
+			// thread.
+			//
+
+			__try
+			{
+				UserTlsInfo->ThreadData[ ThreadIndex ].Flags |= 0x1;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER)
+			{
+				Status = (NTSTATUS)GetExceptionCode();
+
+				goto checkstatus2;
+			}
+
+			//
+			// Set the vector for this thread.
+			//
+
+			__try
+			{
+				*AddrOfCurrentTlsBlock = TlsInfo->ThreadData[ ThreadIndex ].TlsVector;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER)
+			{
+				Status = (NTSTATUS)GetExceptionCode();
+
+				goto checkstatus2;
+			}
+
+checkstatus2:
+			if (NT_SUCCESS( Status ))
+			{
+				//UniqueThread = (HANDLE)Thread->Tcb.ClientId.UniqueThread;
+//
+				//__try
+				//{
+				//	UserTlsInfo->ThreadData[ ThreadIndex ].ThreadId   = UniqueThread;
+				//	UserTlsInfo->ThreadData[ ThreadIndex ].TlsVector  = CurrentTlsBlock;
+				//	UserTlsInfo->ThreadData[ ThreadIndex ].Flags     ^= 0x3;
+//
+				//	ThreadIndex += 1;
+				//}
+				//__except (EXCEPTION_EXECUTE_HANDLER)
+				//{
+				//	Status = (NTSTATUS)GetExceptionCode();
+//
+				//	goto checkstatus3; // Ugh
+				//}
+			}
+			else
+			{
+				//
+				// If we failed, unset the successful-for-not-TLS-bitmap flag.
+				//
+
+				__try
+				{
+					UserTlsInfo->ThreadData[ ThreadIndex ].Flags &= ~0x1;
+				}
+				__except (EXCEPTION_EXECUTE_HANDLER)
+				{
+					Status = (NTSTATUS)GetExceptionCode();
+
+					goto checkstatus3; // Ugh
+				}
+			}
+
+checkstatus3:
+			ExReleaseRundownProtection( &Thread->RundownProtect );
+
+			if (!NT_SUCCESS( Status ))
+				break;
+
+			//
+			// Next loop iteration continues...
+			//
+		}
+	}
+
+	if (Thread)
+		ObDereferenceObject( Thread );
+
+	if (TlsInfo != &OneThreadTlsInfo)
+		ExFreePool(TlsInfo);
+
+	return STATUS_SUCCESS;
+}
+
+NTSTATUS PspSetTlsProcessInformation(PVOID ProcessInformation, ULONG ProcessInformationLength, PEPROCESS Process, KPROCESSOR_MODE ProcessorMode)
+{
+  // return _xxxHandleProcessTlsInformation(  ProcessInformation,  ProcessorMode,  
+  //     ProcessInformation, ProcessInformationLength);
+      const ULONG nonThreadUserTlsInfoLength = RTL_SIZEOF_THROUGH_FIELD(PROCESS_TLS_INFORMATION, TlsIndex);
+    PROCESS_TLS_INFORMATION OneThreadTlsInfo;
+    PPROCESS_TLS_INFORMATION TlsInfo;
+    PPROCESS_TLS_INFORMATION UserTlsInfo = (PPROCESS_TLS_INFORMATION)ProcessInformation;
+    PETHREAD Thread;
+
+    /* Check buffer length */
+    if (ProcessInformationLength < sizeof(PROCESS_TLS_INFORMATION))
+    {
+        return STATUS_INFO_LENGTH_MISMATCH;
+    }
+
+    const ULONG threadUserTlsLength = ProcessInformationLength - nonThreadUserTlsInfoLength;
+  //  const ULONG ThreadCount = threadUserTlsLength / sizeof(THREAD_TLS_INFORMATION);
+
+    if (threadUserTlsLength % sizeof(THREAD_TLS_INFORMATION) != 0)
+    {
+        return STATUS_INFO_LENGTH_MISMATCH;
+    }
+
+    if (ProcessInformationLength == sizeof(OneThreadTlsInfo))
+    {
+        TlsInfo = &OneThreadTlsInfo;
+    }
+    else
+    {
+        TlsInfo = ExAllocatePoolWithQuota(PagedPool | POOL_QUOTA_FAIL_INSTEAD_OF_RAISE,
+                                          ProcessInformationLength);
+        if (!TlsInfo)
+        {
+            return STATUS_INSUFFICIENT_RESOURCES;
+        }
+    }
+
+    _SEH2_TRY
+    {
+        /* Enter SEH for direct buffer read */
+        _SEH2_TRY
+        {
+            if (ProcessInformationLength == sizeof(OneThreadTlsInfo))
+            {
+                OneThreadTlsInfo = *(PPROCESS_TLS_INFORMATION)ProcessInformation;
+            }
+            else
+            {
+                memcpy(TlsInfo, ProcessInformation, ProcessInformationLength);
+            }
+        }
+        _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+        {
+            /* Get exception code */
+            _SEH2_YIELD(return _SEH2_GetExceptionCode());
+        }
+        _SEH2_END;
+
+
+        ULONG ThreadIndex = 0;
+
+        for (; ThreadIndex < TlsInfo->ThreadDataCount; ++ThreadIndex)
+        {
+            if (TlsInfo->ThreadData[ThreadIndex].Flags != 0)
+                _SEH2_YIELD(return STATUS_INVALID_PARAMETER);
+        }
+
+        ThreadIndex = 0;
+
+        for (Thread = PsGetNextProcessThread(Process, NULL);
+             Thread && (ThreadIndex < TlsInfo->ThreadDataCount);
+             Thread = PsGetNextProcessThread(Process, Thread))
+        {
+            BOOLEAN Failure = FALSE;
+
+            /* Make sure the process isn't dying */
+            if (!ExAcquireRundownProtection(&Thread->RundownProtect))
+            {
+                /* Avoid race conditions */
+                continue;
+            }
+
+            _SEH2_TRY
+            {
+                PVOID** AddrOfCurrentTlsBlock;
+                PVOID* CurrentTlsBlock;
+
+                _SEH2_TRY
+                {
+                    AddrOfCurrentTlsBlock = (PVOID**)&Thread->Tcb.Teb->ThreadLocalStoragePointer;
+                    CurrentTlsBlock = (PVOID*)Thread->Tcb.Teb->ThreadLocalStoragePointer;
+                }
+                _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                {
+                    Failure = TRUE;
+                    _SEH2_YIELD(return _SEH2_GetExceptionCode());
+                }
+                _SEH2_END
+
+                if (!CurrentTlsBlock)
+                    _SEH2_YIELD(continue);
+
+                if (TlsInfo->OperationType == ProcessTlsReplaceIndex)
+                {
+                    // This thread didn't expand the TLS bitmap.
+
+                    _SEH2_TRY
+                    {
+                        UserTlsInfo->ThreadData[ThreadIndex].Flags |= 0x1;
+                    }
+                    _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                    {
+                        Failure = TRUE;
+                        _SEH2_YIELD(return _SEH2_GetExceptionCode());
+                    }
+                    _SEH2_END
+
+                    _SEH2_TRY
+                    {
+                        PVOID OldModuleTlsData;
+
+                        ProbeForReadPointer(&CurrentTlsBlock[TlsInfo->TlsIndex]);
+
+                        // Get the old TLS pointer.
+
+                        OldModuleTlsData = CurrentTlsBlock[TlsInfo->TlsIndex];
+
+                        ProbeForWritePointer(&CurrentTlsBlock[TlsInfo->TlsIndex]);
+
+                        // Store the new module TLS pointer.
+
+                        CurrentTlsBlock[TlsInfo->TlsIndex] =
+                            TlsInfo->ThreadData[ThreadIndex].TlsModulePointer;
+
+                        UserTlsInfo->ThreadData[ThreadIndex].TlsVector = (PVOID*)OldModuleTlsData;
+                        UserTlsInfo->ThreadData[ThreadIndex].Flags ^= 0x3;
+
+                        ThreadIndex++;
+                    }
+                    _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                    {
+                        NTSTATUS Status = _SEH2_GetExceptionCode();
+                        Failure = TRUE;
+
+                        _SEH2_TRY
+                        {
+                            UserTlsInfo->ThreadData[ThreadIndex].Flags &= ~0x1;
+                        }
+                        _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                        {
+                            if (NT_SUCCESS(Status))
+                                Status = _SEH2_GetExceptionCode();
+                        }
+                        _SEH2_END
+
+                        _SEH2_YIELD(return Status);
+                    }
+                    _SEH2_END
+                }
+                else
+                {
+                    if (CurrentTlsBlock == (PVOID*)&Thread->Tcb.Teb->ThreadLocalStoragePointer)
+                    {
+                        CurrentTlsBlock = NULL;
+                    }
+                    else
+                    {
+                        const ULONG tlsVectorByteLength = TlsInfo->TlsVectorLength * sizeof(PVOID);
+
+                        // We need to copy over the TLS bitmap.
+
+                        if (tlsVectorByteLength)
+                        {
+                            PVOID* ThreadTlsVector;
+
+                            _SEH2_TRY
+                            {
+                                ProbeForRead(
+                                    CurrentTlsBlock,
+                                    tlsVectorByteLength,
+                                    TYPE_ALIGNMENT(PVOID)
+                                );
+                            }
+                            _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                            {
+                                Failure = TRUE;
+                                _SEH2_YIELD(return _SEH2_GetExceptionCode());
+                            }
+                            _SEH2_END
+
+                            // The actual implementation saves the address, but I see
+                            // no reason to dereference it again.
+
+                            ThreadTlsVector = TlsInfo->ThreadData[ThreadIndex].TlsVector;
+
+                            _SEH2_TRY
+                            {
+                                ProbeForWrite(
+                                    ThreadTlsVector,
+                                    tlsVectorByteLength,
+                                    TYPE_ALIGNMENT(PVOID)
+                                );
+
+                                memcpy(
+                                    ThreadTlsVector,
+                                    CurrentTlsBlock,
+                                    tlsVectorByteLength
+                                );
+                            }
+                            _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                            {
+                                Failure = TRUE;
+                                _SEH2_YIELD(return _SEH2_GetExceptionCode());
+                            }
+                            _SEH2_END
+                        }
+                    }
+
+                    // Set flags accordingly as we're going to set the vector for this thread.
+
+                    _SEH2_TRY
+                    {
+                        UserTlsInfo->ThreadData[ThreadIndex].Flags |= 0x1;
+                    }
+                    _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                    {
+                        Failure = TRUE;
+                        _SEH2_YIELD(return _SEH2_GetExceptionCode());
+                    }
+                    _SEH2_END
+
+                    _SEH2_TRY
+                    {
+                        const HANDLE uniqueThread = Thread->Tcb.Teb->ClientId.UniqueThread;
+
+                        *AddrOfCurrentTlsBlock = TlsInfo->ThreadData[ThreadIndex].TlsVector;
+
+                        UserTlsInfo->ThreadData[ThreadIndex].ThreadId = uniqueThread;
+                        UserTlsInfo->ThreadData[ThreadIndex].TlsVector = CurrentTlsBlock;
+                        UserTlsInfo->ThreadData[ThreadIndex].Flags ^= 0x3;
+
+                        ThreadIndex++;
+                    }
+                    _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                    {
+                        NTSTATUS Status = _SEH2_GetExceptionCode();
+                        Failure = TRUE;
+
+                        _SEH2_TRY
+                        {
+                            UserTlsInfo->ThreadData[ThreadIndex].Flags &= ~0x1;
+                        }
+                        _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+                        {
+                            if (NT_SUCCESS(Status))
+                                Status = _SEH2_GetExceptionCode();
+                        }
+                        _SEH2_END
+
+                        _SEH2_YIELD(return Status);
+                    }
+                    _SEH2_END
+                }
+            }
+            _SEH2_FINALLY
+            {
+                ExReleaseRundownProtection(&Thread->RundownProtect);
+                if (Failure)
+                    ObDereferenceObject(Thread);
+            }
+            _SEH2_END;
+        }
+
+        _SEH2_YIELD(return STATUS_SUCCESS);
+    }
+    _SEH2_FINALLY
+    {
+        if (TlsInfo && TlsInfo != &OneThreadTlsInfo)
+            ExFreePool(TlsInfo);
+    }
+    _SEH2_END;
+}
 /*
  * @implemented
  */
@@ -1140,6 +1908,7 @@ NtSetInformationProcess(IN HANDLE ProcessHandle,
                                        PreviousMode);
     if (!NT_SUCCESS(Status))
     {
+        __debugbreak();
         DPRINT1("NtSetInformationProcess(): Information verification class failed! (Status -> 0x%lx, ProcessInformationClass -> %lx)\n", Status, ProcessInformationClass);
         return Status;
     }
@@ -1635,6 +2404,12 @@ NtSetInformationProcess(IN HANDLE ProcessHandle,
                 Status = STATUS_PROCESS_IS_TERMINATING;
             }
             break;
+
+        case ProcessTlsInformation:
+        {
+            Status = PspSetTlsProcessInformation(ProcessInformation, ProcessInformationLength, Process , PreviousMode);
+            break;
+        }
 
         case ProcessBreakOnTermination:
 

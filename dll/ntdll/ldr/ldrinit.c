@@ -15,8 +15,11 @@
 
 #define NDEBUG
 #include <debug.h>
-
-
+extern TLS_RECLAIM_TABLE_ENTRY LdrpDelayedTlsReclaimTable[16];
+extern RTL_SRWLOCK LdrpTlsLock;
+extern LIST_ENTRY LdrpTlsList;
+extern RTL_BITMAP LdrpTlsBitmap;
+ULONG LdrpActiveThreadCount = 0;
 /* GLOBALS *******************************************************************/
 
 HANDLE ImageExecOptionsKey;
@@ -1257,117 +1260,114 @@ NTSTATUS
 NTAPI
 LdrpInitializeTls(VOID)
 {
-    PLIST_ENTRY NextEntry, ListHead;
-    PLDR_DATA_TABLE_ENTRY LdrEntry;
-    PIMAGE_TLS_DIRECTORY TlsDirectory;
-    PLDRP_TLS_DATA TlsData;
-    ULONG Size;
+    const PLIST_ENTRY ListHead = &NtCurrentPeb()->Ldr->InLoadOrderModuleList;
+    ULONG TlsIndex = 0;
+    NTSTATUS Status;
 
     /* Initialize the TLS List */
     InitializeListHead(&LdrpTlsList);
-
+    PIMAGE_TLS_DIRECTORY TlsDirectory;
     /* Loop all the modules */
-    ListHead = &NtCurrentPeb()->Ldr->InLoadOrderModuleList;
-    NextEntry = ListHead->Flink;
-    while (ListHead != NextEntry)
+    for (PLIST_ENTRY NextEntry = ListHead->Flink; ListHead != NextEntry; NextEntry = NextEntry->Flink)
     {
+        ULONG Size;
+
         /* Get the entry */
-        LdrEntry = CONTAINING_RECORD(NextEntry, LDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
-        NextEntry = NextEntry->Flink;
+        PLDR_DATA_TABLE_ENTRY Module = CONTAINING_RECORD(NextEntry, LDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
 
         /* Get the TLS directory */
-        TlsDirectory = RtlImageDirectoryEntryToData(LdrEntry->DllBase,
-                                                    TRUE,
-                                                    IMAGE_DIRECTORY_ENTRY_TLS,
-                                                    &Size);
+        TlsDirectory = (PIMAGE_TLS_DIRECTORY)RtlImageDirectoryEntryToData(Module->DllBase,
+                                                                               TRUE,
+                                                                               IMAGE_DIRECTORY_ENTRY_TLS,
+                                                                               &Size);
 
         /* Check if we have a directory */
-        if (!TlsDirectory) continue;
+        if (!TlsDirectory || !Size) continue;
 
-        /* Check if the image has TLS */
-        if (!LdrpImageHasTls) LdrpImageHasTls = TRUE;
 
-        /* Show debug message */
-        if (ShowSnaps)
-        {
-            DPRINT1("LDR: Tls Found in %wZ at %p\n",
-                    &LdrEntry->BaseDllName,
-                    TlsDirectory);
-        }
+
 
         /* Allocate an entry */
-        TlsData = RtlAllocateHeap(RtlGetProcessHeap(), 0, sizeof(LDRP_TLS_DATA));
-        if (!TlsData) return STATUS_NO_MEMORY;
+        Status = LdrpAllocateTlsEntry(TlsDirectory, Module, &TlsIndex, NULL, NULL);
+        if (!NT_SUCCESS(Status)) return Status;
 
         /* Lock the DLL and mark it for TLS Usage */
-        LdrEntry->LoadCount = -1;
-        LdrEntry->TlsIndex = -1;
+        Module->LoadCount = LDR_LOADCOUNT_MAX;
+        Module->TlsIndex = -1;
+    }
 
-        /* Save the cached TLS data */
-        TlsData->TlsDirectory = *TlsDirectory;
-        InsertTailList(&LdrpTlsList, &TlsData->TlsLinks);
+    if (!TlsIndex)
+    {
+        RtlInitializeBitMap(&LdrpTlsBitmap, NULL, 0);
+    }
+    else
+    {
+        // First-time equivalent of LdrpAcquireTlsIndex
 
-        /* Update the index */
-        *(PLONG)TlsData->TlsDirectory.AddressOfIndex = LdrpNumberOfTlsEntries;
-        TlsData->TlsDirectory.Characteristics = LdrpNumberOfTlsEntries++;
+        const ULONG BitMapSize = TlsIndex + TLS_BITMAP_GROW_INCREMENT;
+
+        if (!NT_SUCCESS(Status = LdrpGrowTlsBitmap(BitMapSize)))
+            return Status;
+
+        RtlSetBits(&LdrpTlsBitmap, 0, TlsIndex);
     }
 
     /* Done setting up TLS, allocate entries */
     return LdrpAllocateTls();
 }
 
+
+
 NTSTATUS
 NTAPI
 LdrpAllocateTls(VOID)
 {
-    PTEB Teb = NtCurrentTeb();
-    PLIST_ENTRY NextEntry, ListHead;
-    PLDRP_TLS_DATA TlsData;
-    SIZE_T TlsDataSize;
-    PVOID *TlsVector;
+     const PLIST_ENTRY ListHead = &LdrpTlsList;
+    PLIST_ENTRY NextEntry;
+    PVOID* TlsVector;
+
+    RtlAcquireSRWLockShared(&LdrpTlsLock);
 
     /* Check if we have any entries */
-    if (!LdrpNumberOfTlsEntries)
-        return STATUS_SUCCESS;
+    if (!LdrpTlsBitmap.SizeOfBitMap)
+        goto success_exit;
 
     /* Allocate the vector array */
-    TlsVector = RtlAllocateHeap(RtlGetProcessHeap(),
-                                    0,
-                                    LdrpNumberOfTlsEntries * sizeof(PVOID));
-    if (!TlsVector) return STATUS_NO_MEMORY;
-    Teb->ThreadLocalStoragePointer = TlsVector;
+    TlsVector = LdrpGetNewTlsVector(LdrpTlsBitmap.SizeOfBitMap);
+    if (!TlsVector)
+    {
+        RtlReleaseSRWLockShared(&LdrpTlsLock);
+        return STATUS_NO_MEMORY;
+    }
 
     /* Loop the TLS Array */
-    ListHead = &LdrpTlsList;
-    NextEntry = ListHead->Flink;
-    while (NextEntry != ListHead)
+    for (NextEntry = ListHead->Flink; NextEntry != ListHead; NextEntry = NextEntry->Flink)
     {
+        PTLS_ENTRY TlsData;
+        SIZE_T TlsDataSize;
+
         /* Get the entry */
-        TlsData = CONTAINING_RECORD(NextEntry, LDRP_TLS_DATA, TlsLinks);
-        NextEntry = NextEntry->Flink;
+        TlsData = CONTAINING_RECORD(NextEntry, TLS_ENTRY, TlsEntryLinks);
 
         /* Allocate this vector */
         TlsDataSize = TlsData->TlsDirectory.EndAddressOfRawData -
-                      TlsData->TlsDirectory.StartAddressOfRawData;
+            TlsData->TlsDirectory.StartAddressOfRawData;
         TlsVector[TlsData->TlsDirectory.Characteristics] = RtlAllocateHeap(RtlGetProcessHeap(),
                                                                            0,
                                                                            TlsDataSize);
         if (!TlsVector[TlsData->TlsDirectory.Characteristics])
         {
             /* Out of memory */
+
+            ULONG i = 0;
+            for (; i < LdrpTlsBitmap.SizeOfBitMap; ++i)
+                if (TlsVector[i])
+                    RtlFreeHeap(RtlGetProcessHeap(), 0, TlsVector[i]);
+
+            RtlReleaseSRWLockShared(&LdrpTlsLock);
             return STATUS_NO_MEMORY;
         }
 
-        /* Show debug message */
-        if (ShowSnaps)
-        {
-            DPRINT1("LDR: TlsVector %p Index %lu = %p copied from %x to %p\n",
-                    TlsVector,
-                    TlsData->TlsDirectory.Characteristics,
-                    &TlsVector[TlsData->TlsDirectory.Characteristics],
-                    TlsData->TlsDirectory.StartAddressOfRawData,
-                    TlsVector[TlsData->TlsDirectory.Characteristics]);
-        }
 
         /* Copy the data */
         RtlCopyMemory(TlsVector[TlsData->TlsDirectory.Characteristics],
@@ -1375,45 +1375,98 @@ LdrpAllocateTls(VOID)
                       TlsDataSize);
     }
 
+    NtCurrentTeb()->ThreadLocalStoragePointer = TlsVector;
+
+success_exit:
+    InterlockedIncrement((PLONG)&LdrpActiveThreadCount);
+    RtlReleaseSRWLockShared(&LdrpTlsLock);
     /* Done */
     return STATUS_SUCCESS;
+}
+BOOL
+LdrpCleanupThreadTlsData(VOID)
+{
+    #if 1
+    BOOL Result = TRUE;
+    PTLS_VECTOR TargetReclaimTlsVector = NULL;
+    PTLS_VECTOR PreviousReclaimVector = NULL;
+    const HANDLE CurrentThreadHandle = NtCurrentTeb()->RealClientId.UniqueThread;
+   PTLS_RECLAIM_TABLE_ENTRY FoundReclaimEntry = (PTLS_RECLAIM_TABLE_ENTRY)&LdrpDelayedTlsReclaimTable[((ULONG_PTR)CurrentThreadHandle >> 2) & 0xF];
+    PTLS_VECTOR CurrentReclaimVector = FoundReclaimEntry->TlsVector;
+
+#if 1
+    RtlAcquireSRWLockExclusive(&FoundReclaimEntry->Lock);
+#endif
+
+    while (CurrentReclaimVector)
+    {
+        const PTLS_VECTOR NextReclaimVector = CurrentReclaimVector->PreviousDeferredTlsVector;
+
+        if (CurrentReclaimVector->ThreadId == CurrentThreadHandle)
+        {
+            if (PreviousReclaimVector)
+                PreviousReclaimVector->PreviousDeferredTlsVector = NextReclaimVector;
+            else
+                FoundReclaimEntry->TlsVector = NextReclaimVector;
+
+            CurrentReclaimVector->PreviousDeferredTlsVector = TargetReclaimTlsVector;
+            TargetReclaimTlsVector = CurrentReclaimVector;
+            CurrentReclaimVector = PreviousReclaimVector;
+        }
+
+        PreviousReclaimVector = CurrentReclaimVector;
+        CurrentReclaimVector = NextReclaimVector;
+    }
+
+#if 1
+    RtlReleaseSRWLockExclusive(&FoundReclaimEntry->Lock);
+#endif
+
+    while (TargetReclaimTlsVector)
+    {
+        const PTLS_VECTOR NextReclaimTlsVector = TargetReclaimTlsVector->PreviousDeferredTlsVector;
+
+        Result = RtlFreeHeap(RtlGetProcessHeap(), 0, TargetReclaimTlsVector);
+        TargetReclaimTlsVector = NextReclaimTlsVector;
+    }
+
+    return Result;
+    #endif
+    return 1;
 }
 
 VOID
 NTAPI
 LdrpFreeTls(VOID)
 {
-    PLIST_ENTRY ListHead, NextEntry;
-    PLDRP_TLS_DATA TlsData;
-    PVOID *TlsVector;
     PTEB Teb = NtCurrentTeb();
 
+    RtlAcquireSRWLockShared(&LdrpTlsLock);
+
     /* Get a pointer to the vector array */
-    TlsVector = Teb->ThreadLocalStoragePointer;
-    if (!TlsVector) return;
+    PVOID* TlsVector = (PVOID*)Teb->ThreadLocalStoragePointer;
 
-    /* Loop through it */
-    ListHead = &LdrpTlsList;
-    NextEntry = ListHead->Flink;
-    while (NextEntry != ListHead)
+    InterlockedDecrement((PLONG)&LdrpActiveThreadCount);
+    Teb->ThreadLocalStoragePointer = NULL;
+
+    RtlReleaseSRWLockShared(&LdrpTlsLock);
+
+    if (TlsVector)
     {
-        TlsData = CONTAINING_RECORD(NextEntry, LDRP_TLS_DATA, TlsLinks);
-        NextEntry = NextEntry->Flink;
+        /* Loop through it */
+        for (ULONG i = 0; i < LdrpTlsBitmap.SizeOfBitMap; ++i)
+            if (TlsVector[i])
+                RtlFreeHeap(RtlGetProcessHeap(), 0, TlsVector[i]);
 
-        /* Free each entry */
-        if (TlsVector[TlsData->TlsDirectory.Characteristics])
-        {
-            RtlFreeHeap(RtlGetProcessHeap(),
-                        0,
-                        TlsVector[TlsData->TlsDirectory.Characteristics]);
-        }
+        TLS_VECTOR * RealTlsVector = CONTAINING_RECORD(TlsVector, TLS_VECTOR, ModuleTlsData);
+
+        /* Free the array itself */
+        RtlFreeHeap(RtlGetProcessHeap(), 0, RealTlsVector);
     }
 
-    /* Free the array itself */
-    RtlFreeHeap(RtlGetProcessHeap(),
-                0,
-                TlsVector);
+    LdrpCleanupThreadTlsData();
 }
+
 
 NTSTATUS
 NTAPI
@@ -2352,6 +2405,7 @@ LdrpInitializeProcess(IN PCONTEXT Context,
 
     /* Walk the IAT and load all the DLLs */
     ImportStatus = LdrpWalkImportDescriptor(LdrpDefaultPath.Buffer, LdrpImageEntry);
+    //TODO: Tls check moment
 
     /* Check if relocation is needed */
     if (Peb->ImageBaseAddress != (PVOID)NtHeader->OptionalHeader.ImageBase)

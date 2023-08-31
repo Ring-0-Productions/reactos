@@ -939,6 +939,8 @@ LdrpLoadImportModule(IN PWSTR DllPath OPTIONAL,
                        &(*DataTableEntry)->InInitializationOrderLinks);
     }
 
+    if (!(*DataTableEntry)->TlsIndex) // if not initialized (either just loaded or having no TLS data)
+            Status = LdrpHandleTlsData(*DataTableEntry);
 done:
     RtlFreeUnicodeString(&RedirectedImpDescName);
 

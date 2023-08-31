@@ -25,6 +25,12 @@ PVOID g_pfnSE_DllUnloaded;
 PVOID g_pfnSE_InstallBeforeInit;
 PVOID g_pfnSE_InstallAfterInit;
 PVOID g_pfnSE_ProcessDying;
+ULONG LdrpActualBitmapSize = 0;
+TLS_RECLAIM_TABLE_ENTRY LdrpDelayedTlsReclaimTable[16];
+RTL_SRWLOCK LdrpTlsLock = RTL_SRWLOCK_INIT;
+LIST_ENTRY LdrpTlsList;
+RTL_BITMAP LdrpTlsBitmap;
+extern ULONG LdrpActiveThreadCount;
 
 /* FUNCTIONS *****************************************************************/
 
@@ -2599,6 +2605,10 @@ LdrpLoadDll(IN BOOLEAN Redirected,
                     SE_DllLoaded(LdrEntry);
                 }
 
+                DPRINT1("Trying to laod module with TLS data\n");
+                if (!LdrEntry->TlsIndex) // if not initialized (either just loaded or having no TLS data)
+                    Status = LdrpHandleTlsData(LdrEntry);
+
                 /* Run the init routine */
                 Status = LdrpRunInitializeRoutines(NULL);
                 if (!NT_SUCCESS(Status))
@@ -2807,5 +2817,718 @@ LdrpUnloadShimEngine()
     LdrUnloadDll(g_pShimEngineModule);
     g_pShimEngineModule = NULL;
 }
+#define SWAPD(x) x
+#define SWAPW(x) x
+NTSTATUS
+NTAPI
+RtlpImageDirectoryEntryToData32(
+    PVOID BaseAddress,
+    BOOLEAN MappedAsImage,
+    USHORT Directory,
+    PULONG Size,
+    PVOID* Section,
+    PIMAGE_NT_HEADERS32 NtHeader)
+{
+    ULONG Va;
+    PVOID result;
+
+    if (Directory >= SWAPD(NtHeader->OptionalHeader.NumberOfRvaAndSizes))
+        return STATUS_INVALID_PARAMETER;
+
+    Va = SWAPD(NtHeader->OptionalHeader.DataDirectory[Directory].VirtualAddress);
+    if (Va == 0)
+        return STATUS_NOT_IMPLEMENTED;
+
+    *Size = SWAPD(NtHeader->OptionalHeader.DataDirectory[Directory].Size);
+
+    if (MappedAsImage || Va < SWAPD(NtHeader->OptionalHeader.SizeOfHeaders))
+    {
+        *Section = (PVOID)((ULONG_PTR)BaseAddress + Va);
+        return STATUS_SUCCESS;
+    }
+
+    /* Image mapped as ordinary file, we must find raw pointer */
+    result = RtlImageRvaToVa((PIMAGE_NT_HEADERS)NtHeader, BaseAddress, Va, NULL);
+    *Section = result;
+    return result ? STATUS_SUCCESS : STATUS_INVALID_PARAMETER;
+}
+
+/*
+ * @implemented
+ */
+NTSTATUS
+NTAPI
+RtlpImageDirectoryEntryToData64(
+    PVOID BaseAddress,
+    BOOLEAN MappedAsImage,
+    USHORT Directory,
+    PULONG Size,
+    PVOID* Section,
+    PIMAGE_NT_HEADERS64 NtHeader)
+{
+    ULONG Va;
+    PVOID result;
+
+    if (Directory >= SWAPD(NtHeader->OptionalHeader.NumberOfRvaAndSizes))
+        return STATUS_INVALID_PARAMETER;
+
+    Va = SWAPD(NtHeader->OptionalHeader.DataDirectory[Directory].VirtualAddress);
+    if (Va == 0)
+        return STATUS_NOT_IMPLEMENTED;
+
+    *Size = SWAPD(NtHeader->OptionalHeader.DataDirectory[Directory].Size);
+
+    if (MappedAsImage || Va < SWAPD(NtHeader->OptionalHeader.SizeOfHeaders))
+    {
+        *Section = (PVOID)((ULONG_PTR)BaseAddress + Va);
+        return STATUS_SUCCESS;
+    }
+
+    /* Image mapped as ordinary file, we must find raw pointer */
+    result = RtlImageRvaToVa((PIMAGE_NT_HEADERS)NtHeader, BaseAddress, Va, NULL);
+    *Section = result;
+    return result ? STATUS_SUCCESS : STATUS_INVALID_PARAMETER;
+}
+
+NTSTATUS
+NTAPI
+RtlImageDirectoryEntryToDataEx(
+    PVOID BaseAddress,
+    BOOLEAN MappedAsImage,
+    USHORT Directory,
+    PULONG Size,
+    OUT PVOID* Section)
+{
+    PIMAGE_NT_HEADERS NtHeader;
+    NTSTATUS Status;
+
+    if ((ULONG_PTR)BaseAddress & 3)
+    {
+        /* Magic flag for non-mapped images. */
+        if ((ULONG_PTR)BaseAddress & 1)
+            MappedAsImage = FALSE;
+        BaseAddress = (PVOID)((ULONG_PTR)BaseAddress & ~3);
+    }
+
+    Status = RtlImageNtHeaderEx(
+        RTL_IMAGE_NT_HEADER_EX_FLAG_NO_RANGE_CHECK,
+        BaseAddress,
+        0,
+        &NtHeader);
+
+    if (NtHeader)
+    {
+        if (NtHeader->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+            Status = RtlpImageDirectoryEntryToData32(BaseAddress, MappedAsImage, Directory, Size, Section, (PIMAGE_NT_HEADERS32)NtHeader);
+        else if (NtHeader->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+            Status = RtlpImageDirectoryEntryToData64(BaseAddress, MappedAsImage, Directory, Size, Section, (PIMAGE_NT_HEADERS64)NtHeader);
+        else
+            Status = STATUS_INVALID_PARAMETER;
+    }
+
+    return Status;
+}
+
+
+NTSTATUS
+LdrpGrowTlsBitmap(IN ULONG newLength)
+{
+    const ULONG AlignedLength = LDRP_BITMAP_CALC_ALIGN(newLength, LDRP_BITMAP_BITALIGN);
+
+    const PULONG NewBitmapBuffer = (PULONG)RtlAllocateHeap(
+        RtlGetProcessHeap(),
+        HEAP_ZERO_MEMORY, // we will clear bits later
+        AlignedLength * sizeof(ULONG)
+    );
+
+    if (!NewBitmapBuffer)
+    {
+        return STATUS_NO_MEMORY;
+    }
+
+    LdrpActualBitmapSize = AlignedLength;
+
+    if (LdrpTlsBitmap.SizeOfBitMap > 0)
+    {
+        // Copy the contents of the previous buffer into the new one.
+        RtlCopyMemory(
+            NewBitmapBuffer,
+            LdrpTlsBitmap.Buffer,
+            LDRP_BITMAP_CALC_ALIGN(LdrpTlsBitmap.SizeOfBitMap, 8)
+        );
+
+        // Free the old buffer.
+        RtlFreeHeap(RtlGetProcessHeap(), 0, LdrpTlsBitmap.Buffer);
+    }
+
+    // Reinitialize the bitmap as we've changed the buffer pointer.
+
+    RtlInitializeBitMap(
+        &LdrpTlsBitmap,
+        NewBitmapBuffer,
+        newLength
+    );
+
+    return STATUS_SUCCESS;
+}
+
+VOID LdrpReleaseTlsIndex(ULONG TlsIndex)
+{
+    RtlClearBit(&LdrpTlsBitmap, TlsIndex);
+}
+
+NTSTATUS
+LdrpAcquireTlsIndex(
+    OUT PULONG TlsIndex,
+    OUT PBOOLEAN AllocatedBitmap
+)
+{
+    ULONG Index;
+
+    if (LdrpTlsBitmap.SizeOfBitMap > 0)
+    {
+        Index = RtlFindClearBitsAndSet(&LdrpTlsBitmap, 1, 0);
+
+        // If we found space in the existing bitmap then there is no reason to
+        // expand buffers, so we'll just return with the existing data.
+
+        if (Index != 0xFFFFFFFF)
+        {
+            *TlsIndex = Index;
+            *AllocatedBitmap = FALSE;
+
+            return STATUS_SUCCESS;
+        }
+    }
+
+    Index = LdrpTlsBitmap.SizeOfBitMap;
+
+    const ULONG NewLength = LdrpTlsBitmap.SizeOfBitMap + TLS_BITMAP_GROW_INCREMENT;
+
+    // Check if we need to grow the bitmap itself or if the bitmap still
+    // has space
+    if (LDRP_BITMAP_CALC_ALIGN(NewLength, LDRP_BITMAP_BITALIGN) > LdrpActualBitmapSize)
+    {
+        // We'll need to grow it.  Let's go do so now.
+
+        NTSTATUS Status;
+        if (!NT_SUCCESS(Status = LdrpGrowTlsBitmap(NewLength)))
+            return Status;
+    }
+    else
+    {
+        LdrpTlsBitmap.SizeOfBitMap += TLS_BITMAP_GROW_INCREMENT;
+    }
+
+    RtlSetBit(&LdrpTlsBitmap, Index);
+
+    *TlsIndex = Index;
+    *AllocatedBitmap = TRUE;
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS
+LdrpAllocateTlsEntry(
+    IN PIMAGE_TLS_DIRECTORY TlsDirectory,
+    IN PLDR_DATA_TABLE_ENTRY ModuleEntry,
+    OUT PULONG TlsIndex,
+    OUT PBOOLEAN AllocatedBitmap OPTIONAL,
+    OUT PTLS_ENTRY* TlsEntry
+)
+{
+    PTLS_ENTRY Entry = NULL;
+    NTSTATUS Status;
+
+    ASSERT(TlsDirectory);
+
+    __try
+    {
+        Entry = (PTLS_ENTRY)RtlAllocateHeap(RtlGetProcessHeap(), 0, sizeof(TLS_ENTRY));
+
+        if (!Entry)
+            _SEH2_YIELD(return STATUS_NO_MEMORY);
+
+        Status = STATUS_SUCCESS;
+
+        RtlCopyMemory(&Entry->TlsDirectory, TlsDirectory, sizeof(IMAGE_TLS_DIRECTORY));
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER)
+    {
+        Status = GetExceptionCode();
+    }
+    _SEH2_END
+
+    if (!NT_SUCCESS(Status))
+    {
+        DPRINT1("TLS entry creation failed [0x%08lX], exiting...\n", Status);
+
+        RtlFreeHeap(RtlGetProcessHeap(), 0, Entry);
+
+        return Status;
+    }
+
+    // Validate that the TLS directory entry is sane.
+
+    if (Entry->TlsDirectory.StartAddressOfRawData > Entry->TlsDirectory.EndAddressOfRawData)
+    {
+        if (ModuleEntry)
+        {
+            DPRINT1("TLS Directory of %ls has erroneous data range: [%lu, %lu]\n",
+                    ModuleEntry->FullDllName.Buffer, TlsDirectory->StartAddressOfRawData,
+                    TlsDirectory->EndAddressOfRawData);
+        }
+        else
+        {
+            DPRINT1("TLS Directory [UNKNOWN MODULE] has erroneous data range: [%lu, %lu]\n",
+                    TlsDirectory->StartAddressOfRawData, TlsDirectory->EndAddressOfRawData);
+        }
+
+        RtlFreeHeap(RtlGetProcessHeap(), 0, Entry);
+
+        return STATUS_INVALID_IMAGE_FORMAT;
+    }
+
+    Entry->ModuleEntry = ModuleEntry;
+
+    // Insert the entry into our list.
+
+    InsertTailList(&LdrpTlsList, &Entry->TlsEntryLinks);
+
+    if (AllocatedBitmap)
+    {
+        Status = LdrpAcquireTlsIndex(TlsIndex, AllocatedBitmap);
+
+        if (!NT_SUCCESS(Status))
+        {
+            DPRINT1("TLS index acquisition failed during entry creation [0x%08lX].\n", Status);
+
+            RemoveEntryList(&Entry->TlsEntryLinks);
+
+            RtlFreeHeap(RtlGetProcessHeap(), 0, Entry);
+
+            return Status;
+        }
+    }
+    else
+    {
+        *TlsIndex += 1;
+    }
+
+    // We reuse the 'Characteristics' field for the real TLS index.
+
+    Entry->TlsDirectory.Characteristics = *TlsIndex;
+
+    __try
+    {
+        *(PULONG)Entry->TlsDirectory.AddressOfIndex = *TlsIndex;
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER)
+    {
+        Status = GetExceptionCode();
+    }
+
+    if (!NT_SUCCESS(Status))
+    {
+        DPRINT1("TLS directory index persistence failed during entry creation [0x%08lX].\n", Status);
+
+        if (AllocatedBitmap)
+        {
+            LdrpReleaseTlsIndex(*TlsIndex);
+
+            if (*AllocatedBitmap)
+                LdrpTlsBitmap.SizeOfBitMap -= TLS_BITMAP_GROW_INCREMENT;
+        }
+
+        RemoveEntryList(&Entry->TlsEntryLinks);
+
+        RtlFreeHeap(RtlGetProcessHeap(), 0, Entry);
+
+        return Status;
+    }
+
+    if (TlsEntry)
+        *TlsEntry = Entry;
+
+    return STATUS_SUCCESS;
+}
+
+PTLS_ENTRY __fastcall LdrpFindTlsEntry(PLDR_DATA_TABLE_ENTRY ModuleEntry)
+{
+    PTLS_ENTRY  TlsEntry;
+    PLIST_ENTRY ListHead;
+
+    ListHead = &LdrpTlsList;
+
+    for (TlsEntry = CONTAINING_RECORD(LdrpTlsList.Flink, TLS_ENTRY, TlsEntryLinks); &TlsEntry->TlsEntryLinks != ListHead; TlsEntry = CONTAINING_RECORD(TlsEntry->TlsEntryLinks.Flink, TLS_ENTRY, TlsEntryLinks))
+    {
+        if (TlsEntry->ModuleEntry == ModuleEntry)
+        {
+            return TlsEntry;
+        }
+    }
+
+    return 0;
+}
+
+NTSTATUS LdrpReleaseTlsEntry(PLDR_DATA_TABLE_ENTRY ModuleEntry)
+{
+    PTLS_ENTRY TlsEntry;
+
+    // Find the corresponding entry for the module
+
+    TlsEntry = LdrpFindTlsEntry(ModuleEntry);
+
+    if (!TlsEntry)
+    {
+        return STATUS_NOT_FOUND;
+    }
+
+    // Remove it from the global list of entries
+
+    RemoveEntryList(&TlsEntry->TlsEntryLinks);
+
+    // Deallocate the TLS index
+
+    LdrpReleaseTlsIndex(TlsEntry->TlsDirectory.Characteristics);
+
+    // Deallocate the entry itself
+
+    RtlFreeHeap(RtlGetProcessHeap(), 0, TlsEntry);
+
+    return STATUS_SUCCESS;
+}
+
+PVOID* __fastcall LdrpGetNewTlsVector(ULONG TlsBitmapLength)
+{
+    PTLS_VECTOR TlsVector;
+    TlsVector = (PTLS_VECTOR)RtlAllocateHeap(
+        RtlGetProcessHeap(),
+        HEAP_ZERO_MEMORY,
+        FIELD_OFFSET(TLS_VECTOR, ModuleTlsData[TlsBitmapLength])
+    );
+
+    if (!TlsVector)
+        return NULL;
+
+    TlsVector->Length = TlsBitmapLength;
+    return TlsVector->ModuleTlsData;
+}
+
+VOID LdrpQueueDeferredTlsData(PVOID TlsVector, PVOID ThreadId)
+{
+    PTLS_VECTOR RealTlsVector;
+    PTLS_RECLAIM_TABLE_ENTRY ReclaimEntry;
+
+    RealTlsVector = CONTAINING_RECORD(TlsVector, TLS_VECTOR, ModuleTlsData);
+
+    RealTlsVector->ThreadId = ThreadId;
+
+    ReclaimEntry = &LdrpDelayedTlsReclaimTable[((ULONG_PTR)(ThreadId) >> 2) & 0xF];
+
+    // Lock
+
+    RtlAcquireSRWLockExclusive(&ReclaimEntry->Lock);
+
+    RealTlsVector->PreviousDeferredTlsVector = ReclaimEntry->TlsVector;
+
+    ReclaimEntry->TlsVector = RealTlsVector;
+
+    // Unlock
+
+    RtlReleaseSRWLockExclusive(&ReclaimEntry->Lock);
+}
+
+NTSTATUS
+NTAPI
+LdrpHandleTlsData(IN OUT PLDR_DATA_TABLE_ENTRY ModuleEntry)
+{
+    PIMAGE_TLS_DIRECTORY TlsDirectory;
+    ULONG DirectorySize;
+    PPROCESS_TLS_INFORMATION TlsInfo;
+    PTLS_ENTRY PendingReleaseTlsEntry = NULL;
+    BOOLEAN AllocatedBitmap = FALSE, AllocatedTlsEntry = FALSE;
+    NTSTATUS Status;
+
+    if (LdrpActiveThreadCount == 0)
+        return STATUS_SUCCESS;
+
+    // Discover the TLS directory address for this module.
+
+    Status = RtlImageDirectoryEntryToDataEx(
+        ModuleEntry->DllBase,
+        TRUE,
+        IMAGE_DIRECTORY_ENTRY_TLS,
+        &DirectorySize,
+        (PVOID*)&TlsDirectory
+    );
+
+    // If we've got no TLS directory then we're done.
+
+    if (!TlsDirectory || !DirectorySize || !NT_SUCCESS(Status))
+        return STATUS_SUCCESS;
+
+    RtlAcquireSRWLockExclusive(&LdrpTlsLock);
+
+    // We'll be using the process heap.
+
+    // We've got an optimization for one active thread, which is the case for
+    // traditional static-link DLLs that use __declspec(thread).
+
+    // Allocate memory for our thread data block.
+
+    const LONG TlsInfoSize = FIELD_OFFSET(PROCESS_TLS_INFORMATION, ThreadData[LdrpActiveThreadCount]);
+    TlsInfo = (PPROCESS_TLS_INFORMATION)RtlAllocateHeap(
+        RtlGetProcessHeap(),
+        0,
+        TlsInfoSize
+    );
+
+    if (!TlsInfo)
+    {
+        RtlReleaseSRWLockExclusive(&LdrpTlsLock);
+        return STATUS_NO_MEMORY;
+    }
+
+    do
+    {
+        ULONG TlsIndex;
+        SIZE_T TlsRawDataLength;
+        PTLS_ENTRY TlsEntry;
+        ULONG ThreadIndex;
+        ULONG ThreadsCleanedUp = 0;
+
+        // Allocate a TLS index (or a new TLS bitmap).
+
+        ULONG TlsBitmapLength = LdrpTlsBitmap.SizeOfBitMap;
+
+        Status = LdrpAllocateTlsEntry(
+            TlsDirectory,
+            ModuleEntry,
+            &TlsIndex,
+            &AllocatedBitmap,
+            &TlsEntry
+        );
+
+        if (!NT_SUCCESS(Status))
+        {
+            DPRINT1("TLS entry allocation failed [%#X], aborting...\n", Status);
+            break;
+        }
+
+        AllocatedTlsEntry = TRUE;
+
+        TlsInfo->ThreadDataCount = LdrpActiveThreadCount;
+
+        if (AllocatedBitmap)
+        {
+            TlsInfo->OperationType = ProcessTlsReplaceVector;
+            TlsInfo->TlsVectorLength = TlsBitmapLength;
+
+            TlsBitmapLength = LdrpTlsBitmap.SizeOfBitMap;
+        }
+        else
+        {
+            TlsInfo->OperationType = ProcessTlsReplaceIndex;
+            TlsInfo->TlsIndex = TlsIndex;
+        }
+
+        Status = STATUS_SUCCESS;
+
+        // Calculate the size of the raw TLS data for this module.
+
+        TlsRawDataLength = TlsEntry->TlsDirectory.EndAddressOfRawData -
+            TlsEntry->TlsDirectory.StartAddressOfRawData;
+
+        // Prepare data for each running thread.
+
+        for (ThreadIndex = 0; ThreadIndex < TlsInfo->ThreadDataCount; ThreadIndex++)
+        {
+            const PVOID TlsMemoryBlock = RtlAllocateHeap(
+                RtlGetProcessHeap(),
+                0,
+                TlsRawDataLength
+            );
+
+            if (!TlsMemoryBlock)
+            {
+                Status = STATUS_NO_MEMORY;
+                break;
+            }
+
+            // Copy the initializer raw data into the newly allocated TLS memory block for thread #ThreadIndex.
+
+            __try
+            {
+                RtlCopyMemory(
+                    TlsMemoryBlock,
+                    (PVOID)TlsEntry->TlsDirectory.StartAddressOfRawData,
+                    TlsRawDataLength
+                );
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                Status = GetExceptionCode();
+            }
+            _SEH2_END
+
+            if (!NT_SUCCESS(Status))
+            {
+                DPRINT1("RtlCopyMemory failed [%#X], exiting...\n", Status);
+
+                RtlFreeHeap(RtlGetProcessHeap(), 0, TlsMemoryBlock);
+
+                break;
+            }
+
+            if (AllocatedBitmap)
+            {
+                PVOID* TlsVector = (PVOID*)LdrpGetNewTlsVector(TlsBitmapLength);
+
+                if (!TlsVector)
+                {
+                    RtlFreeHeap(RtlGetProcessHeap(), 0, TlsMemoryBlock);
+
+                    if (NT_SUCCESS(Status))
+                        Status = STATUS_NO_MEMORY;
+
+                    break;
+                }
+
+                TlsVector[TlsIndex] = TlsMemoryBlock;
+
+                TlsInfo->ThreadData[ThreadIndex].TlsVector = TlsVector;
+            }
+            else
+            {
+                TlsInfo->ThreadData[ThreadIndex].TlsModulePointer = TlsMemoryBlock;
+            }
+
+            TlsInfo->ThreadData[ThreadIndex].Flags = 0;
+        }
+
+        if (!NT_SUCCESS(Status))
+            break;
+
+        TlsInfo->Reserved = 0;
+
+        ASSERT(ThreadIndex == TlsInfo->ThreadDataCount);
+        ASSERT(TlsInfoSize == FIELD_OFFSET(PROCESS_TLS_INFORMATION, ThreadData[TlsInfo->ThreadDataCount]));
+
+        // Perform the actual work of swapping the thread TLS data.
+
+        Status = NtSetInformationProcess(
+            NtCurrentProcess(),
+            ProcessTlsInformation,
+            TlsInfo,
+            TlsInfoSize
+        );
+
+        // Let's handle each thread that we replaced, as the
+        // ProcessTlsInformation call fills our buffer with the old data
+        // after performing a swap.
+
+        while (ThreadIndex-- > 0)
+        {
+            const PTHREAD_TLS_INFORMATION ResultTlsInformation = &TlsInfo->ThreadData[ThreadIndex];
+
+            if (ResultTlsInformation->Flags & 0x1)
+            {
+                // Failure in kernel mode, potential TLS memory leak
+                DPRINT1("ResultTlsInformation->Flags [%#x] has failure bit set, status %#x.\n",
+                    ResultTlsInformation->Flags, Status);
+                continue;
+            }
+
+            // Same as ThreadTlsData->TlsModulePointer (union)
+            if (!ResultTlsInformation->TlsVector)
+                continue;
+
+            // Success, schedule TLS block deletion on thread exit
+            if ((ResultTlsInformation->Flags & 0x2) && AllocatedBitmap)
+            {
+                LdrpQueueDeferredTlsData(
+                    ResultTlsInformation->TlsVector,
+                    ResultTlsInformation->ThreadId
+                );
+
+                continue;
+            }
+
+            if (!ResultTlsInformation->Flags)
+            {
+                // Thread disposed (not iterated through using PsGetNextProcessThread
+                ThreadsCleanedUp++;
+
+                if (AllocatedBitmap)
+                {
+                    // Free the old TLS memory block, pointed to by the item in TLS_VECTOR
+                    RtlFreeHeap(
+                        RtlGetProcessHeap(),
+                        0,
+                        ResultTlsInformation->TlsVector[TlsIndex]
+                    );
+
+                    // Free the whole TLS_VECTOR allocated with LdrpGetNewTlsVector above
+                    RtlFreeHeap(
+                        RtlGetProcessHeap(),
+                        0,
+                        CONTAINING_RECORD(ResultTlsInformation->TlsVector, TLS_VECTOR, ModuleTlsData)
+                    );
+                }
+            }
+
+            if (!AllocatedBitmap)
+            {
+                // Free the old TLS memory block, pointed to by the TlsModulePointer
+                RtlFreeHeap(
+                    RtlGetProcessHeap(),
+                    0,
+                    ResultTlsInformation->TlsModulePointer
+                );
+            }
+        }
+
+        if (NT_SUCCESS(Status) && (ThreadsCleanedUp > 0))
+        {
+            DPRINT1("TLS Thread Post-Shutdown: success [%#X], decrementing LdrpActiveThreadCount: (%u)-(%u).\n",
+                Status, LdrpActiveThreadCount, ThreadsCleanedUp);
+
+            InterlockedExchangeAdd((PLONG)&LdrpActiveThreadCount, -((LONG)ThreadsCleanedUp));
+        }
+    }
+    while (FALSE);
+
+    if (!NT_SUCCESS(Status))
+    {
+        DPRINT1("TLS memory block swap failure [%#X], rolling back...\n", Status);
+
+        if (AllocatedTlsEntry)
+        {
+            if (!NT_SUCCESS(LdrpReleaseTlsEntry(ModuleEntry)))
+                DPRINT1("TLS rollback memory release failure [%#X].\n");
+        }
+
+        if (AllocatedBitmap)
+        {
+            LdrpTlsBitmap.SizeOfBitMap -= TLS_BITMAP_GROW_INCREMENT;
+        }
+    }
+    else
+    {
+        ModuleEntry->TlsIndex = -1; // just nonzero would be sufficient, but let's mimic the original
+        Status = STATUS_SUCCESS;
+    }
+
+    RtlReleaseSRWLockExclusive(&LdrpTlsLock);
+
+    RtlFreeHeap(RtlGetProcessHeap(), 0, TlsInfo);
+
+    if (PendingReleaseTlsEntry)
+        RtlFreeHeap(RtlGetProcessHeap(), 0, PendingReleaseTlsEntry);
+
+    return Status;
+}
+
 
 /* EOF */

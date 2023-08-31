@@ -1698,6 +1698,13 @@ typedef struct _WIN32_CALLOUTS_FPNS
 #endif
 } WIN32_CALLOUTS_FPNS, *PWIN32_CALLOUTS_FPNS;
 
+
+#endif // !NTOS_MODE_USER
+
+#ifdef __cplusplus
+}; // extern "C"
+#endif
+
 /* Tls moment */
 typedef struct _THREAD_TLS_INFORMATION
 {
@@ -1733,11 +1740,5 @@ typedef struct _PROCESS_TLS_INFORMATION
 
 	THREAD_TLS_INFORMATION ThreadData[ANYSIZE_ARRAY];
 } PROCESS_TLS_INFORMATION, *PPROCESS_TLS_INFORMATION;
-
-#endif // !NTOS_MODE_USER
-
-#ifdef __cplusplus
-}; // extern "C"
-#endif
 
 #endif // _PSTYPES_H
