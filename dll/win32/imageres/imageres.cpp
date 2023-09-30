@@ -5,11 +5,6 @@
  * COPYRIGHT:   Copyright 2023 Ethan Rodensky <splitwirez@gmail.com>
  */
 
-#include <windef.h>
-#include <winbase.h>
-#include <wingdi.h>
-#include <winuser.h>
-
 #include "imageres.h"
 
 BOOL
