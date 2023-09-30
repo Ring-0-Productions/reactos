@@ -348,6 +348,9 @@ HRESULT CTrayNotifyWnd_CreateInstance(HWND hwndParent, REFIID riid, void **ppv);
 /* SysPagerWnd */
 HRESULT CSysPagerWnd_CreateInstance(HWND hwndParent, REFIID riid, void **ppv);
 
+#include "CTrayShowDesktopButton.h"
+#include "trayntfy.h"
+
 /*
  * taskswnd.c
  */
