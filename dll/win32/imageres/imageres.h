@@ -5,7 +5,12 @@
  * COPYRIGHT:   Copyright 2023 Ethan Rodensky <splitwirez@gmail.com>
  */
 
-#pragma once
+#ifndef _IMAGERES_H_
+#define _IMAGERES_H_
+
+#include <windows.h>
 
 /* Icons */
 #define IDI_SHOW_DESKTOP            110 // TODO: Should this be defined somewhere else, so explorer can use the `IDI_SHOW_DESKTOP` constant?
+
+#endif /* _IMAGERES_H_ */
