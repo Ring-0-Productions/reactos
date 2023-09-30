@@ -19,49 +19,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "precomp.h"
+#include "trayntfy.h"
 
-/*
- * TrayNotifyWnd
- */
 
-static const WCHAR szTrayNotifyWndClass[] = L"TrayNotifyWnd";
-
-#define TRAY_NOTIFY_WND_SPACING_X   1
-#define TRAY_NOTIFY_WND_SPACING_Y   1
-
-class CTrayNotifyWnd :
-    public CComCoClass<CTrayNotifyWnd>,
-    public CComObjectRootEx<CComMultiThreadModelNoCS>,
-    public CWindowImpl < CTrayNotifyWnd, CWindow, CControlWinTraits >,
-    public IOleWindow
-{
-    CComPtr<IUnknown> m_clock;
-    CComPtr<IUnknown> m_pager;
-
-    HWND m_hwndClock;
-    HWND m_hwndPager;
-
-    HTHEME TrayTheme;
-    SIZE szTrayClockMin;
-    SIZE szTrayNotify;
-    MARGINS ContentMargin;
-    BOOL IsHorizontal;
-
-public:
-    CTrayNotifyWnd() :
+    CTrayNotifyWnd::CTrayNotifyWnd() :
+        m_ShowDesktopButton(),
         m_hwndClock(NULL),
         m_hwndPager(NULL),
         TrayTheme(NULL),
         IsHorizontal(FALSE)
     {
         ZeroMemory(&szTrayClockMin, sizeof(szTrayClockMin));
+        ZeroMemory(&szTrayShowDesktop, sizeof(szTrayShowDesktop));
         ZeroMemory(&szTrayNotify, sizeof(szTrayNotify));
         ZeroMemory(&ContentMargin, sizeof(ContentMargin));
     }
-    virtual ~CTrayNotifyWnd() { }
+    CTrayNotifyWnd::~CTrayNotifyWnd() { }
 
-    LRESULT OnThemeChanged()
+    LRESULT CTrayNotifyWnd::OnThemeChanged()
     {
         if (TrayTheme)
             CloseThemeData(TrayTheme);
@@ -96,12 +71,12 @@ public:
         return TRUE;
     }
 
-    LRESULT OnThemeChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnThemeChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         return OnThemeChanged();
     }
 
-    LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         HRESULT hr;
 
@@ -120,26 +95,31 @@ public:
         hr = IUnknown_GetWindow(m_pager, &m_hwndPager);
         if (FAILED_UNEXPECTEDLY(hr))
             return FALSE;
-
+        
+        /* Create the 'Show Desktop' button */
+        m_ShowDesktopButton.DoCreate(m_hWnd);
+        m_hwndShowDesktop = m_ShowDesktopButton.m_hWnd;
+        
         return TRUE;
     }
 
-    BOOL GetMinimumSize(IN OUT PSIZE pSize)
+    BOOL CTrayNotifyWnd::GetMinimumSize(IN OUT PSIZE pSize)
     {
         SIZE szClock = { 0, 0 };
         SIZE szTray = { 0, 0 };
+        SIZE szShowDesktop = { 0, 0 };
 
         if (!g_TaskbarSettings.sr.HideClock)
         {
             if (IsHorizontal)
             {
-                szClock.cy = pSize->cy - 2 * TRAY_NOTIFY_WND_SPACING_Y;
+                szClock.cy = pSize->cy;
                 if (szClock.cy <= 0)
                     goto NoClock;
             }
             else
             {
-                szClock.cx = pSize->cx - 2 * TRAY_NOTIFY_WND_SPACING_X;
+                szClock.cx = pSize->cx;
                 if (szClock.cx <= 0)
                     goto NoClock;
             }
@@ -165,12 +145,32 @@ public:
 
         szTrayNotify = szTray;
 
+        INT showDesktopButtonExtent = 0;
+        if (g_TaskbarSettings.bShowDesktopButton)
+        {
+            showDesktopButtonExtent = m_ShowDesktopButton.WidthOrHeight();
+            if (IsHorizontal)
+            {
+                szShowDesktop.cx = showDesktopButtonExtent;
+                szShowDesktop.cy = pSize->cy;
+            }
+            else
+            {
+                szShowDesktop.cx = pSize->cx;
+                szShowDesktop.cy = showDesktopButtonExtent;
+            }
+        }
+        szTrayShowDesktop = szShowDesktop;
+
         if (IsHorizontal)
         {
             pSize->cx = 2 * TRAY_NOTIFY_WND_SPACING_X;
 
             if (!g_TaskbarSettings.sr.HideClock)
                 pSize->cx += TRAY_NOTIFY_WND_SPACING_X + szTrayClockMin.cx;
+            
+            if (g_TaskbarSettings.bShowDesktopButton)
+                pSize->cx += showDesktopButtonExtent;
 
             pSize->cx += szTray.cx;
             pSize->cx += ContentMargin.cxLeftWidth + ContentMargin.cxRightWidth;
@@ -181,6 +181,9 @@ public:
 
             if (!g_TaskbarSettings.sr.HideClock)
                 pSize->cy += TRAY_NOTIFY_WND_SPACING_Y + szTrayClockMin.cy;
+            
+            if (g_TaskbarSettings.bShowDesktopButton)
+                pSize->cy += showDesktopButtonExtent;
 
             pSize->cy += szTray.cy;
             pSize->cy += ContentMargin.cyTopHeight + ContentMargin.cyBottomHeight;
@@ -189,25 +192,122 @@ public:
         return TRUE;
     }
 
-    VOID Size(IN const SIZE *pszClient)
+    VOID CTrayNotifyWnd::Size(IN OUT SIZE *pszClient)
     {
-        if (!g_TaskbarSettings.sr.HideClock)
-        {
-            POINT ptClock;
-            SIZE szClock;
+        RECT rcClient = {0, 0, pszClient->cx, pszClient->cy};
+        AlignControls(&rcClient);
+        pszClient->cx = rcClient.right - rcClient.left;
+        pszClient->cy = rcClient.bottom - rcClient.top;
+    }
 
+    VOID CTrayNotifyWnd::AlignControls(IN PRECT prcClient OPTIONAL)
+    {
+        RECT rcClient;
+        if (prcClient != NULL)
+        {
+            rcClient.left = prcClient->left;
+            rcClient.top = prcClient->top;
+            rcClient.right = prcClient->right;
+            rcClient.bottom = prcClient->bottom;
+        }
+        else
+        {
+            if (!GetClientRect(&rcClient))
+            {
+                ERR("Could not get client rect lastErr=%d\n", GetLastError());
+                return;
+            }
+        }
+
+        rcClient.left += ContentMargin.cxLeftWidth;
+        rcClient.top += ContentMargin.cyTopHeight;
+        rcClient.right -= ContentMargin.cxRightWidth;
+        rcClient.bottom -= ContentMargin.cyBottomHeight;
+
+        UINT swpFlags = SWP_DRAWFRAME | SWP_NOCOPYBITS | SWP_NOZORDER;
+
+        if (g_TaskbarSettings.bShowDesktopButton)
+        {
+            POINT ptShowDesktop =
+            {
+                rcClient.left,
+                rcClient.top
+            };
+            SIZE szShowDesktop =
+            {
+                rcClient.right - rcClient.left,
+                rcClient.bottom - rcClient.top
+            };
+
+            
+            INT cxyShowDesktop = m_ShowDesktopButton.WidthOrHeight();
             if (IsHorizontal)
             {
-                ptClock.x = pszClient->cx - szTrayClockMin.cx - ContentMargin.cxRightWidth;
-                ptClock.y = ContentMargin.cyTopHeight;
-                szClock.cx = szTrayClockMin.cx;
-                szClock.cy = pszClient->cy - ContentMargin.cyTopHeight - ContentMargin.cyBottomHeight;
+                if (!TrayTheme)
+                {
+                    ptShowDesktop.y -= ContentMargin.cyTopHeight;
+                    szShowDesktop.cy += ContentMargin.cyTopHeight + ContentMargin.cyBottomHeight;
+                }
+
+                rcClient.right -= (cxyShowDesktop - ContentMargin.cxRightWidth);
+
+                ptShowDesktop.x = rcClient.right;
+                szShowDesktop.cx = cxyShowDesktop;
+
+                rcClient.right -= 5;
             }
             else
             {
-                ptClock.x = ContentMargin.cxLeftWidth;
-                ptClock.y = pszClient->cy - szTrayClockMin.cy;
-                szClock.cx = pszClient->cx - ContentMargin.cxLeftWidth - ContentMargin.cxRightWidth;
+                if (!TrayTheme)
+                {
+                    ptShowDesktop.x -= ContentMargin.cxLeftWidth;
+                    szShowDesktop.cx += ContentMargin.cxLeftWidth + ContentMargin.cxRightWidth;
+                }
+
+                rcClient.bottom -= (cxyShowDesktop - ContentMargin.cyBottomHeight);
+
+                ptShowDesktop.y = rcClient.bottom;
+                szShowDesktop.cy = cxyShowDesktop;
+
+                rcClient.bottom -= 5;
+            }
+
+            /* Resize and reposition the button */
+            ::SetWindowPos(m_hwndShowDesktop,
+                NULL,
+                ptShowDesktop.x,
+                ptShowDesktop.y,
+                szShowDesktop.cx,
+                szShowDesktop.cy,
+                swpFlags
+            );
+        }
+
+        if (!g_TaskbarSettings.sr.HideClock)
+        {
+            POINT ptClock =
+            {
+                rcClient.left,
+                rcClient.top
+            };
+            SIZE szClock =
+            {
+                rcClient.right - rcClient.left,
+                rcClient.bottom - rcClient.top
+            };
+
+            if (IsHorizontal)
+            {
+                rcClient.right -= szTrayClockMin.cx;
+
+                ptClock.x = rcClient.right;
+                szClock.cx = szTrayClockMin.cx;
+            }
+            else
+            {
+                rcClient.bottom -= szTrayClockMin.cy;
+
+                ptClock.y = rcClient.bottom;
                 szClock.cy = szTrayClockMin.cy;
             }
 
@@ -217,7 +317,7 @@ public:
                 ptClock.y,
                 szClock.cx,
                 szClock.cy,
-                SWP_NOZORDER);
+                swpFlags);
         }
 
         POINT ptPager;
@@ -225,11 +325,11 @@ public:
         if (IsHorizontal)
         {
             ptPager.x = ContentMargin.cxLeftWidth;
-            ptPager.y = (pszClient->cy - szTrayNotify.cy)/2;
+            ptPager.y = ((rcClient.bottom - rcClient.top) - szTrayNotify.cy)/2;
         }
         else
         {
-            ptPager.x = (pszClient->cx - szTrayNotify.cx)/2;
+            ptPager.x = ((rcClient.right - rcClient.left) - szTrayNotify.cx)/2;
             ptPager.y = ContentMargin.cyTopHeight;
         }
 
@@ -239,10 +339,18 @@ public:
             ptPager.y,
             szTrayNotify.cx,
             szTrayNotify.cy,
-            SWP_NOZORDER);
+            swpFlags);
+        
+        if (prcClient != NULL)
+        {
+            prcClient->left = rcClient.left - ContentMargin.cxLeftWidth;
+            prcClient->top = rcClient.top - ContentMargin.cyTopHeight;
+            prcClient->right = rcClient.right + ContentMargin.cxRightWidth;
+            prcClient->bottom = rcClient.bottom + ContentMargin.cyBottomHeight;
+        }
     }
 
-    LRESULT OnEraseBackground(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnEraseBackground(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         HDC hdc = (HDC) wParam;
 
@@ -262,23 +370,24 @@ public:
         return TRUE;
     }
 
-    LRESULT OnGetMinimumSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnGetMinimumSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         BOOL Horizontal = (BOOL) wParam;
 
         if (Horizontal != IsHorizontal)
         {
             IsHorizontal = Horizontal;
-            if (IsHorizontal)
-                SetWindowTheme(m_hWnd, L"TrayNotifyHoriz", NULL);
-            else
-                SetWindowTheme(m_hWnd, L"TrayNotifyVert", NULL);
+            SetWindowTheme(m_hWnd, IsHorizontal
+                ? L"TrayNotifyHoriz"
+                : L"TrayNotifyVert"
+            , NULL);
         }
+        m_ShowDesktopButton.IsHorizontal = Horizontal;
 
         return (LRESULT) GetMinimumSize((PSIZE) lParam);
     }
 
-    LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         SIZE szClient;
 
@@ -290,12 +399,30 @@ public:
         return TRUE;
     }
 
-    LRESULT OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
+        POINT pt;
+        pt.x = GET_X_LPARAM(lParam);
+        pt.y = GET_Y_LPARAM(lParam);
+
+        if (m_ShowDesktopButton && m_ShowDesktopButton.PtInButton(pt))
+            return HTCLIENT;
+        
         return HTTRANSPARENT;
     }
 
-    LRESULT OnCtxMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        POINT pt;
+        ::GetCursorPos(&pt);
+
+        if (m_ShowDesktopButton && m_ShowDesktopButton.PtInButton(pt))
+            m_ShowDesktopButton.StartHovering();
+
+        return TRUE;
+    }
+
+    LRESULT CTrayNotifyWnd::OnCtxMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         bHandled = TRUE;
 
@@ -305,23 +432,41 @@ public:
             return 0;
     }
 
-    LRESULT OnClockMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnClockMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         return SendMessageW(m_hwndClock, uMsg, wParam, lParam);
     }
 
-    LRESULT OnPagerMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnTaskbarSettingsChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        TaskbarSettings* newSettings = (TaskbarSettings*)lParam;
+
+        /* Toggle show desktop button */
+        if (newSettings->bShowDesktopButton != g_TaskbarSettings.bShowDesktopButton)
+        {
+            g_TaskbarSettings.bShowDesktopButton = newSettings->bShowDesktopButton;
+            ::ShowWindow(m_hwndShowDesktop, g_TaskbarSettings.bShowDesktopButton ? SW_SHOW : SW_HIDE);
+            
+            /* Ask the parent to resize */
+            NMHDR nmh = {m_hWnd, 0, NTNWM_REALIGN};
+            SendMessage(WM_NOTIFY, 0, (LPARAM) &nmh);
+        }
+
+        return OnClockMessage(uMsg, wParam, lParam, bHandled);
+    }
+
+    LRESULT CTrayNotifyWnd::OnPagerMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         return SendMessageW(m_hwndPager, uMsg, wParam, lParam);
     }
 
-    LRESULT OnRealign(INT uCode, LPNMHDR hdr, BOOL& bHandled)
+    LRESULT CTrayNotifyWnd::OnRealign(INT uCode, LPNMHDR hdr, BOOL& bHandled)
     {
         hdr->hwndFrom = m_hWnd;
         return GetParent().SendMessage(WM_NOTIFY, 0, (LPARAM)hdr);
     }
 
-    HRESULT WINAPI GetWindow(HWND* phwnd)
+    HRESULT WINAPI CTrayNotifyWnd::GetWindow(HWND* phwnd)
     {
         if (!phwnd)
             return E_INVALIDARG;
@@ -329,37 +474,12 @@ public:
         return S_OK;
     }
 
-    HRESULT WINAPI ContextSensitiveHelp(BOOL fEnterMode)
+    HRESULT WINAPI CTrayNotifyWnd::ContextSensitiveHelp(BOOL fEnterMode)
     {
         return E_NOTIMPL;
     }
 
-    DECLARE_NOT_AGGREGATABLE(CTrayNotifyWnd)
-
-    DECLARE_PROTECT_FINAL_CONSTRUCT()
-    BEGIN_COM_MAP(CTrayNotifyWnd)
-        COM_INTERFACE_ENTRY_IID(IID_IOleWindow, IOleWindow)
-    END_COM_MAP()
-
-    DECLARE_WND_CLASS_EX(szTrayNotifyWndClass, CS_DBLCLKS, COLOR_3DFACE)
-
-    BEGIN_MSG_MAP(CTrayNotifyWnd)
-        MESSAGE_HANDLER(WM_CREATE, OnCreate)
-        MESSAGE_HANDLER(WM_THEMECHANGED, OnThemeChanged)
-        MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBackground)
-        MESSAGE_HANDLER(WM_SIZE, OnSize)
-        MESSAGE_HANDLER(WM_NCHITTEST, OnNcHitTest)
-        MESSAGE_HANDLER(WM_CONTEXTMENU, OnCtxMenu)
-        MESSAGE_HANDLER(WM_NCLBUTTONDBLCLK, OnClockMessage)
-        MESSAGE_HANDLER(TWM_SETTINGSCHANGED, OnClockMessage)
-        MESSAGE_HANDLER(WM_SETFONT, OnClockMessage)
-        MESSAGE_HANDLER(WM_SETTINGCHANGE, OnPagerMessage)
-        MESSAGE_HANDLER(WM_COPYDATA, OnPagerMessage)
-        NOTIFY_CODE_HANDLER(NTNWM_REALIGN, OnRealign)
-        MESSAGE_HANDLER(TNWM_GETMINIMUMSIZE, OnGetMinimumSize)
-    END_MSG_MAP()
-
-    HRESULT Initialize(IN HWND hwndParent)
+    HRESULT CTrayNotifyWnd::Initialize(IN HWND hwndParent)
     {
         DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
         Create(hwndParent, 0, NULL, dwStyle, WS_EX_STATICEDGE);
@@ -367,9 +487,8 @@ public:
             return E_FAIL;
         return S_OK;
     }
-};
 
-HRESULT CTrayNotifyWnd_CreateInstance(HWND hwndParent, REFIID riid, void **ppv)
-{
-    return ShellObjectCreatorInit<CTrayNotifyWnd>(hwndParent, riid, ppv);
-}
+    HRESULT CTrayNotifyWnd_CreateInstance(HWND hwndParent, REFIID riid, void **ppv)
+    {
+        return ShellObjectCreatorInit<CTrayNotifyWnd>(hwndParent, riid, ppv);
+    }

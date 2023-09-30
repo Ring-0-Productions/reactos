@@ -21,6 +21,7 @@ list(APPEND SOURCE
     taskband.cpp
     taskswnd.cpp
     tbsite.cpp
+    CTrayShowDesktopButton.cpp
     trayclock.cpp
     trayntfy.cpp
     trayprop.cpp
