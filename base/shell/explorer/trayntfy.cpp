@@ -375,13 +375,12 @@
         BOOL Horizontal = (BOOL) wParam;
 
         if (Horizontal != IsHorizontal)
-        {
             IsHorizontal = Horizontal;
-            SetWindowTheme(m_hWnd, IsHorizontal
-                ? L"TrayNotifyHoriz"
-                : L"TrayNotifyVert"
-            , NULL);
-        }
+
+        SetWindowTheme(m_hWnd, IsHorizontal
+            ? L"TrayNotifyHoriz"
+            : L"TrayNotifyVert"
+        , NULL);
         m_ShowDesktopButton.IsHorizontal = Horizontal;
 
         return (LRESULT) GetMinimumSize((PSIZE) lParam);
