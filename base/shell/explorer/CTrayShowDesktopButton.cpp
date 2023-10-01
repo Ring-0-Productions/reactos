@@ -70,14 +70,14 @@ HRESULT CTrayShowDesktopButton::DoCreate(HWND hwndParent)
     if (!m_hWnd)
         return E_FAIL;
 
-    DWORD dwImageresFlags = 0; //FIXME: Shouldn't LOAD_LIBRARY_AS_DATAFILE work here? If so, should it be used?
+    DWORD dwImageresFlags = 0; //TODO: Shouldn't LOAD_LIBRARY_AS_DATAFILE work here? If so, should it be used?
     HMODULE hmImageres = LoadLibraryExW(L"imageres.dll", NULL, dwImageresFlags);
     if (hmImageres)
     {
         m_icon = static_cast<HICON>(LoadImageW(
             hmImageres
-            // Why 110? Refer to `dll/win32_vista/imageres/imageres.h`.
-            , L"#110" //MAKEINTRESOURCEW(110)
+            // Why 110? Refer to `dll/win32/imageres/imageres.h`.
+            , MAKEINTRESOURCEW(110) //L"#110"
             , IMAGE_ICON
             , GetSystemMetrics(SM_CXSMICON)
             , GetSystemMetrics(SM_CYSMICON)
