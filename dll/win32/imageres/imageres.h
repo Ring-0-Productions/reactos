@@ -11,6 +11,7 @@
 #include <windows.h>
 
 /* Icons */
-#define IDI_SHOW_DESKTOP            110 // TODO: Should this be defined somewhere else, so explorer can use the `IDI_SHOW_DESKTOP` constant?
+// TODO: Should this be defined somewhere else, so explorer can use the `IDI_SHOW_DESKTOP` constant?
+#define IDI_SHOW_DESKTOP            110 // Why 110? Refer to `dll/win32/imageres/imageres.h`.
 
 #endif /* _IMAGERES_H_ */
