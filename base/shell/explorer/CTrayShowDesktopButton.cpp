@@ -36,30 +36,35 @@ CTrayShowDesktopButton::GetTaskbar(OUT HWND* taskbarWnd)
     return wnd != NULL;
 }
 
-#define SHOW_DESKTOP_MINIMUM_WIDTH 15
-#define SHOW_DESKTOP_CLASSIC_WIDTH 18
-
 INT CTrayShowDesktopButton::WidthOrHeight() const
 {
-    if (m_hTheme)
+    if (IsThemeActive() && !m_highContrastMode)
     {
-        INT cxy = 0;
-        if (m_drawWithDedicatedBackground && !m_highContrastMode) //TODO: verify accuracy
+        if (m_drawWithDedicatedBackground)
         {
-            cxy = (2 * ::GetSystemMetrics(SM_CXEDGE)) + 5; // TODO: is adding 5 excessive?
-            cxy = max(cxy, SHOW_DESKTOP_MINIMUM_WIDTH);
+            if (GetSystemMetrics(SM_TABLETPC))
+            {
+                //TODO: DPI scaling - return logical-to-physical conversion of 24, not fixed value
+                return 24;
+            }
+            else
+                return 15;
         }
         else
         {
-            cxy = max(16 + (IsHorizontal
+            return max(16 + (IsHorizontal
                 ? (m_ContentMargins.cxLeftWidth + m_ContentMargins.cxRightWidth)
                 : (m_ContentMargins.cyTopHeight + m_ContentMargins.cyBottomHeight)
-            ), SHOW_DESKTOP_CLASSIC_WIDTH) + 6;
+            ), 18) + 6;
         }
-        return cxy;
     }
-    
-    return SHOW_DESKTOP_CLASSIC_WIDTH; //TODO: verify accuracy
+    else
+    {
+        return max(
+            2 * GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXSMICON),
+            2 * GetSystemMetrics(SM_CYBORDER) + GetSystemMetrics(SM_CYSMICON)
+        );
+    }
 }
 
 HRESULT CTrayShowDesktopButton::DoCreate(HWND hwndParent)
@@ -70,20 +75,11 @@ HRESULT CTrayShowDesktopButton::DoCreate(HWND hwndParent)
     if (!m_hWnd)
         return E_FAIL;
 
-    DWORD dwImageresFlags = 0; //TODO: Shouldn't LOAD_LIBRARY_AS_DATAFILE work here? If so, should it be used?
-    HMODULE hmImageres = LoadLibraryExW(L"imageres.dll", NULL, dwImageresFlags);
-    if (hmImageres)
-    {
-        m_icon = static_cast<HICON>(LoadImageW(
-            hmImageres
-            // Why 110? Refer to `dll/win32/imageres/imageres.h`.
-            , MAKEINTRESOURCEW(110) //L"#110"
-            , IMAGE_ICON
-            , GetSystemMetrics(SM_CXSMICON)
-            , GetSystemMetrics(SM_CYSMICON)
-            , LR_DEFAULTCOLOR | LR_SHARED
-        ));
-    }
+    ExtractIconExW(
+        L"imageres.dll", -110
+        //L"explorer.exe", -IDI_DESKTOP
+        //L"shell32.dll", -IDI_SHELL_DESKTOP
+        , NULL, &m_icon, 1);
     EnsureWindowTheme(TRUE);
     
     return S_OK;
