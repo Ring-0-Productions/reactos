@@ -13,4 +13,4 @@
 #define REACTOS_STR_ORIGINAL_FILENAME "imageres.dll\0"
 #include <reactos/version.rc>
 
-IDI_SHOW_DESKTOP ICON "res/icons/110.ico"
+IDI_SHOW_DESKTOP ICON "../shell32/res/icons/35.ico"

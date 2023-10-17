@@ -4,13 +4,13 @@
 <svg
    inkscape:export-ydpi="96"
    inkscape:export-xdpi="96"
-   inkscape:export-filename="110-48x.png"
-   width="48px"
-   height="48px"
+   inkscape:export-filename="35-32x.png"
+   width="32"
+   height="32"
    id="svg11300"
    sodipodi:version="0.32"
    inkscape:version="1.1 (1:1.1+202105261517+ce6663b3b7)"
-   sodipodi:docname="48x.svg"
+   sodipodi:docname="32x.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -37,10 +37,10 @@
     </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 24 : 1"
+       inkscape:vp_x="0 : 8 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="48 : 24 : 1"
-       inkscape:persp3d-origin="24 : 16 : 1"
+       inkscape:vp_z="48 : 8 : 1"
+       inkscape:persp3d-origin="24 : 0 : 1"
        id="perspective75" />
     <linearGradient
        id="linearGradient5048">
@@ -130,22 +130,12 @@
        xlink:href="#linearGradient3844"
        id="radialGradient3854"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.000000,0.000000,0.000000,0.355140,1.780868e-14,28.29322)"
+       gradientTransform="matrix(1,0,0,0.35514,0,28.29322)"
        cx="35.1875"
        cy="43.875"
        fx="35.1875"
        fy="43.875"
        r="6.6875" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1428"
-       id="linearGradient1812"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.857967,0,0,0.83092,0.286652,4.247197)"
-       x1="30.802307"
-       y1="6.3776422"
-       x2="30.802307"
-       y2="42.314632" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient5500"
@@ -154,26 +144,37 @@
        y1="38"
        x2="2"
        y2="41"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-1,-14)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1428"
+       id="linearGradient1738"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.857967,0,0,0.83092,-0.713348,3.247197)"
+       x1="21.006275"
+       y1="4.6190629"
+       x2="21.006275"
+       y2="27.578806" />
     <clipPath
        clipPathUnits="userSpaceOnUse"
-       id="clipPath5603">
+       id="clipPath2689">
       <g
-         id="g5609">
+         id="g2695">
         <rect
            rx="1.36"
-           y="38"
-           x="2"
+           y="24"
+           x="1"
            height="3"
-           width="44"
-           id="rect5605"
+           width="29"
+           id="rect2691"
            style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none" />
         <rect
-           y="38"
-           x="2"
+           y="24"
+           x="1"
            height="1.5"
-           width="44"
-           id="rect5607"
+           width="29"
+           id="rect2693"
            style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none" />
       </g>
     </clipPath>
@@ -188,8 +189,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="25.5"
-     inkscape:cy="23.5"
+     inkscape:cx="17.5"
+     inkscape:cy="15.5"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:grid-bbox="true"
@@ -243,20 +244,20 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <rect
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:url(#linearGradient1812);fill-opacity:1;fill-rule:evenodd;stroke:#173764;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none"
-       id="rect1426"
-       width="45"
-       height="36"
-       x="1.5"
-       y="5.5"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:url(#linearGradient1738);fill-opacity:1;fill-rule:evenodd;stroke:#173764;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none"
+       id="rect1022"
+       width="30"
+       height="23"
+       x="0.5"
+       y="4.5"
        rx="1.8561548"
        ry="1.8561562" />
     <rect
        rx="0.84399998"
-       y="6.5"
-       x="2.5"
-       height="34"
-       width="43"
+       y="5.5"
+       x="1.5"
+       height="21"
+       width="28"
        id="rect2317"
        style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.28655;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none" />
   </g>
@@ -268,29 +269,29 @@
     <g
        id="g968">
       <g
-         id="g6249">
+         id="g2356">
         <rect
-           y="37"
-           x="2"
+           y="23"
+           x="1"
            height="1"
-           width="44"
+           width="29"
            id="rect5054"
            style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#0e0e0f;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none" />
         <rect
            style="fill:url(#linearGradient5502);fill-opacity:1;stroke:none;stroke-width:2;stroke-opacity:1"
            id="rect5360"
-           width="44"
+           width="29"
            height="3"
-           x="2"
-           y="38"
-           clip-path="url(#clipPath5603)" />
+           x="1"
+           y="24"
+           clip-path="url(#clipPath2689)" />
       </g>
       <rect
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2;stroke-opacity:1"
          id="rect6019"
          width="2"
-         x="3"
-         y="38"
+         x="2"
+         y="24"
          height="2" />
     </g>
   </g>
