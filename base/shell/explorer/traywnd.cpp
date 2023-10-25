@@ -2344,6 +2344,7 @@ ChangePos:
         hRet = CTrayNotifyWnd_CreateInstance(m_hWnd, IID_PPV_ARG(IUnknown, &m_TrayNotifyInstance));
         if (FAILED_UNEXPECTEDLY(hRet))
             return FALSE;
+#if 0
         IUnknown* tniUnknown = m_TrayNotifyInstance;
         CTrayNotifyWnd* tniPtr = (CTrayNotifyWnd*)tniUnknown;
         m_ptShowDesktopButton = &(tniPtr->m_ShowDesktopButton);
@@ -2352,6 +2353,7 @@ ChangePos:
             m_hwndShowDesktop = m_ptShowDesktopButton->m_hWnd;
         else
             ERR("!m_ptShowDesktopButton");
+#endif
 
         /* Get the hwnd of the rebar */
         hRet = IUnknown_GetWindow(m_TrayBandSite, &m_Rebar);
@@ -2367,6 +2369,7 @@ ChangePos:
         hRet = IUnknown_GetWindow(m_TrayNotifyInstance, &m_TrayNotify);
         if (FAILED_UNEXPECTEDLY(hRet))
             return FALSE;
+        ::SendMessage(m_TrayNotify, TNWM_GETSHOWDESKTOPBUTTON, (WPARAM)&m_hwndShowDesktop, 0);
 
         SetWindowTheme(m_Rebar, L"TaskBar", NULL);
 
