@@ -19,10 +19,43 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "trayntfy.h"
+#include "precomp.h"
+#include <commoncontrols.h>
 
+static const WCHAR szTrayNotifyWndClass[] = L"TrayNotifyWnd";
 
-    CTrayNotifyWnd::CTrayNotifyWnd() :
+#define TRAY_NOTIFY_WND_SPACING_X   1
+#define TRAY_NOTIFY_WND_SPACING_Y   1
+
+/*
+ * TrayNotifyWnd
+ */
+
+class CTrayNotifyWnd :
+    public CComCoClass<CTrayNotifyWnd>,
+    public CComObjectRootEx<CComMultiThreadModelNoCS>,
+    public CWindowImpl < CTrayNotifyWnd, CWindow, CControlWinTraits >,
+    public IOleWindow
+{
+    CComPtr<IUnknown> m_clock;
+public:
+    CTrayShowDesktopButton m_ShowDesktopButton;
+private:
+    CComPtr<IUnknown> m_pager;
+
+    HWND m_hwndClock;
+    HWND m_hwndShowDesktop;
+    HWND m_hwndPager;
+
+    HTHEME TrayTheme;
+    SIZE szTrayClockMin;
+    SIZE szTrayShowDesktop;
+    SIZE szTrayNotify;
+    MARGINS ContentMargin;
+    BOOL IsHorizontal;
+
+public:
+    CTrayNotifyWnd() :
         m_ShowDesktopButton(),
         m_hwndClock(NULL),
         m_hwndPager(NULL),
@@ -34,9 +67,9 @@
         ZeroMemory(&szTrayNotify, sizeof(szTrayNotify));
         ZeroMemory(&ContentMargin, sizeof(ContentMargin));
     }
-    CTrayNotifyWnd::~CTrayNotifyWnd() { }
+    ~CTrayNotifyWnd() { }
 
-    LRESULT CTrayNotifyWnd::OnThemeChanged()
+    LRESULT OnThemeChanged()
     {
         if (TrayTheme)
             CloseThemeData(TrayTheme);
@@ -71,12 +104,12 @@
         return TRUE;
     }
 
-    LRESULT CTrayNotifyWnd::OnThemeChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnThemeChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         return OnThemeChanged();
     }
 
-    LRESULT CTrayNotifyWnd::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         HRESULT hr;
 
@@ -103,7 +136,7 @@
         return TRUE;
     }
 
-    BOOL CTrayNotifyWnd::GetMinimumSize(IN OUT PSIZE pSize)
+    BOOL GetMinimumSize(IN OUT PSIZE pSize)
     {
         SIZE szClock = { 0, 0 };
         SIZE szTray = { 0, 0 };
@@ -192,7 +225,7 @@
         return TRUE;
     }
 
-    VOID CTrayNotifyWnd::Size(IN OUT SIZE *pszClient)
+    VOID Size(IN OUT SIZE *pszClient)
     {
         RECT rcClient = {0, 0, pszClient->cx, pszClient->cy};
         AlignControls(&rcClient);
@@ -200,7 +233,7 @@
         pszClient->cy = rcClient.bottom - rcClient.top;
     }
 
-    VOID CTrayNotifyWnd::AlignControls(IN PRECT prcClient OPTIONAL)
+    VOID AlignControls(IN PRECT prcClient OPTIONAL)
     {
         RECT rcClient;
         if (prcClient != NULL)
@@ -350,7 +383,7 @@
         }
     }
 
-    LRESULT CTrayNotifyWnd::OnEraseBackground(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnEraseBackground(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         HDC hdc = (HDC) wParam;
 
@@ -370,7 +403,7 @@
         return TRUE;
     }
 
-    LRESULT CTrayNotifyWnd::OnGetMinimumSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnGetMinimumSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         BOOL Horizontal = (BOOL) wParam;
 
@@ -386,7 +419,14 @@
         return (LRESULT) GetMinimumSize((PSIZE) lParam);
     }
 
-    LRESULT CTrayNotifyWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnGetShowDesktopButton(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        bHandled = TRUE;
+        *(HWND*)wParam = m_ShowDesktopButton.m_hWnd;
+        return 0;
+    }
+
+    LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         SIZE szClient;
 
@@ -398,7 +438,7 @@
         return TRUE;
     }
 
-    LRESULT CTrayNotifyWnd::OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         POINT pt;
         pt.x = GET_X_LPARAM(lParam);
@@ -410,7 +450,7 @@
         return HTTRANSPARENT;
     }
 
-    LRESULT CTrayNotifyWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         POINT pt;
         ::GetCursorPos(&pt);
@@ -421,7 +461,7 @@
         return TRUE;
     }
 
-    LRESULT CTrayNotifyWnd::OnCtxMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnCtxMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         bHandled = TRUE;
 
@@ -431,12 +471,12 @@
             return 0;
     }
 
-    LRESULT CTrayNotifyWnd::OnClockMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnClockMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         return SendMessageW(m_hwndClock, uMsg, wParam, lParam);
     }
 
-    LRESULT CTrayNotifyWnd::OnTaskbarSettingsChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnTaskbarSettingsChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         TaskbarSettings* newSettings = (TaskbarSettings*)lParam;
 
@@ -454,18 +494,18 @@
         return OnClockMessage(uMsg, wParam, lParam, bHandled);
     }
 
-    LRESULT CTrayNotifyWnd::OnPagerMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    LRESULT OnPagerMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         return SendMessageW(m_hwndPager, uMsg, wParam, lParam);
     }
 
-    LRESULT CTrayNotifyWnd::OnRealign(INT uCode, LPNMHDR hdr, BOOL& bHandled)
+    LRESULT OnRealign(INT uCode, LPNMHDR hdr, BOOL& bHandled)
     {
         hdr->hwndFrom = m_hWnd;
         return GetParent().SendMessage(WM_NOTIFY, 0, (LPARAM)hdr);
     }
 
-    HRESULT WINAPI CTrayNotifyWnd::GetWindow(HWND* phwnd)
+    HRESULT WINAPI GetWindow(HWND* phwnd)
     {
         if (!phwnd)
             return E_INVALIDARG;
@@ -473,12 +513,12 @@
         return S_OK;
     }
 
-    HRESULT WINAPI CTrayNotifyWnd::ContextSensitiveHelp(BOOL fEnterMode)
+    HRESULT WINAPI ContextSensitiveHelp(BOOL fEnterMode)
     {
         return E_NOTIMPL;
     }
 
-    HRESULT CTrayNotifyWnd::Initialize(IN HWND hwndParent)
+    HRESULT Initialize(IN HWND hwndParent)
     {
         DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
         Create(hwndParent, 0, NULL, dwStyle, WS_EX_STATICEDGE);
@@ -487,7 +527,36 @@
         return S_OK;
     }
 
-    HRESULT CTrayNotifyWnd_CreateInstance(HWND hwndParent, REFIID riid, void **ppv)
-    {
-        return ShellObjectCreatorInit<CTrayNotifyWnd>(hwndParent, riid, ppv);
-    }
+    DECLARE_NOT_AGGREGATABLE(CTrayNotifyWnd)
+
+    DECLARE_PROTECT_FINAL_CONSTRUCT()
+    BEGIN_COM_MAP(CTrayNotifyWnd)
+        COM_INTERFACE_ENTRY_IID(IID_IOleWindow, IOleWindow)
+    END_COM_MAP()
+
+    DECLARE_WND_CLASS_EX(szTrayNotifyWndClass, CS_DBLCLKS, COLOR_3DFACE)
+
+    BEGIN_MSG_MAP(CTrayNotifyWnd)
+        MESSAGE_HANDLER(WM_CREATE, OnCreate)
+        MESSAGE_HANDLER(WM_THEMECHANGED, OnThemeChanged)
+        MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBackground)
+        MESSAGE_HANDLER(WM_SIZE, OnSize)
+        MESSAGE_HANDLER(WM_NCHITTEST, OnNcHitTest)
+        MESSAGE_HANDLER(WM_MOUSEMOVE, OnMouseMove)
+        MESSAGE_HANDLER(WM_NCMOUSEMOVE, OnMouseMove)
+        MESSAGE_HANDLER(WM_CONTEXTMENU, OnCtxMenu)
+        MESSAGE_HANDLER(WM_NCLBUTTONDBLCLK, OnClockMessage)
+        MESSAGE_HANDLER(WM_SETFONT, OnClockMessage)
+        MESSAGE_HANDLER(WM_SETTINGCHANGE, OnPagerMessage)
+        MESSAGE_HANDLER(WM_COPYDATA, OnPagerMessage)
+        MESSAGE_HANDLER(TWM_SETTINGSCHANGED, OnTaskbarSettingsChanged)
+        NOTIFY_CODE_HANDLER(NTNWM_REALIGN, OnRealign)
+        MESSAGE_HANDLER(TNWM_GETMINIMUMSIZE, OnGetMinimumSize)
+        MESSAGE_HANDLER(TNWM_GETSHOWDESKTOPBUTTON, OnGetShowDesktopButton)
+    END_MSG_MAP()
+};
+
+HRESULT CTrayNotifyWnd_CreateInstance(HWND hwndParent, REFIID riid, void **ppv)
+{
+    return ShellObjectCreatorInit<CTrayNotifyWnd>(hwndParent, riid, ppv);
+}
