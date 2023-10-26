@@ -343,7 +343,6 @@ class CTrayWindow :
     HWND m_Rebar;
     HWND m_TaskSwitch;
     HWND m_TrayNotify;
-    HWND m_hwndShowDesktop;
 
     CComPtr<IUnknown> m_TrayNotifyInstance;
 
@@ -384,13 +383,13 @@ public:
 public:
     CTrayWindow() :
         m_StartButton(),
+        m_ptShowDesktopButton(NULL),
         m_Theme(NULL),
         m_Font(NULL),
         m_DesktopWnd(NULL),
         m_Rebar(NULL),
         m_TaskSwitch(NULL),
         m_TrayNotify(NULL),
-        m_hwndShowDesktop(NULL),
         m_Position(0),
         m_Monitor(NULL),
         m_PreviousMonitor(NULL),
@@ -2345,16 +2344,6 @@ ChangePos:
         hRet = CTrayNotifyWnd_CreateInstance(m_hWnd, IID_PPV_ARG(IUnknown, &m_TrayNotifyInstance));
         if (FAILED_UNEXPECTEDLY(hRet))
             return FALSE;
-#if 0
-        IUnknown* tniUnknown = m_TrayNotifyInstance;
-        CTrayNotifyWnd* tniPtr = (CTrayNotifyWnd*)tniUnknown;
-        m_ptShowDesktopButton = &(tniPtr->m_ShowDesktopButton);
-
-        if (m_ptShowDesktopButton)
-            m_hwndShowDesktop = m_ptShowDesktopButton->m_hWnd;
-        else
-            ERR("!m_ptShowDesktopButton");
-#endif
 
         /* Get the hwnd of the rebar */
         hRet = IUnknown_GetWindow(m_TrayBandSite, &m_Rebar);
@@ -2370,7 +2359,10 @@ ChangePos:
         hRet = IUnknown_GetWindow(m_TrayNotifyInstance, &m_TrayNotify);
         if (FAILED_UNEXPECTEDLY(hRet))
             return FALSE;
-        ::SendMessage(m_TrayNotify, TNWM_GETSHOWDESKTOPBUTTON, (WPARAM)&m_hwndShowDesktop, 0);
+        
+        ::SendMessage(m_TrayNotify, TNWM_GETSHOWDESKTOPBUTTON, (WPARAM)&m_ptShowDesktopButton, 0);
+        if (!m_ptShowDesktopButton)
+            return FALSE;
 
         SetWindowTheme(m_Rebar, L"TaskBar", NULL);
 
@@ -2551,7 +2543,7 @@ ChangePos:
             pt.x = GET_X_LPARAM(lParam);
             pt.y = GET_Y_LPARAM(lParam);
 
-            if (::IsWindow(m_hwndShowDesktop) && m_ptShowDesktopButton->PtInButton(pt))
+            if (::IsWindow(m_ptShowDesktopButton->m_hWnd) && m_ptShowDesktopButton->PtInButton(&pt))
                 return HTBORDER;
 
             if (PtInRect(&rcClient, pt))
@@ -2743,6 +2735,94 @@ ChangePos:
         return TRUE;
     }
 
+    BOOL IsPointWithinStartButton(LPPOINT ppt, LPRECT prcStartBtn, WINDOWINFO* pwi)
+    {
+        if (!ppt)
+            return FALSE;
+        if (!prcStartBtn)
+            return FALSE;
+        if (!pwi)
+            return FALSE;
+
+        switch (m_Position)
+        {
+            case ABE_TOP:
+            case ABE_LEFT:
+            {
+                if (ppt->x > prcStartBtn->right || ppt->y > prcStartBtn->bottom)
+                    return FALSE;
+                break;
+            }
+            case ABE_RIGHT:
+            {
+                if (ppt->x < prcStartBtn->left || ppt->y > prcStartBtn->bottom)
+                    return FALSE;
+
+                if (prcStartBtn->right + (int)pwi->cxWindowBorders * 2 + 1 < pwi->rcWindow.right &&
+                    ppt->x > prcStartBtn->right)
+                {
+                    return FALSE;
+                }
+                break;
+            }
+            case ABE_BOTTOM:
+            {
+                if (ppt->x > prcStartBtn->right || ppt->y < prcStartBtn->top)
+                    return FALSE;
+
+                if (prcStartBtn->bottom + (int)pwi->cyWindowBorders * 2 + 1 < pwi->rcWindow.bottom &&
+                    ppt->y > prcStartBtn->bottom)
+                {
+                    return FALSE;
+                }
+
+                break;
+            }
+        }
+        return TRUE;
+    }
+
+    BOOL IsPointWithinShowDesktopButton(LPPOINT ppt, LPRECT prcShowDesktopBtn, WINDOWINFO* pwi)
+    {
+        if (!ppt)
+            return FALSE;
+        if (!prcShowDesktopBtn)
+            return FALSE;
+        UNREFERENCED_PARAMETER(pwi);
+        /*if (!pwi)
+            return FALSE;*/
+        //InflateRect(prcShowDesktopBtn, (int)pwi->cxWindowBorders * 2 + 1, (int)pwi->cyWindowBorders * 2 + 1);
+
+        switch (m_Position)
+        {
+            case ABE_LEFT:
+            {
+                if (ppt->x > prcShowDesktopBtn->right || ppt->y < prcShowDesktopBtn->top)
+                    return FALSE;
+                break;
+            }
+            case ABE_TOP:
+            {
+                if (ppt->x < prcShowDesktopBtn->left || ppt->y > prcShowDesktopBtn->bottom)
+                    return FALSE;
+                break;
+            }
+            case ABE_RIGHT:
+            {
+                if (ppt->x < prcShowDesktopBtn->left || ppt->y < prcShowDesktopBtn->top)
+                    return FALSE;
+                break;
+            }
+            case ABE_BOTTOM:
+            {
+                if (ppt->x < prcShowDesktopBtn->left || ppt->y < prcShowDesktopBtn->top)
+                    return FALSE;
+                break;
+            }
+        }
+        return TRUE;
+    }
+
     LRESULT OnNcLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         /* This handler implements the trick that makes  the start button to
@@ -2755,47 +2835,18 @@ ChangePos:
 
         RECT rcStartBtn;
         m_StartButton.GetWindowRect(&rcStartBtn);
-
         GetWindowInfo(m_hWnd, &wi);
 
-        switch (m_Position)
+
+        if (IsPointWithinStartButton(&pt, &rcStartBtn, &wi))
         {
-            case ABE_TOP:
-            case ABE_LEFT:
-            {
-                if (pt.x > rcStartBtn.right || pt.y > rcStartBtn.bottom)
-                    return 0;
-                break;
-            }
-            case ABE_RIGHT:
-            {
-                if (pt.x < rcStartBtn.left || pt.y > rcStartBtn.bottom)
-                    return 0;
-
-                if (rcStartBtn.right + (int)wi.cxWindowBorders * 2 + 1 < wi.rcWindow.right &&
-                    pt.x > rcStartBtn.right)
-                {
-                    return 0;
-                }
-                break;
-            }
-            case ABE_BOTTOM:
-            {
-                if (pt.x > rcStartBtn.right || pt.y < rcStartBtn.top)
-                    return 0;
-
-                if (rcStartBtn.bottom + (int)wi.cyWindowBorders * 2 + 1 < wi.rcWindow.bottom &&
-                    pt.y > rcStartBtn.bottom)
-                {
-                    return 0;
-                }
-
-                break;
-            }
+            bHandled = TRUE;
+            PopupStartMenu();
         }
 
-        bHandled = TRUE;
-        PopupStartMenu();
+        if (m_ptShowDesktopButton && m_ptShowDesktopButton->PtInButton(&pt))
+            m_ptShowDesktopButton->OnLButtonDown(WM_LBUTTONDOWN, 0, 0, bHandled);
+
         return 0;
     }
 
@@ -2911,21 +2962,6 @@ HandleTrayContextMenu:
         return Ret;
     }
 
-    BOOL CheckShowDesktopButtonClick(LPARAM lParam, BOOL& bHandled)
-    {
-        POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-        if (m_ptShowDesktopButton->PtInButton(pt)) // Did you click the button?
-        {
-            m_ptShowDesktopButton->Click();
-            bHandled = TRUE;
-            return TRUE;
-        }
-        else
-            m_ptShowDesktopButton->OnLButtonUp(WM_LBUTTONUP, 0, lParam, bHandled);
-
-        return FALSE;
-    }
-
     LRESULT OnNcLButtonDblClick(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         /* Let the clock handle the double-click */
@@ -2938,13 +2974,24 @@ HandleTrayContextMenu:
 
     LRESULT OnNcLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
-        CheckShowDesktopButtonClick(lParam, bHandled);
+        if (!m_ptShowDesktopButton)
+            return FALSE;
+        
+        if (m_ptShowDesktopButton->m_bPressed) // Did you click the button?
+        {
+            m_ptShowDesktopButton->Click();
+            m_ptShowDesktopButton->OnLButtonUp(WM_LBUTTONUP, 0, 0, bHandled);
+            bHandled = TRUE;
+            //return TRUE;
+        }
+
         return FALSE;
     }
     
     LRESULT OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
-        m_ptShowDesktopButton->OnLButtonUp(uMsg, wParam, lParam, bHandled);
+        if (m_ptShowDesktopButton)
+            m_ptShowDesktopButton->OnLButtonUp(uMsg, wParam, lParam, bHandled);
         return FALSE;
     }
 
