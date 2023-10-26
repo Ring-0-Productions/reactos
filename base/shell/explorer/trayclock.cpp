@@ -545,6 +545,8 @@ LRESULT CTrayClockWnd::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 
         hPrevFont = (HFONT) SelectObject(hDC, hFont);
 
+        rcClient.left -= contentMargins.cxLeftWidth;
+        rcClient.right -= contentMargins.cxLeftWidth;
         rcClient.top = (rcClient.bottom - CurrentSize.cy) / 2;
         rcClient.bottom = rcClient.top + CurrentSize.cy;
 
