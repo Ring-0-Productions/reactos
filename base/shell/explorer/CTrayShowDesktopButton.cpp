@@ -118,7 +118,7 @@ LRESULT CTrayShowDesktopButton::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lPa
     Invalidate(TRUE);
     POINT pt;
     ::GetCursorPos(&pt);
-    if (PtInButton(pt))
+    if (PtInButton(&pt))
         Click(); // Left-click
     
     return 0;
@@ -218,8 +218,10 @@ LRESULT CTrayShowDesktopButton::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam,
     return 0;
 }
 
-BOOL CTrayShowDesktopButton::PtInButton(POINT pt)
+BOOL CTrayShowDesktopButton::PtInButton(LPPOINT ppt)
 {
+    if (!ppt)
+        return FALSE;
     if (!IsWindow())
         return FALSE;
     RECT rc;
@@ -227,8 +229,8 @@ BOOL CTrayShowDesktopButton::PtInButton(POINT pt)
     INT cxEdge = ::GetSystemMetrics(SM_CXEDGE), cyEdge = ::GetSystemMetrics(SM_CYEDGE);
     ::InflateRect(&rc, max(cxEdge, 1), max(cyEdge, 1));
     return IsHorizontal
-        ? (pt.x > rc.left)
-        : (pt.y > rc.top)
+        ? (ppt->x > rc.left)
+        : (ppt->y > rc.top)
     ;
 }
 
@@ -263,7 +265,7 @@ LRESULT CTrayShowDesktopButton::OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
     POINT pt;
     ::GetCursorPos(&pt);
-    if (!PtInButton(pt)) // The end of hovering?
+    if (!PtInButton(&pt)) // The end of hovering?
     {
         m_bHovering = FALSE;
         KillTimer(SHOW_DESKTOP_TIMER_ID);
