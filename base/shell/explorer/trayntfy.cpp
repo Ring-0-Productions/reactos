@@ -421,8 +421,15 @@ public:
 
     LRESULT OnGetShowDesktopButton(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
+        CTrayShowDesktopButton** ptr = (CTrayShowDesktopButton**)wParam;
+        if (!m_ShowDesktopButton)
+        {
+            *ptr = 0;
+            return 0;
+        }
+
+        *ptr = &m_ShowDesktopButton;
         bHandled = TRUE;
-        *(HWND*)wParam = m_ShowDesktopButton.m_hWnd;
         return 0;
     }
 
@@ -444,7 +451,7 @@ public:
         pt.x = GET_X_LPARAM(lParam);
         pt.y = GET_Y_LPARAM(lParam);
 
-        if (m_ShowDesktopButton && m_ShowDesktopButton.PtInButton(pt))
+        if (m_ShowDesktopButton && m_ShowDesktopButton.PtInButton(&pt))
             return HTCLIENT;
         
         return HTTRANSPARENT;
@@ -455,7 +462,7 @@ public:
         POINT pt;
         ::GetCursorPos(&pt);
 
-        if (m_ShowDesktopButton && m_ShowDesktopButton.PtInButton(pt))
+        if (m_ShowDesktopButton && m_ShowDesktopButton.PtInButton(&pt))
             m_ShowDesktopButton.StartHovering();
 
         return TRUE;
