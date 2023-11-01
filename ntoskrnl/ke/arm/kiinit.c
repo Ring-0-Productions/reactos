@@ -377,10 +377,10 @@ AppCpuInit:
     /* Setup CPU-related fields */
     Pcr->PrcbData.Number = Cpu;
     Pcr->PrcbData.SetMember = 1 << Cpu;
-        DbgPrintEarly("Starting HAL\n");
+    DbgPrintEarly("Starting HAL\n");
     /* Initialize the Processor with HAL */
-   // HalInitializeProcessor(Cpu, KeLoaderBlock);
-     //  DbgPrintEarly("left HAL\n");
+    HalInitializeProcessor(Cpu, KeLoaderBlock);
+    DbgPrintEarly("left HAL\n");
     /* Set active processors */
     KeActiveProcessors |= 1;
     KeNumberProcessors++;
@@ -394,14 +394,10 @@ AppCpuInit:
         /* Check for break-in */
     //    if (KdPollBreakIn()) DbgBreakPointWithStatus(DBG_STATUS_CONTROL_C);
     }
-    DPRINT1("testing IRRQL change\n");
+
     /* Raise to HIGH_LEVEL */
     KfRaiseIrql(HIGH_LEVEL);
- DPRINT1("finish testing IRRQL change\n");
- for(;;)
- {
 
- }
     /* Set the exception address to high */
     ControlRegister = KeArmControlRegisterGet();
     ControlRegister.HighVectors = TRUE;
