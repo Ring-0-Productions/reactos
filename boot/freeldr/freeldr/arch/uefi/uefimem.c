@@ -259,11 +259,18 @@ UefiMemGetMemoryMap(ULONG *MemoryMapSize)
 
         }
 
-
-        UefiSetMemory(FreeldrMem,
+        if (MapEntry->PhysicalStart > 0x1000)
+        {
+             UefiSetMemory(FreeldrMem,
                       MapEntry->PhysicalStart,
                       MapEntry->NumberOfPages,
                       MemoryType);
+
+        }
+
+
+
+
         MapEntry = NEXT_MEMORY_DESCRIPTOR(MapEntry, DescriptorSize);
     }
 
