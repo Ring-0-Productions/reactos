@@ -44,16 +44,6 @@ PcwRegister( PPCW_REGISTRATION             *Registration,
 }
 
 
-NTSTATUS
-NTAPI
-IopSynchronousCompletion(IN PDEVICE_OBJECT DeviceObject,
-                         IN PIRP Irp,
-                         IN PVOID Context)
-{
-    KeSetEvent((PKEVENT)Context, IO_NO_INCREMENT, FALSE);
-    return STATUS_MORE_PROCESSING_REQUIRED;
-}
-
 extern
 VOID
 NTAPI

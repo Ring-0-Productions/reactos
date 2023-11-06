@@ -1460,12 +1460,20 @@ KeTerminateThread(IN KPRIORITY Increment)
     KiSwapThread(Thread, KeGetCurrentPrcb());
 }
 
+
+NTKRNLVISTAAPI
 NTSTATUS
 NTAPI
-KeExpandKernelStackAndCallout(_In_ PEXPAND_STACK_CALLOUT Callout,
-                              _In_opt_ PVOID Parameter,
-                              _In_ SIZE_T Size)
+KeQueryDpcWatchdogInformation(
+  OUT PKDPC_WATCHDOG_INFORMATION WatchdogInformation
+)
 {
-    UNIMPLEMENTED;
-    return STATUS_NOT_IMPLEMENTED;
+    //UNIMPLEMENTED;
+    WatchdogInformation->DpcTimeLimit = 100000;
+    WatchdogInformation->DpcTimeCount = 0;
+    WatchdogInformation->DpcWatchdogLimit = 100000;
+    WatchdogInformation->DpcWatchdogCount = 0;
+    WatchdogInformation->Reserved = 0;
+    
+    return 0;
 }
