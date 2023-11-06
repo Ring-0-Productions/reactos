@@ -1094,6 +1094,21 @@ KeBugCheckUnicodeToAnsi(
     IN ULONG Length
 );
 
+ULONG_PTR
+NTAPI
+KiGetStackPointer(
+    VOID);
+
+VOID
+NTAPI
+KiReapCallbackStacks(
+    _In_ PKTHREAD Thread);
+
+VOID
+NTAPI
+KiRemoveThreadCalloutStack(
+    _In_ PKTHREAD Thread);
+
 #ifdef __cplusplus
 } // extern "C"
 

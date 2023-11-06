@@ -859,7 +859,16 @@ MmAccessFault(
 
 PVOID
 NTAPI
-MmCreateKernelStack(BOOLEAN GuiStack, UCHAR Node);
+MmCreateKernelStack(
+    _In_ BOOLEAN GuiStack,
+    _In_ UCHAR Node);
+
+PVOID
+NTAPI
+MmCreateKernelStackEx(
+    _In_ BOOLEAN GuiStack,
+    _In_ SIZE_T CommitSize,
+    _In_ UCHAR Node);
 
 VOID
 NTAPI
@@ -1685,6 +1694,12 @@ MmGrowKernelStack(
     IN PVOID StackPointer
 );
 
+NTSTATUS
+NTAPI
+MmGrowKernelStackEx(
+    _In_ PVOID StackPointer,
+    _In_ ULONG GrowSize
+);
 
 FORCEINLINE
 VOID
