@@ -272,8 +272,10 @@ MmDeleteKernelStack(IN PVOID StackBase,
 
 PVOID
 NTAPI
-MmCreateKernelStack(IN BOOLEAN GuiStack,
-                    IN UCHAR Node)
+MmCreateKernelStackEx(
+    _In_ BOOLEAN GuiStack,
+    _In_ SIZE_T CommitSize,
+    _In_ UCHAR Node)
 {
     PFN_COUNT StackPtes, StackPages;
     PMMPTE PointerPte, StackPte;
@@ -290,10 +292,23 @@ MmCreateKernelStack(IN BOOLEAN GuiStack,
     if (GuiStack)
     {
         //
-        // We'll allocate 64KB stack, but only commit 12K
+        // We always reserve MmLargeStackSize
         //
         StackPtes = BYTES_TO_PAGES(MmLargeStackSize);
-        StackPages = BYTES_TO_PAGES(KERNEL_LARGE_STACK_COMMIT);
+
+        //
+        // If requested, use the whole thing, otherwise just the minimum
+        //
+        if (CommitSize != 0)
+        {
+            ASSERT(CommitSize >= KERNEL_LARGE_STACK_COMMIT);
+            ASSERT(CommitSize <= MmLargeStackSize);
+            StackPages = BYTES_TO_PAGES(CommitSize);
+        }
+        else
+        {
+            StackPages = BYTES_TO_PAGES(KERNEL_LARGE_STACK_COMMIT);
+        }
     }
     else
     {
@@ -383,6 +398,18 @@ MmCreateKernelStack(IN BOOLEAN GuiStack,
     return BaseAddress;
 }
 
+PVOID
+NTAPI
+MmCreateKernelStack(
+    _In_ BOOLEAN GuiStack,
+    _In_ UCHAR Node)
+{
+    //
+    // Call the extended version
+    //
+    return MmCreateKernelStackEx(GuiStack, 0, Node);
+}
+
 NTSTATUS
 NTAPI
 MmGrowKernelStackEx(IN PVOID StackPointer,
@@ -410,7 +437,7 @@ MmGrowKernelStackEx(IN PVOID StackPointer,
     // Get the new one and make sure this isn't a retarded request
     //
     NewLimitPte = MiAddressToPte((PVOID)((ULONG_PTR)StackPointer - GrowSize));
-    if (NewLimitPte == LimitPte) return STATUS_SUCCESS;
+    if (NewLimitPte >= LimitPte) return STATUS_SUCCESS;
 
     //
     // Now make sure you're not going past the reserved space
@@ -426,7 +453,7 @@ MmGrowKernelStackEx(IN PVOID StackPointer,
     }
 
     //
-    // Calculate the number of new pages
+    // Start with the first unmapped PTE
     //
     LimitPte--;
 
@@ -443,6 +470,8 @@ MmGrowKernelStackEx(IN PVOID StackPointer,
     //
     while (LimitPte >= NewLimitPte)
     {
+        ASSERT(LimitPte->u.Long == 0);
+
         /* Get a page and write the current invalid PTE */
         MI_SET_USAGE(MI_USAGE_KERNEL_STACK_EXPANSION);
         MI_SET_PROCESS2(PsGetCurrentProcess()->ImageFileName);
