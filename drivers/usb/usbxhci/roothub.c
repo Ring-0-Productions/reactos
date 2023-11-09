@@ -2,12 +2,12 @@
  * PROJECT:     ReactOS USB xHCI Miniport Driver
  * LICENSE:     GPL-2.0+ (https://spdx.org/licenses/GPL-2.0+)
  * PURPOSE:     USBXHCI root hub functions
- * COPYRIGHT:   Copyright 2023 Ian Marco Moffett <ian@vegaa.systems>
+ * COPYRIGHT:   Copyright 2023 Ian Marco Moffett <ian@osmora.org>
  */
 
 #include "usbxhci.h"
 
-#define NDEBUG
+//m#define NDEBUG
 #include <debug.h>
 
 /**
@@ -77,7 +77,9 @@ XHCI_RH_ChirpRootPort(
     _In_ PVOID XhciExtension,
     _In_ USHORT Port)
 {
-    DPRINT("XHCI_RH_ChirpRootPort: UNIMPLEMENTED. FIXME\n");
+    DPRINT("XHCI_RH_ChirpRootPort: Port - %x\n", Port);
+    XHCI_ASSERT_PORT_VALID(Port, XhciExtension);
+
     return MP_STATUS_SUCCESS;
 }
 
