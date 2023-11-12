@@ -352,7 +352,7 @@
 @ stdcall GetBinaryType(str ptr) GetBinaryTypeA
 @ stdcall GetBinaryTypeA(str ptr)
 @ stdcall GetBinaryTypeW(wstr ptr)
-@ stdcall -version=0x501-0x600 GetCPFileNameFromRegistry(long wstr long)
+@ stdcall -version=0x600+ GetCPFileNameFromRegistry(long wstr long)
 @ stdcall GetCPInfo(long ptr)
 @ stdcall GetCPInfoExA(long long ptr)
 @ stdcall GetCPInfoExW(long long ptr)
