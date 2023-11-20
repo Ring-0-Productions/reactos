@@ -5,12 +5,11 @@
  * COPYRIGHT:   Copyright 2006-2007 Thomas Weidenmueller <w3seek@reactos.org>
  * COPYRIGHT:   Copyright 2018-2022 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>
  */
+#pragma once
+
 #include "precomp.h"
 #include <commoncontrols.h>
 #include <uxtheme.h>
-
-#ifndef CTRAYSHOWDESKTOPBUTTON_H
-#define CTRAYSHOWDESKTOPBUTTON_H
 
 
 // This window class name is CONFIRMED on Win10 by WinHier.
@@ -75,5 +74,3 @@ public:
     LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 };
-
-#endif
