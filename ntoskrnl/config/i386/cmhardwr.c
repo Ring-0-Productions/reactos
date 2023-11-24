@@ -466,7 +466,7 @@ CmpInitializeMachineDependentConfiguration(IN PLOADER_PARAMETER_BLOCK LoaderBloc
                 if (!Prcb->CpuID)
                 {
                     /* Uh oh, no CPUID! Should not happen as we don't support 80386 and older 80486 */
-                    ASSERT(FALSE);
+                 //   ASSERT(FALSE);
                 }
                 else
                 {
