@@ -40,7 +40,7 @@ KiInitMachineDependent(VOID)
     BOOLEAN FbCaching = FALSE;
     NTSTATUS Status;
     ULONG ReturnLength;
-    ULONG i, Affinity, Sample = 0;
+    ULONG Sample = 0;
     PFX_SAVE_AREA FxSaveArea;
     ULONG MXCsrMask = 0xFFBF;
     CPU_INFO CpuInfo;
@@ -118,15 +118,15 @@ KiInitMachineDependent(VOID)
     KiRestoreFastSyscallReturnState();
 
     /* Loop every CPU */
-    i = KeActiveProcessors;
-    for (Affinity = 1; i; Affinity <<= 1)
+   // i = KeActiveProcessors;
+    for (int i = 0; i < 1; i++)
     {
         /* Check if this is part of the set */
-        if (i & Affinity)
+        if (1)
         {
             /* Run on this CPU */
-            i &= ~Affinity;
-            KeSetSystemAffinityThread(Affinity);
+          //  i &= ~Affinity;
+          //  KeSetSystemAffinityThread(Affinity);
 
             /* Reset MHz to 0 for this CPU */
             KeGetCurrentPrcb()->MHz = 0;
@@ -265,7 +265,7 @@ KiInitMachineDependent(VOID)
     }
 
     /* Return affinity back to where it was */
-    KeRevertToUserAffinityThread();
+ //   KeRevertToUserAffinityThread();
 
     /* NT allows limiting the duration of an ISR with a registry key */
     if (KiTimeLimitIsrMicroseconds)
