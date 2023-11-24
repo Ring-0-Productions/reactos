@@ -677,7 +677,7 @@ KiSystemStartupBootStack(VOID)
 {
     PKTHREAD Thread;
 
-if (KeGetCurrentProcessorNumber() > 0)
+if (KeGetCurrentProcessorNumber() > 1)
 {
       /* Initialize the kernel for the current CPU */
     KiInitializeKernel(&KiInitialProcess.Pcb,
