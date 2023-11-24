@@ -677,6 +677,17 @@ KiSystemStartupBootStack(VOID)
 {
     PKTHREAD Thread;
 
+if (KeGetCurrentProcessorNumber() > 0)
+{
+      /* Initialize the kernel for the current CPU */
+    KiInitializeKernel(&KiInitialProcess.Pcb,
+                       (PKTHREAD)__readfsdword(KPCR_CURRENT_THREAD),
+                       (PVOID)(KeLoaderBlock->KernelStack & ~3),
+                       (PKPRCB)__readfsdword(KPCR_PRCB),
+                       KeNumberProcessors - 1,
+                       KeLoaderBlock);
+}
+else {
     /* Initialize the kernel for the current CPU */
     KiInitializeKernel(&KiInitialProcess.Pcb,
                        (PKTHREAD)KeLoaderBlock->Thread,
@@ -684,6 +695,7 @@ KiSystemStartupBootStack(VOID)
                        (PKPRCB)__readfsdword(KPCR_PRCB),
                        KeNumberProcessors - 1,
                        KeLoaderBlock);
+}
 
     /* Set the priority of this thread to 0 */
     Thread = KeGetCurrentThread();

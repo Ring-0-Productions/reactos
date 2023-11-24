@@ -299,7 +299,7 @@ KiIdleLoop(VOID)
 
             /* The thread is now running */
             NewThread->State = Running;
-
+            __debugbreak();
             /* Switch away from the idle thread */
             KiSwapContext(APC_LEVEL, OldThread);
         }

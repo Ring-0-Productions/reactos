@@ -163,9 +163,14 @@ KeStartAllProcessors()
         ProcessorState->ContextFrame.EFlags = __readeflags() & ~EFLAGS_INTERRUPT_MASK;
 
         // Prepare the LOADER_PARAMETER_BLOCK structure
-        KeLoaderBlock->KernelStack = (ULONG_PTR)KernelStack;
+       // KeLoaderBlock->KernelStack = (ULONG_PTR)KernelStack;
+       // KeLoaderBlock->Prcb = (ULONG_PTR)&APInfo->Pcr.Prcb;
+       // KeLoaderBlock->Thread = (ULONG_PTR)&APInfo->Pcr.Prcb->IdleThread;
+
+      KeLoaderBlock->KernelStack = (ULONG_PTR)KernelStack;
+        KeLoaderBlock->Thread = (ULONG_PTR)&APInfo->Thread;
+        KeLoaderBlock->Process = (ULONG_PTR)PsGetCurrentProcess();
         KeLoaderBlock->Prcb = (ULONG_PTR)&APInfo->Pcr.Prcb;
-        KeLoaderBlock->Thread = (ULONG_PTR)&APInfo->Pcr.Prcb->IdleThread;
 
         // Start the CPU
         if (!HalStartNextProcessor(KeLoaderBlock, ProcessorState))

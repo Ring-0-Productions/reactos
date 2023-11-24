@@ -209,13 +209,12 @@ FASTCALL
 KiSwapContextExit(IN PKTHREAD OldThread,
                   IN PKSWITCHFRAME SwitchFrame)
 {
-    PKIPCR Pcr = (PKIPCR)KeGetPcr();
     PKPROCESS OldProcess, NewProcess;
     PKTHREAD NewThread;
     ARM_TTB_REGISTER TtbRegister;
 
     /* We are on the new thread stack now */
-    NewThread = Pcr->Prcb.CurrentThread;
+    NewThread = KeGetCurrentPrcb()->CurrentThread;
 
     /* Now we are the new thread. Check if it's in a new process */
     OldProcess = OldThread->ApcState.Process;
@@ -231,7 +230,7 @@ KiSwapContextExit(IN PKTHREAD OldThread,
     NewThread->ContextSwitches++;
 
     /* DPCs shouldn't be active */
-    if (Pcr->Prcb.DpcRoutineActive)
+    if (KeGetCurrentPrcb()->DpcRoutineActive)
     {
         /* Crash the machine */
         KeBugCheckEx(ATTEMPTED_SWITCH_FROM_DPC,
@@ -264,9 +263,9 @@ KiSwapContextEntry(IN PKSWITCHFRAME SwitchFrame,
 {
     PKIPCR Pcr = (PKIPCR)KeGetPcr();
     PKTHREAD OldThread, NewThread;
-
+    __debugbreak();
     /* Save APC bypass disable */
-    SwitchFrame->ApcBypassDisable = OldThreadAndApcFlag & 3;
+   // SwitchFrame->ApcBypassDisable = OldThreadAndApcFlag & 3;
 
     /* Increase context switch count and check if tracing is enabled */
     Pcr->Prcb.KeContextSwitches++;

@@ -13,11 +13,6 @@
 #define NDEBUG
 #include <debug.h>
 
-#ifdef NDEBUG
-#define KdpDprintf(...)
-#endif
-
-
 /* GLOBALS ********************************************************************/
 
 /* Freeze data */
@@ -41,11 +36,10 @@ KiFreezeTargetExecution(_In_ PKTRAP_FRAME TrapFrame,
     InterlockedExchange((LONG*)&Prcb->IpiFrozen, IPI_FROZEN_HALTED);
 
     /* Wait for triggering AP to give the go ahead to thaw */
-    while ((Prcb->IpiFrozen & 0xF) == IPI_FROZEN_HALTED)
+    while (Prcb->IpiFrozen != IPI_FROZEN_THAWING)
     {
-        YieldProcessor();
         /* We only continue on if we are thawing, otherwise something else has happened! */
-        if ((Prcb->IpiFrozen & 0x20) != 0 )
+        if (Prcb->IpiFrozen == IPI_FROZEN_RUNNING)
         {
             RtlZeroMemory(&ExceptionRecord, sizeof(EXCEPTION_RECORD));
             ExceptionRecord.ExceptionAddress = (PVOID)Prcb->ProcessorState.ContextFrame.Eip;
@@ -53,9 +47,8 @@ KiFreezeTargetExecution(_In_ PKTRAP_FRAME TrapFrame,
                                (PCONTEXT)&Prcb->ProcessorState, FALSE);
         }
     }
-
-    if (TrapFrame)
-        KiRestoreProcessorControlState(&Prcb->ProcessorState);
+    //if (TrapFrame)
+        //KiRestoreProcessorControlState(TrapFrame, ExceptionFrame);
     KeFlushCurrentTb();
     /* Notify AP we're running once again */
     InterlockedExchange((LONG*)&Prcb->IpiFrozen, IPI_FROZEN_RUNNING);
@@ -115,7 +108,7 @@ KeFreezeExecution(IN PKTRAP_FRAME TrapFrame,
                 /* Await for this processor to be frozen*/
                 while (TargetPrcb->IpiFrozen != IPI_FROZEN_HALTED)
                 {
-                    YieldProcessor();
+                    /* Do nothing, we're trying to synch */
                 }
             }
         }
@@ -155,7 +148,7 @@ KeThawExecution(IN BOOLEAN Enable)
             InterlockedExchange((LONG*)&TargetPrcb->IpiFrozen, IPI_FROZEN_THAWING);
             while (Prcb->IpiFrozen != IPI_FROZEN_RUNNING)
             {
-                YieldProcessor();
+                /* Do nothing we're waiting for ready */
             }
         }
     }
