@@ -434,6 +434,7 @@ _main(IN INT argc,
       IN PCHAR envp[],
       IN ULONG DebugFlag)
 {
+    __debugbreak();
     NTSTATUS Status;
     KPRIORITY SetBasePriority;
     ULONG_PTR Parameters[4];

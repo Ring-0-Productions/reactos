@@ -2024,7 +2024,7 @@ Phase1Initialization(IN PVOID Context)
 {
     /* Do the .INIT part of Phase 1 which we can free later */
     Phase1InitializationDiscard(Context);
-
+    __debugbreak();
     /* Jump into zero page thread */
     MmZeroPageThread();
 }
