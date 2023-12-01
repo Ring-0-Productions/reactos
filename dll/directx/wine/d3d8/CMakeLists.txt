@@ -28,6 +28,10 @@ add_library(d3d8 MODULE
     version.rc
     ${CMAKE_CURRENT_BINARY_DIR}/d3d8.def)
 
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(d3d8 PRIVATE -Wno-incompatible-pointer-types -Wno-unused-but-set-variable -Wno-switch -Wno-error) # Our favourite compiler :)
+endif()
+
 set_module_type(d3d8 win32dll UNICODE)
 target_link_libraries(d3d8 uuid wine)
 add_importlibs(d3d8 d3dwine msvcrt kernel32 ntdll)

@@ -1450,3 +1450,28 @@ BOOL WINAPI GetDefaultCommConfigA(
 	RtlFreeUnicodeString(&lpszNameW);
 	return ret;
 }
+
+BOOL
+WINAPI
+K32QueryWorkingSet(
+        HANDLE hProcess,
+        PVOID  pv,
+        DWORD  cb
+)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
+BOOL
+WINAPI
+K32QueryWorkingSetEx(
+        HANDLE hProcess,
+        PVOID  pv,
+        DWORD  cb
+)
+{
+    UNIMPLEMENTED;
+    return TRUE;
+}
+
