@@ -191,6 +191,7 @@ typedef struct _CLIENT_INFO {
 //-----------------------------------------------------------------------------
 // WDFLDR.SYS exported function prototype definitions
 //-----------------------------------------------------------------------------
+CODE_SEG("PAGE")
 _Must_inspect_result_
 NTSTATUS
 NTAPI
@@ -201,6 +202,7 @@ WdfVersionBind(
     __out   PWDF_COMPONENT_GLOBALS* ComponentGlobals
     );
 
+CODE_SEG("PAGE")
 NTSTATUS
 NTAPI
 WdfVersionUnbind(
@@ -209,6 +211,7 @@ WdfVersionUnbind(
     __in PWDF_COMPONENT_GLOBALS ComponentGlobals
     );
 
+CODE_SEG("PAGE")
 _Must_inspect_result_
 NTSTATUS
 NTAPI
