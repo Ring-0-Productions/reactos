@@ -1617,6 +1617,7 @@
 @ cdecl strspn()
 @ cdecl strstr()
 @ cdecl swprintf()
+@ varargs -stub -version=0x601+ swprintf_s(ptr long wstr)
 @ cdecl tolower()
 @ cdecl toupper()
 @ cdecl towlower()
