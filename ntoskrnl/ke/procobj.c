@@ -968,6 +968,13 @@ KeRemoveSystemServiceTable(IN ULONG Index)
     return TRUE;
 }
 
+ULONG
+NTAPI
+KeQueryMaximumProcessorCountEx(USHORT GroupNumber)
+{
+    return 1;
+}
+
 /* UNIMPLEMENTED */
 ULONG
 NTAPI
