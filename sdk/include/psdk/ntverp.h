@@ -13,21 +13,9 @@
  * PROGRAMMERS:     Alex Ionescu (alex.ionescu@reactos.org)
  */
 
-#define  TARGET_VERSION _WIN32_WINNT_WIN8
+#define  TARGET_VERSION _WIN32_WINNT_WIN7
 
-#if (TARGET_VERSION >= _WIN32_WINNT_WIN8)
-
-//
-// Windows NT 6.2.9200.16384
-//
-#define VER_PRODUCTBUILD                    9200
-#define VER_PRODUCTBUILD_QFE                16384
-#define VER_PRODUCTMAJORVERSION             6
-#define VER_PRODUCTMINORVERSION             2
-#define VER_PRODUCTVERSION_W                (0x0602)
-#define VER_PRODUCTVERSION_DW               (0x06020000 | VER_PRODUCTBUILD)
-
-#elif (TARGET_VERSION >= _WIN32_WINNT_WIN7)
+#if (TARGET_VERSION >= _WIN32_WINNT_WIN7)
 
 //
 // Windows NT 6.1.7601.17514
