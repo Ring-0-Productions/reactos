@@ -275,17 +275,17 @@ IoSynchronousCallDriver(_In_ PDEVICE_OBJECT DeviceObject,
     KEVENT Event;
     PIO_STACK_LOCATION IrpStack;
     NTSTATUS Status;
-    
+
     UNIMPLEMENTED;
-    
+
     /* Initialize the event */
     KeInitializeEvent(&Event, SynchronizationEvent, FALSE);
-    
+
     IrpStack = Irp->Tail.Overlay.CurrentStackLocation;
     IrpStack->Context = &Event;
     IrpStack->CompletionRoutine = IopSynchronousCompletionLoc;
     IrpStack->Control = -1;
-    
+
     Status = IofCallDriver(DeviceObject, Irp);
     DPRINT1("IofCallDriver status: %x\n", Status);
     if (Status == STATUS_PENDING)
