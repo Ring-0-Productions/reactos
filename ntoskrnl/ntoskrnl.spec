@@ -927,6 +927,7 @@
 @ stdcall NtQuerySystemInformation(long ptr long ptr)
 @ stdcall NtQueryVolumeInformationFile(ptr ptr ptr long long)
 @ stdcall NtReadFile(ptr ptr ptr ptr ptr ptr long ptr ptr)
+@ stdcall -version=0x600+ NtRemoveIoCompletionEx(ptr ptr long ptr ptr long)
 @ stdcall NtRequestPort(ptr ptr)
 @ stdcall NtRequestWaitReplyPort(ptr ptr ptr)
 @ stdcall NtSetEaFile(ptr ptr ptr long)
@@ -1589,6 +1590,7 @@
 @ stdcall -version=0x600+ ZwQueryVirtualMemory(long ptr long ptr long ptr)
 @ stdcall ZwQueryVolumeInformationFile(ptr ptr ptr long long)
 @ stdcall ZwReadFile(ptr ptr ptr ptr ptr ptr long ptr ptr)
+@ stdcall -version=0x600+ ZwRemoveIoCompletionEx(ptr ptr long ptr ptr long) NtRemoveIoCompletionEx
 @ stdcall ZwReplaceKey(ptr ptr ptr)
 @ stdcall ZwRequestWaitReplyPort(ptr ptr ptr)
 @ stdcall ZwResetEvent(ptr ptr)
