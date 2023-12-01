@@ -44,6 +44,10 @@ add_library(d3dcompiler_43 MODULE
     ${CMAKE_CURRENT_BINARY_DIR}/d3dcompiler_43_stubs.c
     ${CMAKE_CURRENT_BINARY_DIR}/d3dcompiler_43.def)
 
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(d3dcompiler_43 PRIVATE -Wno-incompatible-pointer-types -Wno-unused-but-set-variable -Wno-switch -Wno-error) # Our favourite compiler :)
+endif()
+
 set_module_type(d3dcompiler_43 win32dll)
 target_link_libraries(d3dcompiler_43 dx10guid uuid wine wpp)
 add_importlibs(d3dcompiler_43 msvcrt kernel32 ntdll)
