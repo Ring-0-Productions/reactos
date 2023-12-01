@@ -512,6 +512,7 @@
 @ stdcall IoSetHardErrorOrVerifyDevice(ptr ptr)
 @ stdcall IoSetInformation(ptr ptr long ptr)
 @ stdcall IoSetIoCompletion(ptr ptr ptr long ptr long)
+@ stdcall -stub -version=0x600+ IoSetIoCompletionEx()
 @ fastcall IoSetPartitionInformation(ptr long long long)
 @ stdcall IoSetPartitionInformationEx(ptr long ptr)
 @ stdcall -version=0x600+ IoSetDeviceInterfacePropertyData(ptr ptr ptr long ptr long ptr)
@@ -1541,6 +1542,7 @@
 @ stdcall ZwFlushVirtualMemory(ptr ptr ptr ptr)
 @ stdcall ZwFreeVirtualMemory(ptr ptr ptr long)
 @ stdcall ZwFsControlFile(ptr ptr ptr ptr ptr long ptr long ptr long)
+@ stdcall -version=0x600+ ZwImpersonateAnonymousToken(ptr) NtImpersonateAnonymousToken
 @ stdcall ZwInitiatePowerAction(long long long long)
 @ stdcall ZwIsProcessInJob(ptr ptr)
 @ stdcall ZwLoadDriver(ptr)
