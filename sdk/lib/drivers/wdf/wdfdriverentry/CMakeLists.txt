@@ -3,7 +3,7 @@ remove_definitions(-D_WIN32_WINNT=0x502)
 add_library(wdfdriverentry STATIC wdfdriverentry.c)
 add_dependencies(wdfdriverentry xdk)
 
-if(GCC)
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_compile_options(wdfdriverentry PRIVATE -Wno-unknown-pragmas -Wno-switch)
 endif()
 
