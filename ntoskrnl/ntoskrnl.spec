@@ -1492,20 +1492,20 @@
 @ stdcall ZwAlertThread(ptr)
 @ stdcall ZwAllocateVirtualMemory(ptr ptr long ptr long long)
 @ stdcall -version=0x600+ ZwAllocateLocallyUniqueId(ptr)
-@ stdcall -version=0x600+ ZwAlpcCancelMessage(ptr long ptr) NtAlpcCancelMessage
-@ stdcall -version=0x600+ ZwAlpcConnectPort(ptr wstr ptr ptr long ptr ptr long ptr ptr ptr) NtAlpcConnectPort
-@ stdcall -version=0x600+ ZwAlpcConnectPortEx(ptr wstr ptr ptr long ptr ptr long ptr ptr ptr) NtAlpcConnectPort
-@ stdcall -version=0x600+ ZwAlpcCreatePortSection(ptr long ptr long ptr long) NtAlpcCreatePortSection
-@ stdcall -version=0x600+ ZwAlpcCreateResourceReserve(ptr long long ptr) NtAlpcCreateResourceReserve
-@ stdcall -version=0x600+ ZwAlpcCreateSectionView(ptr long ptr) NtAlpcCreateSectionView
-@ stdcall -version=0x600+ ZwAlpcCreateSecurityContext(ptr long ptr) NtAlpcCreateSecurityContext
-@ stdcall -version=0x600+ ZwAlpcDeletePortSection(ptr long ptr) NtAlpcDeletePortSection
-@ stdcall -version=0x600+ ZwAlpcDeleteSectionView(ptr long ptr) NtAlpcDeleteSectionView
-@ stdcall -version=0x600+ ZwAlpcDeleteSecurityContext(ptr long ptr) NtAlpcDeleteSecurityContext
-@ stdcall -version=0x600+ ZwAlpcDisconnectPort(ptr long) NtAlpcDisconnectPort
-@ stdcall -version=0x600+ ZwAlpcQueryInformation(ptr ptr ptr long long) NtAlpcQueryInformation
-@ stdcall -version=0x600+ ZwAlpcSendWaitReceivePort(ptr long ptr ptr ptr long ptr ptr) NtAlpcSendWaitReceivePort
-@ stdcall -version=0x600+ ZwAlpcSetInformation(ptr ptr ptr long) NtAlpcSetInformation
+@ stdcall -stub -version=0x600+ ZwAlpcCancelMessage(ptr long ptr); NtAlpcCancelMessage
+@ stdcall -stub -version=0x600+ ZwAlpcConnectPort(ptr wstr ptr ptr long ptr ptr long ptr ptr ptr) ;NtAlpcConnectPort
+@ stdcall -stub -version=0x600+ ZwAlpcConnectPortEx(ptr wstr ptr ptr long ptr ptr long ptr ptr ptr) ;NtAlpcConnectPort
+@ stdcall -stub -version=0x600+ ZwAlpcCreatePortSection(ptr long ptr long ptr long) ;NtAlpcCreatePortSection
+@ stdcall -stub -version=0x600+ ZwAlpcCreateResourceReserve(ptr long long ptr) ;NtAlpcCreateResourceReserve
+@ stdcall -stub -version=0x600+ ZwAlpcCreateSectionView(ptr long ptr) ;NtAlpcCreateSectionView
+@ stdcall -stub -version=0x600+ ZwAlpcCreateSecurityContext(ptr long ptr) ;NtAlpcCreateSecurityContext
+@ stdcall -stub -version=0x600+ ZwAlpcDeletePortSection(ptr long ptr) ;NtAlpcDeletePortSection
+@ stdcall -stub -version=0x600+ ZwAlpcDeleteSectionView(ptr long ptr) ;NtAlpcDeleteSectionView
+@ stdcall -stub -version=0x600+ ZwAlpcDeleteSecurityContext(ptr long ptr) ;NtAlpcDeleteSecurityContext
+@ stdcall -stub -version=0x600+ ZwAlpcDisconnectPort(ptr long) ;NtAlpcDisconnectPort
+@ stdcall -stub -version=0x600+ ZwAlpcQueryInformation(ptr ptr ptr long long) ;NtAlpcQueryInformation
+@ stdcall -stub -version=0x600+ ZwAlpcSendWaitReceivePort(ptr long ptr ptr ptr long ptr ptr) ;NtAlpcSendWaitReceivePort
+@ stdcall -stub -version=0x600+ ZwAlpcSetInformation(ptr ptr ptr long); NtAlpcSetInformation
 @ stdcall ZwAssignProcessToJobObject(ptr ptr)
 @ stdcall ZwCancelIoFile(ptr ptr)
 @ stdcall ZwCancelTimer(ptr ptr)
