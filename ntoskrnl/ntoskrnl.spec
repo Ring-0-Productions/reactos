@@ -1517,6 +1517,7 @@
 @ stdcall ZwCreateDirectoryObject(ptr long ptr)
 @ stdcall ZwCreateEvent(ptr long ptr long long)
 @ stdcall ZwCreateFile(ptr long ptr ptr ptr long long long long ptr long)
+@ stdcall -version=0x600+ ZwCreateIoCompletion(ptr long ptr long) NtCreateIoCompletion
 @ stdcall ZwCreateJobObject(ptr long ptr)
 @ stdcall ZwCreateKey(ptr long ptr long ptr long ptr)
 @ stdcall ZwCreateSection(ptr long ptr ptr long long ptr)
