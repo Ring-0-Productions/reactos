@@ -619,6 +619,7 @@
 @ stdcall -arch=arm KeFlushIoBuffers(ptr long long)
 @ stdcall KeFlushQueuedDpcs()
 @ stdcall KeGenericCallDpc(ptr ptr)
+@ stdcall -version=0x600+ KeGetCurrentNodeNumber()
 @ stdcall -version=0x600+ KeGetCurrentProcessorNumberEx(ptr)
 @ stdcall KeGetCurrentThread()
 @ stdcall KeGetPreviousMode()
@@ -679,6 +680,7 @@
 @ stdcall -arch=i386,arm KeQueryInterruptTime()
 @ stdcall -version=0x600+ KeQueryLogicalProcessorRelationship(ptr ptr ptr ptr)
 ;@ cdecl -arch=x86_64 KeQueryMultiThreadProcessorSet
+@ stdcall KeQueryMaximumProcessorCountEx(long)
 @ stdcall -version=0x600+ KeQueryNodeActiveAffinity(long ptr ptr)
 ;@ cdecl -arch=x86_64 KeQueryPrcbAddress
 @ stdcall KeQueryPriorityThread(ptr)
@@ -801,6 +803,7 @@
 @ stdcall MmAdjustWorkingSetSize(long long long long)
 @ stdcall MmAdvanceMdl(ptr long)
 @ stdcall MmAllocateContiguousMemory(long long long)
+@ stdcall -stub MmAllocateContiguousNodeMemory(long ptr ptr ptr long long)
 @ stdcall MmAllocateContiguousMemorySpecifyCache(long long long long long long long long)
 @ stdcall -version=0x600+ MmAllocateContiguousMemorySpecifyCacheNode(long long long long long long long long long)
 @ stdcall MmAllocateMappingAddress(long long)
@@ -1731,6 +1734,7 @@
 @ cdecl wcsncat()
 @ cdecl wcsncmp()
 @ cdecl wcsncpy()
+@ cdecl -version=0x601+ wcsncpy_s(ptr long wstr long)
 @ cdecl wcsrchr()
 @ cdecl wcsspn()
 @ cdecl wcsstr()
