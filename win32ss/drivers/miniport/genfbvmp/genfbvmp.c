@@ -390,17 +390,17 @@ GenFbGetDeviceDataCallback(
             }
 
             /* Pre-initialize VideoConfigData */
-            VideoPortZeroMemory(&DeviceExtension->VideoConfigData,
-                                sizeof(DeviceExtension->VideoConfigData));
+            VideoPortZeroMemory(&DeviceExtension->DisplayInfo.VideoConfigData,
+                                sizeof(DeviceExtension->DisplayInfo.VideoConfigData));
 
-            Status = GetFramebufferVideoData(&DeviceExtension->FrameBufData.BaseAddress,
-                                             &DeviceExtension->FrameBufData.BufferSize,
-                                             &DeviceExtension->VideoConfigData,
+            Status = GetFramebufferVideoData(&DeviceExtension->DisplayInfo.BaseAddress,
+                                             &DeviceExtension->DisplayInfo.BufferSize,
+                                             &DeviceExtension->DisplayInfo.VideoConfigData,
                                              GET_LEGACY_DATA(ConfigurationData),
                                              GET_LEGACY_DATA_LEN(ConfigurationDataLength));
             if (!NT_SUCCESS(Status) ||
-                (DeviceExtension->FrameBufData.BaseAddress.QuadPart == 0) ||
-                (DeviceExtension->FrameBufData.BufferSize == 0))
+                (DeviceExtension->DisplayInfo.BaseAddress.QuadPart == 0) ||
+                (DeviceExtension->DisplayInfo.BufferSize == 0))
             {
                 /* Fail if no framebuffer was provided */
                 DPRINT1("No framebuffer found!\n");
@@ -422,8 +422,8 @@ GenFbGetDeviceDataCallback(
             // ConfigData->ControlBase/Size and ConfigData->CursorBase/Size
             // memory ports, or any other resource we get,
             // besides setting up the framebuffer?
-            accessRanges[0].RangeStart = DeviceExtension->FrameBufData.BaseAddress;
-            accessRanges[0].RangeLength = DeviceExtension->FrameBufData.BufferSize;
+            accessRanges[0].RangeStart = DeviceExtension->DisplayInfo.BaseAddress;
+            accessRanges[0].RangeLength = DeviceExtension->DisplayInfo.BufferSize;
             accessRanges[0].RangeInIoSpace = VIDEO_MEMORY_SPACE_MEMORY;
             accessRanges[0].RangeVisible = FALSE;
             accessRanges[0].RangeShareable = FALSE;
@@ -446,12 +446,12 @@ GenFbGetDeviceDataCallback(
 
             /* Map the video memory into the system virtual
              * address space so we can clear it out. */
-            DeviceExtension->FrameAddress =
+            DeviceExtension->DisplayInfo.FrameAddress =
                 VideoPortGetDeviceBase(DeviceExtension,
                                        accessRanges[0].RangeStart, // Frame
                                        accessRanges[0].RangeLength,
                                        accessRanges[0].RangeInIoSpace);
-            if (!DeviceExtension->FrameAddress)
+            if (!DeviceExtension->DisplayInfo.FrameAddress)
             {
                 /* We failed, release the acquired resources and bail out */
                 VideoPortVerifyAccessRanges(HwDeviceExtension, 0, NULL);
@@ -460,7 +460,7 @@ GenFbGetDeviceDataCallback(
 
             DPRINT1("GenFbVmpFindAdapter: Mapped framebuffer 0x%I64x to 0x%p - size %lu\n",
                     accessRanges[0].RangeStart,
-                    DeviceExtension->FrameAddress,
+                    DeviceExtension->DisplayInfo.FrameAddress,
                     accessRanges[0].RangeLength);
 
             return NO_ERROR;
@@ -486,12 +486,12 @@ GenFbGetDeviceDataCallback(
             }
 
             /* Pre-initialize MonitorConfigData */
-            VideoPortZeroMemory(&DeviceExtension->MonitorConfigData,
-                                sizeof(DeviceExtension->MonitorConfigData));
+            VideoPortZeroMemory(&DeviceExtension->DisplayInfo.MonitorConfigData,
+                                sizeof(DeviceExtension->DisplayInfo.MonitorConfigData));
 
             /* Retrieve optional monitor configuration data;
              * ignore any error if it does not exist. */
-            GetFramebufferMonitorData(&DeviceExtension->MonitorConfigData,
+            GetFramebufferMonitorData(&DeviceExtension->DisplayInfo.MonitorConfigData,
                                       GET_LEGACY_DATA(ConfigurationData),
                                       GET_LEGACY_DATA_LEN(ConfigurationDataLength));
 
@@ -540,7 +540,9 @@ GenFbVmpFindAdapter(
      * Retrieve any configuration data for the display controller and monitor.
      */
 
-    VideoPortZeroMemory(FrameBufData, sizeof(*FrameBufData));
+    //GENFB_DISPLAY_INFO DisplayInfo;
+
+   // VideoPortZeroMemory(FrameBufData, sizeof(*FrameBufData));
 
     /* Enumerate and find the boot-time console display controller */
     // ControllerClass, DisplayController
@@ -605,7 +607,7 @@ GenFbVmpFindAdapter(
                                    sizeof(AdapterDacType));
 
     /* Video Memory in *MB* */
-    VRamInMB = FrameBufData->BufferSize / (1024 * 1024);
+    VRamInMB = DeviceExtension->DisplayInfo.BufferSize / (1024 * 1024);
     VideoPortSetRegistryParameters(HwDeviceExtension,
                                    L"HardwareInformation.MemorySize",
                                    &VRamInMB,
@@ -641,8 +643,8 @@ GenFbVmpInitialize(
     DPRINT1("GenFbVmpInitialize(%p)\n", HwDeviceExtension);
 
     /* Zero the frame buffer */
-    VideoPortZeroDeviceMemory(DeviceExtension->FrameAddress,
-                              DeviceExtension->FrameBufData.BufferSize);
+    VideoPortZeroDeviceMemory(DeviceExtension->DisplayInfo.FrameAddress,
+                              DeviceExtension->DisplayInfo.BufferSize);
 
     return TRUE;
 }

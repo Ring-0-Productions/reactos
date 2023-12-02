@@ -23,6 +23,8 @@
 #include <ndk/kefuncs.h>
 #endif
 
+#include <ndk/halfuncs.h>
+
 //#include <drivers/bootvid/framebuf.h> // FIXME: Include?
 #include <drivers/videoprt/vpcfgcnv.h>
 
@@ -573,6 +575,7 @@ pEnumDisplayControllerCallback(
 #define GetDeviceInfoLength(info) \
     ((info) ? (info)->DataLength : 0)
 
+    NTSTATUS Status;
     PDISPLAY_CONTEXT DisplayContext = Context;
     PKEY_VALUE_FULL_INFORMATION* DeviceInformation;
     PWCHAR Identifier;
@@ -647,14 +650,6 @@ pEnumDisplayControllerCallback(
                                              DisplayContext->VideoConfigData,
                                              GET_LEGACY_DATA(ConfigurationData),
                                              GET_LEGACY_DATA_LEN(ConfigurationDataLength));
-            if (!NT_SUCCESS(Status) ||
-                (*DisplayContext->BaseAddress.QuadPart == 0) ||
-                (*DisplayContext->BufferSize == 0))
-            {
-                /* Fail if no framebuffer was provided */
-                DPRINT1("No framebuffer found!\n");
-                return STATUS_DEVICE_DOES_NOT_EXIST;
-            }
 
             DisplayContext->Interface = BusType;
             DisplayContext->BusNumber = BusNumber;
@@ -741,7 +736,7 @@ FindBootDisplayFromCachedConfigTree(
     /* Find the first DisplayController available on any bus in the system */
     DisplayContext.DeviceType = ControllerType;
     DisplayContext.VideoConfigData = VideoConfigData;
-    for (InterfaceType = 0; InterfaceType < MaximumInterfaceType, ++InterfaceType)
+    for (InterfaceType = 0; InterfaceType < MaximumInterfaceType; ++InterfaceType)
     {
         Status = IoQueryDeviceDescription(&InterfaceType,
                                           NULL,
@@ -926,7 +921,7 @@ FindBootDisplay(
  * It allows context passing for the underlying HalFindBusAddressTranslation
  * between different calls of the function.
  **/
-#if 0
+#if 1
 typedef BOOLEAN
 (NTAPI *pHalFindBusAddressTranslation)(
     _In_ PHYSICAL_ADDRESS BusAddress,

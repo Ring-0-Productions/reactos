@@ -1111,6 +1111,9 @@ UefiHwDetect(
     DetectAcpiBios(SystemKey, &BusNumber);
     DetectInternal(SystemKey, &BusNumber);
 
+     DetectPci(SystemKey, &BusNumber);
+   // DetectAcpiBios(SystemKey, &BusNumber);
+    DetectIsaBios(SystemKey, &BusNumber);
     TRACE("DetectHardware() Done\n");
     return SystemKey;
 }
