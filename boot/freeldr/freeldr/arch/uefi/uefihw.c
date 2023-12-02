@@ -898,43 +898,6 @@ DetectAcpiBios(PCONFIGURATION_COMPONENT_DATA SystemKey, ULONG *BusNumber)
 extern REACTOS_INTERNAL_BGCONTEXT framebufferData;
 /****/extern EFI_PIXEL_BITMASK UefiGopPixelBitmask;/****/
 
-/**
- * @brief
- * Calculates the number of bits per pixel ("PixelDepth") for
- * the given pixel format, given by the pixel color masks.
- *
- * @note
- * The calculation is done by finding the highest bit set in
- * the combined pixel color masks.
- *
- * @remark
- * When the GOP pixel format is given by PixelBitMask, the pixel
- * element size _may be_ different from 4 bytes.
- * See UEFI Spec Rev.2.10 Section 12.9 "Graphics Output Protocol":
- * example code "GetPixelElementSize()" function.
- **/
-static ULONG
-PixelBitmasksToBpp(
-    ULONG RedMask,
-    ULONG GreenMask,
-    ULONG BlueMask,
-    ULONG ReservedMask)
-{
-    ULONG CompoundMask = (RedMask | GreenMask | BlueMask | ReservedMask);
-#if 1
-    ULONG ret = 0;
-    return (_BitScanReverse(&ret, CompoundMask) ? ret : 0);
-#else
-    ULONG ret = 32; // (8 * sizeof(ULONG));
-    while ((CompoundMask & (1 << 31)) == 0)
-    {
-        ret--;
-        CompoundMask <<= 1;
-    }
-    return ret;
-#endif
-}
-
 static VOID
 DetectDisplayController(PCONFIGURATION_COMPONENT_DATA BusKey)
 {
@@ -1022,10 +985,7 @@ DetectDisplayController(PCONFIGURATION_COMPONENT_DATA BusKey)
         case PixelRedGreenBlueReserved8BitPerColor:
         {
             FramebufferData->BitsPerPixel = (8 * sizeof(EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-            FramebufferData->PixelInformation.RedMask      = 0x000000FF;
-            FramebufferData->PixelInformation.GreenMask    = 0x0000FF00;
-            FramebufferData->PixelInformation.BlueMask     = 0x00FF0000;
-            FramebufferData->PixelInformation.ReservedMask = 0xFF000000;
+           *(EFI_PIXEL_BITMASK*)&FramebufferData->PixelInformation = EfiPixelMasks[framebufferData.PixelFormat];
             break;
         }
 
@@ -1046,10 +1006,11 @@ DetectDisplayController(PCONFIGURATION_COMPONENT_DATA BusKey)
                                    UefiGopPixelBitmask.GreenMask,
                                    UefiGopPixelBitmask.BlueMask,
                                    UefiGopPixelBitmask.ReservedMask);
-            FramebufferData->PixelInformation.RedMask      = UefiGopPixelBitmask.RedMask;
-            FramebufferData->PixelInformation.GreenMask    = UefiGopPixelBitmask.GreenMask;
-            FramebufferData->PixelInformation.BlueMask     = UefiGopPixelBitmask.BlueMask;
-            FramebufferData->PixelInformation.ReservedMask = UefiGopPixelBitmask.ReservedMask;
+           *(EFI_PIXEL_BITMASK*)&FramebufferData->PixelInformation = UefiGopPixelBitmask;
+           //FramebufferData->PixelInformation.RedMask      = UefiGopPixelBitmask.RedMask;
+           //FramebufferData->PixelInformation.GreenMask    = UefiGopPixelBitmask.GreenMask;
+           //FramebufferData->PixelInformation.BlueMask     = UefiGopPixelBitmask.BlueMask;
+           //FramebufferData->PixelInformation.ReservedMask = UefiGopPixelBitmask.ReservedMask;
             break;
         }
 
