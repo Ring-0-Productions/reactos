@@ -1,6 +1,6 @@
 
 list(APPEND SOURCE
-    usbxhci.c)
+    usbxhci.cpp)
 
 add_library(usbxhci MODULE
     ${SOURCE}
