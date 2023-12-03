@@ -20,7 +20,6 @@ list(APPEND INF_FILES
     msmouse.inf
     NET_NIC.inf
     nettcpip.inf
-    nvme.inf
     ports.inf
     scsi.inf
     shortcuts.inf
@@ -31,6 +30,7 @@ list(APPEND INF_FILES
     uaspstor.inf
     usbport.inf
     volume.inf
+    usbaudio.inf
     wdmaudio.inf
     wmiacpi.inf)
 
