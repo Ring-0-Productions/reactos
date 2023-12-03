@@ -1,5 +1,6 @@
 
 #include <ntifs.h>
+#include <watchdog.h>
 
 #define NDEBUG
 #include <debug.h>
@@ -228,10 +229,121 @@ WdMadeAnyProgress(
     return FALSE;
 }
 
+#if (NTDDI_VERSION >= NTDDI_VISTA)
 
+#if (NTDDI_VERSION >= NTDDI_WIN8)
+NTSTATUS
+NTAPI
+SMgrNotifySessionChange(
+	_In_ WATCHDOG_SESSION_CHANGE_TYPE Type,
+	_In_opt_ PVIDEO_WIN32K_CALLOUT Callout
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;
+}
 
+NTSTATUS
+NTAPI
+SMgrRegisterSessionChangeCallout(
+	_In_ PWATCHDOG_SESSION_CHANGE_CALLOUT Callout
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;
+}
 
+NTSTATUS
+NTAPI
+SMgrUnregisterSessionChangeCallout(
+	_In_ PWATCHDOG_SESSION_CHANGE_CALLOUT Callout
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;   
+}
 
+NTSTATUS
+NTAPI
+SMgrGdiCallout(
+	_In_ PVIDEO_WIN32K_CALLBACK_PARAMS CallbackParams,
+	_In_ UINT64 TargetSessionId,
+	_In_ UINT32 ProcessNow,
+	_In_opt_ PWATCHDOG_CALLOUT_STATUS_CALLBACK StatusCallback,
+	_In_opt_ void* UserData,
+	_In_opt_ PVIDEO_SCENARIO_CONTEXT* ScenarioContext
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;   
+}
+#else
+NTSTATUS
+NTAPI
+SMgrNotifySessionChange(
+	_In_ UINT32 Type
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;   
+}
 
+NTSTATUS
+NTAPI
+SMgrRegisterGdiCallout(
+	_In_ PVIDEO_WIN32K_CALLOUT Callout
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;   
+}
 
+NTSTATUS
+NTAPI
+SMgrRegisterSessionStartCallout(
+	_In_ PWATCHDOG_SESSION_START_CALLOUT Callout
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;   
+}
 
+NTSTATUS
+NTAPI
+SMgrUnregisterSessionStartCallout(
+	_In_ PWATCHDOG_SESSION_START_CALLOUT Callout
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;   
+}
+
+NTSTATUS
+NTAPI
+SMgrGdiCallout(
+	_In_ PVIDEO_WIN32K_CALLBACKS_PARAMS CallbackParams,
+	_In_ UINT32 ProcessAll,
+	_In_ UINT32 ProcessNow
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_INVALID_PARAMETER;   
+}
+#endif
+
+HANDLE
+NTAPI
+SMgrGetActiveSessionProcess()
+{
+    UNIMPLEMENTED;
+    return NULL;   
+}
+
+ULONG
+NTAPI
+SMgrGetNumberOfSessions()
+{
+    UNIMPLEMENTED;
+    return 0;   
+}
+#endif /* #if (NTDDI_VERSION >= NTDDI_VISTA) */
