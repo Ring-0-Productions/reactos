@@ -27,7 +27,7 @@
 @ stdcall -version=0x602+ SMgrRegisterSessionChangeCallout(ptr)
 @ stdcall -version=0x602+ SMgrUnregisterSessionChangeCallout(ptr)
 @ stdcall -version=0x602+ SMgrGdiCallout(ptr long long ptr ptr ptr)
-@ stdcall -version=0x600-0x601 SMgrNotifySessionChange(ptr)
+@ stdcall -version=0x600-0x601 SMgrNotifySessionChange(long)
 @ stdcall -version=0x600-0x601 SMgrRegisterGdiCallout(ptr)
 @ stdcall -version=0x600-0x601 SMgrRegisterSessionStartCallout(ptr)
 @ stdcall -version=0x600-0x601 SMgrUnregisterSessionStartCallout(ptr)
