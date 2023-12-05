@@ -8,9 +8,349 @@
 #define _WATCHDOG_H_
 
 #if (NTDDI_VERSION >= NTDDI_VISTA)
-/* Session Manager interface */
+#include <Ntddvdeo.h>
+#endif
 
-#include <ntddvdeo.h>
+/* 
+	The internal structure is not exposed by the public api
+*/
+typedef struct _WATCHDOG WATCHDOG;
+typedef WATCHDOG* PWATCHDOG;
+
+/**
+ * Types of watchdog events
+*/
+enum WATCHDOG_EVENT_TYPE
+{
+	/**
+	 * No event happend
+	*/
+	WATCHDOG_EVENT_NONE					= 0x0,
+
+	/**
+	 * This event is used when the timer was cancelled by the user (via WdStopWatch)
+	*/
+	WATCHDOG_EVENT_CANCELLED_BY_USER 	= 0x1,
+
+	/**
+	 * This event is used when the timer has expired
+	*/
+	WATCHDOG_EVENT_EXPIRED 				= 0x2,
+
+	/**
+	 * This event is used when the timer has been restarted
+	*/
+	WATCHDOG_EVENT_RESTARTED 			= 0x3,
+};
+
+/**
+ * Types of watchdog
+*/
+enum WATCHDOG_TYPE
+{
+	// TODO: discover...
+
+	WATCHDOG_TYPE_1 = 1,
+	WATCHDOG_TYPE_2 = 2,
+	WATCHDOG_TYPE_3 = 3,
+	WATCHDOG_TYPE_4 = 4,
+};
+
+/**
+ * Enters a monitored section
+ * @param[in] Watchdog Watchdog
+*/
+VOID
+FASTCALL
+WdEnterMonitoredSection(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Exits a monitored section
+ * @param[in] Watchdog Watchdog
+*/
+VOID
+FASTCALL
+WdExitMonitoredSection(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Resets the deferred watchdog to it's inital state
+ * @param[in] Watchdog Watchdog to reset
+*/
+VOID
+FASTCALL
+WdResetDeferredWatch(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Attempts to resume the deferred watchdog
+ * @param[in] Watchdog Watchdog to resume
+ * @param[in] ResetSuspensionCount If this variable is set to TRUE, then the suspension counts of the 
+ * 	watchdog will be set to 0
+ * @note Resetting the suspension count DOES NOT resume the deferred watchdog
+*/
+VOID
+FASTCALL
+WdResumeDeferredWatch(
+	_In_ PWATCHDOG Watchdog,
+	_In_ BOOLEAN ResetSuspensionCount
+);
+
+/**
+ * Attempts to suspend the current watchdog and increment the suspension count by 1
+ * @param[in] pWatchdog Watchdog to suspend
+*/
+VOID
+FASTCALL
+WdSuspendDeferredWatch(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Allocates a new deferred watchdog
+ * @param[in] DeviceObject Device driver object to link the watchdog with
+ * @param[in] Type Type of watchdog
+ * @param[in] AllocationTag Tag to use for memory allocation
+*/
+PWATCHDOG
+NTAPI
+WdAllocateDeferredWatchdog(
+	_In_ PDEVICE_OBJECT DeviceObject,
+	_In_ UINT32 Type,
+	_In_ ULONG AllocationTag 
+);
+
+/**
+ * Allocates a new watchdog
+ * @param[in] DeviceObject Device driver object to link the watchdog with
+ * @param[in] Type Type of watchdog
+ * @param[in] AllocationTag Tag to use for memory allocation
+*/
+PWATCHDOG
+NTAPI
+WdAllocateWatchdog(
+	_In_ PDEVICE_OBJECT DeviceObject,
+	_In_ UINT32 Type,
+	_In_ ULONG AllocationTag 
+);
+
+VOID
+NTAPI
+WdCompleteEvent(
+	_In_ PWATCHDOG Watchdog,
+	_In_ PDEVICE_OBJECT DeviceObject
+);
+
+/**
+ * This callback is executed for queueing 
+*/
+VOID
+NTAPI
+WdDdiWatchdogDpcCallback(
+	_In_ PKDPC Dpc,
+	_In_opt_ PVOID DeferredContext,
+	_In_opt_ PVOID SystemArgument1,
+	_In_opt_ PVOID SystemArgument2
+);
+
+/**
+ * Unreferences the current object, decrementing it's reference count
+ * @param[in] Watchdog Watchdog to decrement
+*/
+VOID
+NTAPI
+WdDereferenceObject(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Frees an allocated deferred watchdog
+ * @param[in] Watchdog Watchdog to free
+*/
+VOID
+NTAPI
+WdFreeDeferredWatchdog(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Frees an allocated deferred watchdog
+ * @param[in] Watchdog Watchdog to free
+*/
+void
+NTAPI
+WdFreeWatchdog(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Gets the linked device driver object of the current watchdog
+ * @param[in] Watchdog Watchdog to get the device object
+ * @return Device object
+*/
+PDEVICE_OBJECT
+NTAPI
+WdGetDeviceObject(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Gets the last event that happend in the watchdog
+ * @param[in] Watchdog Watchdog
+ * @return Any value from WATCHDOG_EVENT_TYPE
+*/
+ULONG
+NTAPI
+WdGetLastEvent(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Gets the lowest-level device object from the attached device driver
+ * @param[in] Watchdog Watchdog
+ * @return Lowest-level device object
+*/
+PDEVICE_OBJECT
+NTAPI
+WdGetLowestDeviceObject(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Checks if the watchdog was executed
+ * @param[in] Watchdog Watchdog
+ * @return Returns FALSE if the watchdog hasn't made any progress
+*/
+BOOLEAN
+NTAPI
+WdMadeAnyProgress(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Add a reference the current object, incrementing it's reference count
+ * @param[in] Watchdog Watchdog to increment
+*/
+VOID
+NTAPI
+WdReferenceObject(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Resets the watchdog to it's inital state
+ * @param[in] Watchdog Watchdog to reset
+ * @note The reset only works if the watchdog has been already started
+*/
+VOID
+NTAPI
+WdResetWatch(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Attempts to resume the watchdog
+ * @param[in] Watchdog Watchdog to resume
+ * @param[in] CheckForResumeCount If this is set to TRUE, the suspension count is 
+ *  decremented and will be checked before resuming the watchdog
+ * @note Setting CheckForResumeCount to FALSE will forcefully resume the watchdog
+*/
+VOID
+NTAPI
+WdResumeWatch(
+	_In_ PWATCHDOG Watchdog,
+	_In_ BOOLEAN CheckForResumeCount
+);
+
+/**
+ * Starts a deferred watchdog
+ * @param[in] Watchdog Watchdog to start
+ * @param[in] Dpc DPC to be queued for execution after the timer expired or restarted
+ * @param[in] DueTime Time when the watchdog will be hitted
+ * @note DueTime is rappresented in milliseconds relative to the system time
+*/
+VOID
+NTAPI
+WdStartDeferredWatch(
+	_In_ PWATCHDOG Watchdog,
+	_In_ PRKDPC Dpc,
+	_In_ ULONG DueTime
+);
+
+/**
+ * Starts the watchdog
+ * @param[in] Watchdog Watchdog to start
+ * @param[in] DueTime Time when the watchdog will be hitted
+ * @param[in] Dpc DPC to be queued for execution after the timer expired or restarted
+ */
+VOID
+NTAPI
+WdStartWatch(
+	_In_ PWATCHDOG Watchdog,
+	_In_ LARGE_INTEGER DueTime,
+	_In_ PKDPC Dpc
+);
+
+VOID
+NTAPI
+WdStopDeferredWatch(
+	_In_ PWATCHDOG Watchdog
+);
+
+/**
+ * Attempts to stop the watchdog
+ * @param[in] Watchdog Watchdog to stop
+ * @param[in] CheckForStartCount If this is set to TRUE, the start count is 
+ *  decremented and will be checked before stopping the watchdog
+ * @note Setting CheckForStartCount to FALSE will forcefully stop the watchdog
+*/
+VOID
+NTAPI
+WdStopWatch(
+	_In_ PWATCHDOG Watchdog,
+	_In_ BOOLEAN CheckForStartCount
+);
+
+/**
+ * Attempts to suspend the current watchdog and increment the suspension count by 1
+ * @param[in] pWatchdog Watchdog to suspend
+*/
+VOID
+NTAPI
+WdSuspendWatch(
+	_In_ PWATCHDOG pWatchdog
+);
+
+#if (NTDDI_VERSION >= NTDDI_WS03)
+/**
+ * Attaches a new context
+ * @param[in] Watchdog Watchdog
+ * @param[in] ContextSize Size of the context to allocate
+*/
+VOID
+NTAPI
+WdAttachContext(
+    _In_ PWATCHDOG Watchdog,
+    _In_ SIZE_T ContextSize
+);
+
+/**
+ * Detaches a previously allocated context
+ * @param[in] Watchdog Watchdog
+*/
+VOID
+NTAPI
+WdDetachContext(
+    _In_ PWATCHDOG Watchdog
+);
+#endif
+
+#if (NTDDI_VERSION >= NTDDI_VISTA)
+/* Session Manager interface */
 
 /**
  Types of session notifications that can be sent
@@ -127,7 +467,7 @@ NTAPI
 SMgrGdiCallout(
 	_In_ PVIDEO_WIN32K_CALLBACKS_PARAMS CallbackParams,
 	_In_ UINT64 TargetSessionId,
-	_In_ UINT32 ProcessNow,
+	_In_ BOOLEAN ProcessNow,
 	_In_opt_ PWATCHDOG_CALLOUT_STATUS_CALLBACK StatusCallback,
 	_In_opt_ void* UserData,
 	_In_opt_ PVIDEO_SCENARIO_CONTEXT* ScenarioContext
@@ -195,8 +535,8 @@ NTSTATUS
 NTAPI
 SMgrGdiCallout(
 	_In_ PVIDEO_WIN32K_CALLBACKS_PARAMS CallbackParams,
-	_In_ UINT32 ProcessAll,
-	_In_ UINT32 ProcessNow
+	_In_ BOOLEAN ProcessAll,
+	_In_ BOOLEAN ProcessNow
 );
 
 #endif /* NTDDI_VERSION >= NTDDI_WIN8 */
