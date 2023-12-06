@@ -157,54 +157,31 @@ VidInitialize(
     }
 
     /* Convert from bus-relative to physical address, and map it into system space */
-    PHYSICAL_ADDRESS TranslatedAddress;
+   // PHYSICAL_ADDRESS TranslatedAddress;
     ULONG AddressSpace = 0;
-    if (!HalTranslateBusAddress(Interface,
-                                BusNumber,
-                                FrameBuffer,
-                                &AddressSpace,
-                                &TranslatedAddress))
+    DPRINT1("Framebuffer %p\n", FrameBuffer.QuadPart);
+    FrameBufferStart = (ULONG_PTR)MmMapIoSpace(FrameBuffer,
+                                               gBootDisp.BufferSize,
+                                               MmNonCached);
+    if (!FrameBufferStart)
     {
-        DPRINT1("Could not map 0x%p\n", FrameBuffer.QuadPart);
+        DPRINT1("Out of memory!\n");
         goto Failure;
     }
-
-    if (AddressSpace == 0)
-    {
-        FrameBufferStart = (ULONG_PTR)MmMapIoSpace(TranslatedAddress,
-                                                   gBootDisp.BufferSize,
-                                                   MmNonCached);
-        if (!FrameBufferStart)
-        {
-            DPRINT1("Out of memory!\n");
-            goto Failure;
-        }
-    }
-    else
-    {
-        /* The base is the translated address, no need to map */
-        FrameBufferStart = (ULONG_PTR)TranslatedAddress.LowPart; // Yes, LowPart.
-    }
+    DPRINT1("Framebuffer mapped %p\n", FrameBufferStart);
 
 
     /*
      * Reserve off-screen area for the backbuffer that contains
      * 8-bit indexed color screen image, plus preserved row data.
      */
-    ULONG BackBufferSize = SCREEN_WIDTH * (SCREEN_HEIGHT + (BOOTCHAR_HEIGHT + 1));
 
     /* If there is enough video memory in the physical framebuffer,
      * place the backbuffer in the hidden part of the framebuffer,
      * otherwise allocate a zone for the backbuffer. */
-    if (gBootDisp.BufferSize >= FrameBufferSize + BackBufferSize)
-    {
-        /* Place backbuffer in the hidden part of framebuffer */
-        BackBuffer = (PUCHAR)(FrameBufferStart + gBootDisp.BufferSize - BackBufferSize);
-    }
-    else // if (gBootDisp.BufferSize - FrameBufferSize < BackBufferSize)
-    {
+
         /* Allocate framebuffer. 600kb works out to 640x480@16bpp */
-        SIZE_T BackBufferSize = 600 * 1024;
+        SIZE_T BackBufferSize = gBootDisp.BufferSize;
         // PHYSICAL_ADDRESS PhysicalAddress;
         // PhysicalAddress.QuadPart = -1;
         // BackBuffer = MmAllocateContiguousMemory(BackBufferSize, PhysicalAddress);
@@ -214,12 +191,13 @@ VidInitialize(
             DPRINT1("Out of memory!\n");
             goto Failure;
         }
-    }
-
+    
+    DPRINT1("everyting is setup\n");
     /* Now check if we have to set the mode */
     if (SetMode)
         VidResetDisplay(TRUE);
 
+    DPRINT1("VidInitialize return true\n");
     /* Video is ready */
     return TRUE;
 
@@ -249,9 +227,6 @@ VidResetDisplay(
     VidpCurrentY = 0;
 
     /* Clear the screen with HAL if we were asked to */
-    if (HalReset)
-        HalResetDisplay();
-
     /* Re-initialize the palette and fill the screen black */
     RtlZeroMemory((PVOID)FrameBufferStart, gBootDisp.BufferSize);
     InitializePalette();
