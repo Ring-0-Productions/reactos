@@ -44,21 +44,30 @@ enum WATCHDOG_EVENT_TYPE
 };
 
 /**
- * Types of watchdog
+ * Types of monitoring that the watchdog have to do
 */
-enum WATCHDOG_TYPE
+enum WATCHDOG_MONITOR_TYPE
 {
-	// TODO: discover...
+	/**
+	 * Monitors only the differences in the kernel thread run-time
+	*/
+	WATCHDOG_MONITOR_KERNEL_TIME = 1,
 
-	WATCHDOG_TYPE_1 = 1,
-	WATCHDOG_TYPE_2 = 2,
-	WATCHDOG_TYPE_3 = 3,
-	WATCHDOG_TYPE_4 = 4,
+	/**
+	 * Monitors only the differences in the user thread run-time
+	*/
+	WATCHDOG_MONITOR_USER_TIME = 2,
+
+	/**
+	 * Monitors the differences between both the times
+	*/
+	WATCHDOG_MONITOR_ALL_TIMES = 3,
 };
 
 /**
- * Enters a monitored section
+ * Starts a section in the code that has to be monitored
  * @param[in] Watchdog Watchdog
+ * @note This API is only available in a deferred watch
 */
 VOID
 FASTCALL
@@ -67,8 +76,9 @@ WdEnterMonitoredSection(
 );
 
 /**
- * Exits a monitored section
+ * Stop monitoring a section
  * @param[in] Watchdog Watchdog
+ * @note This API is only available in a deferred watch
 */
 VOID
 FASTCALL
@@ -127,8 +137,9 @@ WdAllocateDeferredWatchdog(
 /**
  * Allocates a new watchdog
  * @param[in] DeviceObject Device driver object to link the watchdog with
- * @param[in] Type Type of watchdog
+ * @param[in] Type Type of monitoring that the watchdog has to do
  * @param[in] AllocationTag Tag to use for memory allocation
+ * @see WATCHDOG_MONITOR_TYPE for the types of monitoring
 */
 PWATCHDOG
 NTAPI
@@ -138,15 +149,27 @@ WdAllocateWatchdog(
 	_In_ ULONG AllocationTag 
 );
 
+/**
+ * Notify the watchdog that the event previously fired to the DPC has been completed
+ * @param[in] Watchdog Watchdog to signal
+ * @param[in] ThreadObject a pointer to the thread object that is passed in the completion handler
+*/
 VOID
 NTAPI
 WdCompleteEvent(
 	_In_ PWATCHDOG Watchdog,
-	_In_ PDEVICE_OBJECT DeviceObject
+	_In_ PVOID ThreadObject
 );
 
+#if (NTDDI_VERSION == NTDDI_WINXP)
 /**
- * This callback is executed for queueing 
+ * This is a special watchdog dpc callback that is executed for attempting to restore (or bugcheck)
+ * the video driver
+ * @param[in] Dpc Dpc pointer that called this function
+ * @param[in] DeferredContext
+ * @param[in] SystemArgument1
+ * @param[in] SystemArgument2
+ * @note in Windows Server 2003, it's present in VIDEOPRT.SYS
 */
 VOID
 NTAPI
@@ -156,6 +179,7 @@ WdDdiWatchdogDpcCallback(
 	_In_opt_ PVOID SystemArgument1,
 	_In_opt_ PVOID SystemArgument2
 );
+#endif
 
 /**
  * Unreferences the current object, decrementing it's reference count
@@ -221,7 +245,7 @@ WdGetLowestDeviceObject(
 );
 
 /**
- * Checks if the watchdog was executed
+ * Checks if the runner thread was frozen or it has made a progress
  * @param[in] Watchdog Watchdog
  * @return Returns FALSE if the watchdog hasn't made any progress
 */
