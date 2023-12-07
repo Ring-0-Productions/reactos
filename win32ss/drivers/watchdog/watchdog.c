@@ -206,7 +206,7 @@ VOID
 NTAPI
 WdCompleteEvent(
 	_In_ PWATCHDOG Watchdog,
-	_In_ PDEVICE_OBJECT DeviceObject)
+	_In_ PVOID ThreadObject)
 {
     UNIMPLEMENTED;
 }
@@ -236,6 +236,7 @@ WdMadeAnyProgress(
     return FALSE;
 }
 
+#if (NTDDI_VERSION == NTDDI_WINXP)
 VOID
 NTAPI
 WdDdiWatchdogDpcCallback(
@@ -247,6 +248,7 @@ WdDdiWatchdogDpcCallback(
 {
     UNIMPLEMENTED;
 }
+#endif
 
 #if (NTDDI_VERSION >= NTDDI_VISTA)
 
