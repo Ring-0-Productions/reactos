@@ -7,7 +7,7 @@
 @ stdcall WdAllocateWatchdog(ptr ptr long)
 @ stdcall -version=0x502+ WdAttachContext(ptr long)
 @ stdcall WdCompleteEvent(ptr ptr)
-@ stdcall WdDdiWatchdogDpcCallback(ptr ptr ptr ptr)
+@ stdcall -version=0x501 WdDdiWatchdogDpcCallback(ptr ptr ptr ptr)
 @ stdcall WdDereferenceObject(ptr)
 @ stdcall -version=0x502+ WdDetachContext(ptr)
 @ stdcall WdFreeDeferredWatchdog(ptr)
