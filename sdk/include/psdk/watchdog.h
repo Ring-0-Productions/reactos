@@ -8,10 +8,10 @@
 #define _WATCHDOG_H_
 
 #if (NTDDI_VERSION >= NTDDI_VISTA)
-#include <Ntddvdeo.h>
+#include <ntddvdeo.h>
 #endif
 
-/* 
+/*
 	The internal structure is not exposed by the public api
 */
 typedef struct _WATCHDOG WATCHDOG;
@@ -99,7 +99,7 @@ WdResetDeferredWatch(
 /**
  * Attempts to resume the deferred watchdog
  * @param[in] Watchdog Watchdog to resume
- * @param[in] ResetSuspensionCount If this variable is set to TRUE, then the suspension counts of the 
+ * @param[in] ResetSuspensionCount If this variable is set to TRUE, then the suspension counts of the
  * 	watchdog will be set to 0
  * @note Resetting the suspension count DOES NOT resume the deferred watchdog
 */
@@ -131,7 +131,7 @@ NTAPI
 WdAllocateDeferredWatchdog(
 	_In_ PDEVICE_OBJECT DeviceObject,
 	_In_ UINT32 Type,
-	_In_ ULONG AllocationTag 
+	_In_ ULONG AllocationTag
 );
 
 /**
@@ -146,7 +146,7 @@ NTAPI
 WdAllocateWatchdog(
 	_In_ PDEVICE_OBJECT DeviceObject,
 	_In_ UINT32 Type,
-	_In_ ULONG AllocationTag 
+	_In_ ULONG AllocationTag
 );
 
 /**
@@ -279,7 +279,7 @@ WdResetWatch(
 /**
  * Attempts to resume the watchdog
  * @param[in] Watchdog Watchdog to resume
- * @param[in] CheckForResumeCount If this is set to TRUE, the suspension count is 
+ * @param[in] CheckForResumeCount If this is set to TRUE, the suspension count is
  *  decremented and will be checked before resuming the watchdog
  * @note Setting CheckForResumeCount to FALSE will forcefully resume the watchdog
 */
@@ -328,7 +328,7 @@ WdStopDeferredWatch(
 /**
  * Attempts to stop the watchdog
  * @param[in] Watchdog Watchdog to stop
- * @param[in] CheckForStartCount If this is set to TRUE, the start count is 
+ * @param[in] CheckForStartCount If this is set to TRUE, the start count is
  *  decremented and will be checked before stopping the watchdog
  * @note Setting CheckForStartCount to FALSE will forcefully stop the watchdog
 */
@@ -386,17 +386,17 @@ enum WATCHDOG_SESSION_CHANGE_TYPE
 	 Registers the current process
 	*/
 	WATCHDOG_SESSION_OPEN = 0,
-	
+
 	/**
 	 Unregister the current process
 	*/
 	WATCHDOG_SESSION_CLOSE = 1,
-	
+
 	/**
 	 Similar to close but it doesn't try to unregister the process
 	*/
 	WACTHDOG_SESSION_RUNDOWN = 2,
-	
+
 	/**
 	 Sets the current session process as the one used during SwithConsole callouts
 	*/
@@ -404,14 +404,14 @@ enum WATCHDOG_SESSION_CHANGE_TYPE
 
 	/**
 	* Unsets the previously setted session id
-	*/	
+	*/
 	WATCHDOG_SESSION_UNSET_CONSOLESESSIONID = 4,
 #else
 	/**
 	 Unregister the current process
 	*/
 	WATCHDOG_SESSION_CLOSE = 0,
-	
+
 	/**
 	 Registers the current process
 	*/
@@ -424,7 +424,7 @@ enum WATCHDOG_SESSION_CHANGE_TYPE
 /** When this flag is passed, the execution simply fails. Unsure what it used to be. */
 #define WATCHDOG_GDI_CALLOUT_NO_EXECUTION				0x300000000U
 
-/** 
+/**
    Executes the callout for all processes that matches the Console ID callout
    @note The stored session ID are used only if the callee current active console Id is -1 (not active)
  */
