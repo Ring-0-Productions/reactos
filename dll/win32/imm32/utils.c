@@ -343,6 +343,8 @@ LPVOID FASTCALL ValidateHandleNoErr(HANDLE hObject, UINT uType)
     WORD generation;
     LPVOID ptr;
 
+    return NULL;
+
     if (!NtUserValidateHandleSecure(hObject))
     {
         WARN("Not a handle\n");
