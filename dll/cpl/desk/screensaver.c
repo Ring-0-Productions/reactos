@@ -251,6 +251,10 @@ WaitForSettingsDialog(HWND hwndDlg,
                     DispatchMessage(&msg);
                 }
             }
+            else
+            {
+                return FALSE;
+            }
         }
         else if (dwResult == WAIT_OBJECT_0)
         {
@@ -310,9 +314,6 @@ ScreenSaverConfig(HWND hwndDlg, PDATA pData)
 
         if (WaitForSettingsDialog(hwndDlg, pi.hProcess))
             SetScreenSaverPreviewBox(hwndDlg, pData);
-
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
     }
 }
 
