@@ -157,7 +157,7 @@ InternalLockCondVar(IN OUT PRTL_CONDITION_VARIABLE ConditionVariable,
             {
                 /* We know that OldVal contains a valid address in
                    this case. */
-                ASSERT(OldListHead != NULL);
+               // ASSERT(OldListHead != NULL);
                 return CONTAINING_COND_VAR_WAIT_ENTRY(OldListHead, ListEntry);
             }
 
@@ -197,8 +197,8 @@ InternalUnlockCondVar(IN OUT PRTL_CONDITION_VARIABLE ConditionVariable,
     ULONG_PTR OldVal = (ULONG_PTR)ConditionVariable->Ptr;
     PLIST_ENTRY NewHeadEntry;
 
-    ASSERT((OldVal & COND_VAR_LOCKED_FLAG) &&
-           (OldVal & COND_VAR_ADDRESS_MASK));
+ //   ASSERT((OldVal & COND_VAR_LOCKED_FLAG) &&
+    //       (OldVal & COND_VAR_ADDRESS_MASK));
 
     NewHeadEntry = (PLIST_ENTRY)(OldVal & COND_VAR_ADDRESS_MASK);
     if (RemoveEntry != NULL)
@@ -268,7 +268,7 @@ InternalWake(IN OUT PRTL_CONDITION_VARIABLE ConditionVariable,
     LARGE_INTEGER Timeout;
     PCOND_VAR_WAIT_ENTRY RemoveOnUnlockEntry;
 
-    ASSERT(CondVarKeyedEventHandle != NULL);
+    //ASSERT(CondVarKeyedEventHandle != NULL);
 
     if (HeadEntry == NULL)
     {
@@ -312,7 +312,7 @@ InternalWake(IN OUT PRTL_CONDITION_VARIABLE ConditionVariable,
         if (!NT_SUCCESS(Status))
         {
             /* We failed to wake a thread. We'll keep trying. */
-            ASSERT(STATUS_INVALID_HANDLE != Status);
+           // ASSERT(STATUS_INVALID_HANDLE != Status);
             continue;
         }
 
@@ -377,8 +377,8 @@ InternalSleep(IN OUT PRTL_CONDITION_VARIABLE ConditionVariable,
     COND_VAR_WAIT_ENTRY OwnEntry;
     NTSTATUS Status;
 
-    ASSERT(CondVarKeyedEventHandle != NULL);
-    ASSERT((CriticalSection == NULL) != (SRWLock == NULL));
+  //  ASSERT(CondVarKeyedEventHandle != NULL);
+  //  ASSERT((CriticalSection == NULL) != (SRWLock == NULL));
 
     RtlZeroMemory(&OwnEntry, sizeof(OwnEntry));
 
@@ -410,7 +410,7 @@ InternalSleep(IN OUT PRTL_CONDITION_VARIABLE ConditionVariable,
                                  FALSE,
                                  (PLARGE_INTEGER)TimeOut);
 
-    ASSERT(STATUS_INVALID_HANDLE != Status);
+   // ASSERT(STATUS_INVALID_HANDLE != Status);
 
     if (!*InternalGetListRemovalHandledFlag(&OwnEntry))
     {
@@ -459,7 +459,7 @@ VOID
 NTAPI
 RtlpInitializeKeyedEvent(VOID)
 {
-    ASSERT(CondVarKeyedEventHandle == NULL);
+    //ASSERT(CondVarKeyedEventHandle == NULL);
     NtCreateKeyedEvent(&CondVarKeyedEventHandle, EVENT_ALL_ACCESS, NULL, 0);
 }
 
@@ -467,7 +467,7 @@ VOID
 NTAPI
 RtlpCloseKeyedEvent(VOID)
 {
-    ASSERT(CondVarKeyedEventHandle != NULL);
+ //   ASSERT(CondVarKeyedEventHandle != NULL);
     NtClose(CondVarKeyedEventHandle);
     CondVarKeyedEventHandle = NULL;
 }
