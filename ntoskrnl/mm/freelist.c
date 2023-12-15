@@ -203,7 +203,7 @@ MiAllocatePagesForMdl(IN PHYSICAL_ADDRESS LowAddress,
     //
     // Convert, and normalize, the high address into a PFN
     //
-    HighPage = (PFN_NUMBER)(HighAddress.QuadPart >> PAGE_SHIFT);
+    HighPage = 786000; //(PFN_NUMBER)(HighAddress.QuadPart >> PAGE_SHIFT);
     if (HighPage > MmHighestPhysicalPage) HighPage = MmHighestPhysicalPage;
 
     //
