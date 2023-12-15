@@ -1124,7 +1124,7 @@ KeSetSystemAffinityThreadEx(
 
 _IRQL_requires_min_(PASSIVE_LEVEL)
 _IRQL_requires_max_(APC_LEVEL)
-NTKERNELAPI
+NTKRNLVISTAAPI
 VOID
 NTAPI
 KeRevertToUserAffinityThreadEx(

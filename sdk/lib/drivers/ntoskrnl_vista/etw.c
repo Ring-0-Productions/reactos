@@ -9,6 +9,21 @@
 #include <ntifs.h>
 #include <debug.h>
 
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+NtTraceControl(
+    ULONG FunctionCode,
+    _In_opt_ PVOID InBuffer,
+    _In_opt_ ULONG InBufferLen,
+    _Out_opt_ PVOID OutBuffer,
+    _Out_opt_ ULONG OutBufferLen,
+    _Out_ ULONG *ReturnSize)
+{
+	UNIMPLEMENTED;
+	return STATUS_NOT_IMPLEMENTED;
+}
+
 NTSTATUS
 NTKRNLVISTAAPI
 NTAPI

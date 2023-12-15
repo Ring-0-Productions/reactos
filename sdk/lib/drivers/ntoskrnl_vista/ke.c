@@ -30,6 +30,15 @@ KeQueryActiveProcessorCount(OUT PKAFFINITY ActiveProcessors OPTIONAL)
 NTKRNLVISTAAPI
 ULONG
 NTAPI
+KeQueryMaximumProcessorCount()
+{
+    UNIMPLEMENTED;
+	return 1;
+}
+
+NTKRNLVISTAAPI
+ULONG
+NTAPI
 KeQueryMaximumProcessorCountEx(_In_ USHORT GroupNumber)
 {
     UNIMPLEMENTED;
@@ -166,6 +175,19 @@ KeSetCoalescableTimer(
     return KeSetTimerEx(Timer, DueTime, Period, Dpc);
 }
 
+KAFFINITY
+KeSetSystemAffinityThreadEx(
+    _In_ KAFFINITY Affinity
+)
+{
+#if 0
+    PKTHREAD CurrentThread = KeGetCurrentThread();
+    KAFFINITY PreviousAffinityCurrentThread->Affinity;
+#endif
+	KeSetSystemAffinityThread(Affinity);
+	return 0; //PreviousAffinity;
+}
+
 NTKRNLVISTAAPI
 NTSTATUS
 NTAPI
@@ -178,4 +200,17 @@ KeSetTargetProcessorDpcEx(
 
     KeSetTargetProcessorDpc(Dpc, ProcNumber->Number);
     return STATUS_SUCCESS;
+}
+
+_IRQL_requires_min_(PASSIVE_LEVEL)
+_IRQL_requires_max_(APC_LEVEL)
+NTKRNLVISTAAPI
+VOID
+NTAPI
+KeRevertToUserAffinityThreadEx(
+    _In_ KAFFINITY Affinity
+)
+{
+	UNIMPLEMENTED;
+    KeRevertToUserAffinityThread();
 }

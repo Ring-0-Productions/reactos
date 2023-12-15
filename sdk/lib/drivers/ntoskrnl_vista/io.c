@@ -10,6 +10,14 @@
 #include <ntifs.h>
 #include <debug.h>
 
+typedef struct _IO_WORKITEM
+{
+    WORK_QUEUE_ITEM Item;
+    PDEVICE_OBJECT DeviceObject;
+    PIO_WORKITEM_ROUTINE WorkerRoutine;
+    PVOID Context;
+} IO_WORKITEM;
+
 typedef struct _EX_WORKITEM_CONTEXT
 {
     PIO_WORKITEM WorkItem;
@@ -25,6 +33,11 @@ NTAPI
 IopSynchronousCompletion(IN PDEVICE_OBJECT DeviceObject,
                          IN PIRP Irp,
                          IN PVOID Context);
+
+extern
+VOID
+NTAPI
+IopWorkItemCallback(IN PVOID Parameter);
 
 NTKRNLVISTAAPI
 NTSTATUS
@@ -83,6 +96,34 @@ IoQueueWorkItemEx(
     newContext->Context = Context;
 
     IoQueueWorkItem(IoWorkItem, IopWorkItemExCallback, QueueType, newContext);
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoInitializeWorkItem(
+    _In_ PVOID IoObject,
+    _In_ PIO_WORKITEM IoWorkItem)
+{
+    /* Initialize it */
+    IoWorkItem->DeviceObject = IoObject;
+    ExInitializeWorkItem(&IoWorkItem->Item, IopWorkItemCallback, IoWorkItem);
+}
+
+NTKRNLVISTAAPI
+ULONG
+NTAPI
+IoSizeofWorkItem()
+{
+	return sizeof(IO_WORKITEM);
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoUninitializeWorkItem(_In_ PIO_WORKITEM IoWorkItem)
+{
+    UNIMPLEMENTED;
 }
 
 NTSTATUS
