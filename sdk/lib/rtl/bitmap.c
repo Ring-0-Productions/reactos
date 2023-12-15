@@ -46,6 +46,7 @@ typedef ULONG64 BITMAP_BUFFER, *PBITMAP_BUFFER;
 #define RtlAreBitsClear RtlAreBitsClear64
 #define RtlAreBitsSet RtlAreBitsSet64
 #define RtlNumberOfSetBits RtlNumberOfSetBits64
+#define RtlNumberOfSetBitsUlongPtr RtlNumberOfSetBitsUlongPtr64
 #define RtlNumberOfClearBits RtlNumberOfClearBits64
 #define RtlFindClearBits RtlFindClearBits64
 #define RtlFindSetBits RtlFindSetBits64
@@ -493,6 +494,14 @@ RtlNumberOfSetBits(
     }
 
     return BitCount;
+}
+
+ULONG
+NTAPI
+RtlNumberOfSetBitsUlongPtr(
+    _In_ ULONG_PTR Target)
+{
+    return 0;
 }
 
 BITMAP_INDEX

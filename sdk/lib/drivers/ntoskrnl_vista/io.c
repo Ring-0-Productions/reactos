@@ -10,6 +10,14 @@
 #include <ntifs.h>
 #include <debug.h>
 
+typedef struct _IO_WORKITEM
+{
+    WORK_QUEUE_ITEM Item;
+    PDEVICE_OBJECT DeviceObject;
+    PIO_WORKITEM_ROUTINE WorkerRoutine;
+    PVOID Context;
+} IO_WORKITEM;
+
 typedef struct _EX_WORKITEM_CONTEXT
 {
     PIO_WORKITEM WorkItem;
@@ -30,6 +38,11 @@ IopSynchronousCompletionLoc(IN PDEVICE_OBJECT DeviceObject,
         KeSetEvent((PKEVENT)Context, IO_NO_INCREMENT, FALSE);
     return STATUS_MORE_PROCESSING_REQUIRED;
 }
+
+extern
+VOID
+NTAPI
+IopWorkItemCallback(IN PVOID Parameter);
 
 NTKRNLVISTAAPI
 NTSTATUS
@@ -52,17 +65,6 @@ IoSizeofWorkItem()
 NTKRNLVISTAAPI
 VOID NTAPI
 IoUninitializeWorkItem(_In_ PIO_WORKITEM IoWorkItem)
-{
-    UNIMPLEMENTED;
-    __debugbreak();
-}
-
-NTKRNLVISTAAPI
-VOID NTAPI
-IoInitializeWorkItem(
-  _In_ PVOID        IoObject,
-  _In_ PIO_WORKITEM IoWorkItem
-)
 {
     UNIMPLEMENTED;
     __debugbreak();
@@ -138,6 +140,68 @@ IoQueueWorkItemEx(
     newContext->Context = Context;
 
     IoQueueWorkItem(IoWorkItem, IopWorkItemExCallback, QueueType, newContext);
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoInitializeWorkItem(
+    _In_ PVOID IoObject,
+    _In_ PIO_WORKITEM IoWorkItem)
+{
+    /* Initialize it */
+    IoWorkItem->DeviceObject = IoObject;
+    ExInitializeWorkItem(&IoWorkItem->Item, IopWorkItemCallback, IoWorkItem);
+}
+
+NTKRNLVISTAAPI
+ULONG
+NTAPI
+IoSizeofWorkItem()
+{
+	return sizeof(IO_WORKITEM);
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoUninitializeWorkItem(_In_ PIO_WORKITEM IoWorkItem)
+{
+    UNIMPLEMENTED;
+}
+
+NTSTATUS
+NTAPI
+IoAllocateSfioStreamIdentifier(
+  _In_ PFILE_OBJECT FileObject,
+  _In_ ULONG Length,
+  _In_ PVOID Signature,
+  _Out_ PVOID *StreamIdentifier)
+{
+    UNIMPLEMENTED;
+    *StreamIdentifier = NULL;
+    return STATUS_SUCCESS;
+}
+
+
+PVOID
+NTAPI
+IoGetSfioStreamIdentifier(
+    _In_ PFILE_OBJECT FileObject,
+    _In_ PVOID Signature)
+{
+    UNIMPLEMENTED;
+    return NULL;
+}
+
+NTSTATUS
+NTAPI
+IoFreeSfioStreamIdentifier(
+    _In_ PFILE_OBJECT FileObject,
+    _In_ PVOID Signature)
+{
+    UNIMPLEMENTED;
+    return STATUS_SUCCESS;
 }
 
 NTKRNLVISTAAPI

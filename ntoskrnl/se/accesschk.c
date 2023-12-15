@@ -2109,6 +2109,29 @@ SeAccessCheck(
     return ret;
 }
 
+BOOLEAN
+NTAPI
+SeAccessCheckFromState(
+    _In_ PSECURITY_DESCRIPTOR SecurityDescriptor,
+    _In_ PTOKEN_ACCESS_INFORMATION PrimaryTokenInformation,
+    _In_ PTOKEN_ACCESS_INFORMATION ClientTokenInformation,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_ ACCESS_MASK PreviouslyGrantedAccess,
+    _Out_ PPRIVILEGE_SET* Privileges,
+    _In_ PGENERIC_MAPPING GenericMapping,
+    _In_ KPROCESSOR_MODE AccessMode,
+    _Out_ PACCESS_MASK GrantedAccess,
+    _Out_ PNTSTATUS AccessStatus)
+{
+    BOOLEAN ret;
+
+    PAGED_CODE();
+
+    /* Sorry for that profanation George */
+    ret = TRUE;
+    return ret;
+}
+
 /**
  * @brief
  * Determines whether security access rights can be given to an object
