@@ -2,3 +2,4 @@
 @ stdcall -stub -version=0x600+ AvSetMmThreadCharacteristicsW(ptr ptr)
 @ stdcall -stub -version=0x600+ AvRevertMMThreadCharacteristics(ptr ptr)
 @ stdcall -stub -version=0x600+ AvRevertMmThreadCharacteristics(ptr)
+@ stdcall -stub -version=0x600+ AvSetMmThreadPriority(ptr long)
