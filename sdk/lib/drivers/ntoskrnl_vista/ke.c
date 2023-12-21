@@ -48,6 +48,23 @@ KeQueryDpcWatchdogInformation(
     return STATUS_UNSUCCESSFUL;
 }
 
+#if 0
+NTKRNLVISTAAPI
+VOID
+NTAPI
+KeRevertToUserAffinityThreadEx(_In_ KAFFINITY Affinity)
+{
+    UNIMPLEMENTED;
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+KeSetSystemAffinityThreadEx(_In_ KAFFINITY Affinity)
+{
+    UNIMPLEMENTED;
+}
+#endif
 
 NTKRNLVISTAAPI
 KAFFINITY

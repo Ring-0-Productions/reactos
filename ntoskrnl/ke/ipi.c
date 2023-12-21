@@ -18,6 +18,15 @@ extern KSPIN_LOCK KiReverseStallIpiLock;
 
 /* PRIVATE FUNCTIONS *********************************************************/
 
+VOID
+FASTCALL
+KeInvalidateRangeAllCaches(
+  _In_ PVOID BaseAddress,
+  _In_ ULONG Length)
+{
+    UNIMPLEMENTED;
+    __debugbreak();
+}
 #ifndef _M_AMD64
 
 VOID
