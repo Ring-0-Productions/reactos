@@ -707,3 +707,5 @@
 @ stdcall -version=0x600+ RegLoadMUIStringA(ptr str str long ptr long str)
 @ stdcall -version=0x600+ RegDeleteTreeA(long str)
 @ stdcall -version=0x600+ RegDeleteTreeW(long wstr)
+
+@ stub -version=0x600+ CheckAppInitBlockedServiceIdentity
