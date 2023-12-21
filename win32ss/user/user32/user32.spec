@@ -275,6 +275,7 @@
 272 stdcall GetDCEx(long long long) NtUserGetDCEx
 # GetDbgTagFlags
 274 stdcall GetDesktopWindow()
+@ stdcall -version=0x600+ GetDpiForWindow(ptr)
 275 stdcall GetDialogBaseUnits()
 276 stdcall GetDlgCtrlID(long)
 277 stdcall GetDlgItem(long long)
@@ -388,8 +389,10 @@
 383 stdcall GetWindowTextW(long ptr long)
 384 stdcall GetWindowThreadProcessId(long ptr)
 385 stdcall GetWindowWord(long long)
+@ stdcall -version=0x600+ GhostWindowFromHungWindow(ptr)
 386 stdcall GrayStringA(long long ptr long long long long long long)
 387 stdcall GrayStringW(long long ptr long long long long long long)
+@ stdcall -version=0x600+ HungWindowFromGhostWindow(ptr)
 388 stdcall HideCaret(long) NtUserHideCaret
 389 stdcall HiliteMenuItem(long long long long) NtUserHiliteMenuItem
 390 stdcall IMPGetIMEA(long ptr)
@@ -432,9 +435,11 @@
 427 stdcall IsIconic(long)
 428 stdcall IsMenu(long)
 429 stdcall -stub IsProcess16Bit()
+@ stdcall -version=0x600+ IsProcessDPIAware()
 430 stdcall IsRectEmpty(ptr)
 431 stdcall IsSETEnabled()
 432 stdcall IsServerSideWindow(long)
+@ stdcall -version=0x600+ IsThreadDesktopComposited()
 433 stdcall IsWinEventHookInstalled(long)
 434 stdcall IsWindow(long)
 435 stdcall IsWindowEnabled(long)
@@ -628,6 +633,7 @@
 621 stdcall SetMessageQueue(long)
 622 stdcall SetParent(long long) NtUserSetParent
 623 stdcall SetProcessDefaultLayout(long)
+@ stdcall -version=0x600+ SetProcessDPIAware()
 624 stdcall SetProcessWindowStation(long) NtUserSetProcessWindowStation
 625 stdcall SetProgmanWindow (long)
 626 stdcall SetPropA(long str long)
@@ -675,6 +681,7 @@
 666 stdcall ShowStartGlass(long)
 667 stdcall ShowWindow(long long) NtUserShowWindow
 668 stdcall ShowWindowAsync(long long) NtUserShowWindowAsync
+@ stdcall -version=0x600+ ShutdownBlockReasonCreate(ptr wstr)
 669 stdcall SoftModalMessageBox(ptr)
 670 stdcall SubtractRect(ptr ptr ptr)
 671 stdcall SwapMouseButton(long)
