@@ -43,6 +43,32 @@ IoCreateArcName(
 }
 
 NTKRNLVISTAAPI
+ULONG NTAPI
+IoSizeofWorkItem()
+{
+    return 0;
+}
+
+NTKRNLVISTAAPI
+VOID NTAPI
+IoUninitializeWorkItem(_In_ PIO_WORKITEM IoWorkItem)
+{
+    UNIMPLEMENTED;
+    __debugbreak();
+}
+
+NTKRNLVISTAAPI
+VOID NTAPI
+IoInitializeWorkItem(
+  _In_ PVOID        IoObject,
+  _In_ PIO_WORKITEM IoWorkItem
+)
+{
+    UNIMPLEMENTED;
+    __debugbreak();
+}
+
+NTKRNLVISTAAPI
 NTSTATUS
 NTAPI
 IoGetActivityIdIrp(
