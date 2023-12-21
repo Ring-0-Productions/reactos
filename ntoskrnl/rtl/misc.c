@@ -222,4 +222,33 @@ RtlPrefetchMemoryNonTemporal(IN PVOID Source,
 }
 #endif
 
+NTSTATUS
+NTAPI
+RtlQueryElevationFlags(DWORD* pFlags)
+{
+    UNIMPLEMENTED;
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+BOOLEAN
+NTAPI
+RtlGetIntegerAtom(_In_ PWSTR AtomName,
+                  _Out_opt_ PUSHORT IntegerAtom)
+{
+    UNIMPLEMENTED;
+    return FALSE;
+}
+
+NTSTATUS
+NTAPI
+NtQueryLicenseValue(PUNICODE_STRING Name,
+                    ULONG *Type,
+                    PVOID Buffer,
+                    ULONG Length,
+                    ULONG *DataLength)
+{
+    UNIMPLEMENTED;
+    return STATUS_NOT_IMPLEMENTED;
+}
+
 /* EOF */
