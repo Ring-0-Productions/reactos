@@ -13,3 +13,13 @@ UINT WINAPI GetDpiForWindow(HWND hWnd)
     UNREFERENCED_PARAMETER(hWnd);
     return USER_DEFAULT_SCREEN_DPI;
 }
+
+BOOL WINAPI IsProcessDPIAware()
+{
+    return FALSE;
+}
+
+BOOL WINAPI SetProcessDPIAware()
+{
+    return FALSE;
+}
