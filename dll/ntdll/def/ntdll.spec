@@ -71,6 +71,7 @@
 @ stdcall -stub -version=0x600+ EtwEventActivityIdControl(long ptr)
 @ stdcall -stub -version=0x600+ EtwEventEnabled(int64 ptr)
 @ stdcall -stub -version=0x600+ EtwEventProviderEnabled(long long long)
+@ stdcall -stub -version=0x600+ EtwEventRegister(ptr ptr ptr ptr)
 @ stdcall -version=0x600+ EtwRegister(ptr ptr ptr ptr)
 @ stdcall -version=0x600+ EtwUnregister(int64)
 @ stdcall -version=0x600+ EtwWrite(int64 ptr ptr long ptr)
