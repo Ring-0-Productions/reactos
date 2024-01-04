@@ -7,6 +7,7 @@ if(CMAKE_CROSSCOMPILING)
 
 add_subdirectory(3rdparty)
 add_subdirectory(cicero)
+add_subdirectory(apisets)
 add_subdirectory(comsupp)
 add_subdirectory(conutils)
 add_subdirectory(cportlib)
