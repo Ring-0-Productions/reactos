@@ -346,7 +346,7 @@
 @ stdcall GenerateConsoleCtrlEvent(long long)
 @ stdcall GetACP()
 @ stdcall -version=0x600+ GetApplicationRecoveryCallback(ptr ptr ptr ptr ptr)
-@ stub -version=0x600+ GetApplicationRestartSettings
+@ stdcall -version=0x600+ GetApplicationRestartSettings(ptr wstr ptr ptr)
 @ stdcall GetAtomNameA(long ptr long)
 @ stdcall GetAtomNameW(long ptr long)
 @ stdcall GetBinaryType(str ptr) GetBinaryTypeA
@@ -1180,17 +1180,17 @@
 @ stdcall WaitNamedPipeW(wstr long)
 @ stdcall -version=0x600+ WakeAllConditionVariable(ptr) ntdll.RtlWakeAllConditionVariable
 @ stdcall -version=0x600+ WakeConditionVariable(ptr) ntdll.RtlWakeConditionVariable
-@ stub -version=0x600+ WerGetFlags
-@ stub -version=0x600+ WerRegisterFile
-@ stub -version=0x600+ WerRegisterMemoryBlock
-@ stub -version=0x600+ WerSetFlags
-@ stub -version=0x600+ WerUnregisterFile
-@ stub -version=0x600+ WerUnregisterMemoryBlock
+@ stdcall -version=0x600+ WerGetFlags(ptr ptr)
+@ stdcall -version=0x600+ WerRegisterFile(ptr long long)
+@ stdcall -version=0x600+ WerRegisterMemoryBlock(ptr long)
+@ stdcall -version=0x600+ WerSetFlags(long)
+@ stdcall -version=0x600+ WerUnregisterFile(wstr)
+@ stdcall -version=0x600+ WerUnregisterMemoryBlock(ptr)
 @ stub -version=0x600+ WerpCleanupMessageMapping
 @ stub -version=0x600+ WerpInitiateRemoteRecovery
-@ stub -version=0x600+ WerpNotifyLoadStringResource
+@ stdcall -version=0x600+ WerpNotifyLoadStringResource(ptr wstr ptr long)
 @ stub -version=0x600+ WerpNotifyLoadStringResourceEx
-@ stub -version=0x600+ WerpNotifyUseStringResource
+@ stdcall -version=0x600+ WerpNotifyUseStringResource(ptr)
 @ stub -version=0x600+ WerpStringLookup
 @ stdcall WideCharToMultiByte(long long wstr long ptr long ptr ptr)
 @ stdcall WinExec(str long)
@@ -1355,8 +1355,8 @@
 @ stdcall -stub -version=0x601+ -arch=i386,x86_64 SetXStateFeaturesMask(ptr int64)
 @ stdcall -stub -version=0x601+ SystemTimeToTzSpecificLocalTimeEx(ptr ptr ptr)
 @ stdcall -stub -version=0x601+ TzSpecificLocalTimeToSystemTimeEx(ptr ptr ptr)
-@ stdcall -stub -version=0x601+ WerRegisterRuntimeExceptionModule(wstr ptr)
-@ stdcall -stub -version=0x601+ WerUnregisterRuntimeExceptionModule(wstr ptr)
+@ stdcall -version=0x601+ WerRegisterRuntimeExceptionModule(wstr ptr)
+@ stdcall -version=0x601+ WerUnregisterRuntimeExceptionModule(wstr ptr)
 @ stdcall -stub -version=0x601+ Wow64GetThreadSelectorEntry(ptr long ptr)
 @ stdcall -stub -version=0x601+ -arch=x86_64 UmsThreadYield(ptr)
 @ stdcall -stub -version=0x601+ -arch=i386,x86_64 InitializeContext(ptr long ptr ptr)

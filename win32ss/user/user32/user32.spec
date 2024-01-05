@@ -762,3 +762,21 @@
 @ stdcall -stub -version=0x600+ ShutdownBlockReasonDestroy(ptr)
 @ stub -version=0x600+ PaintMonitor
 @ stub IsWindowRedirectedForPrint
+
+; More vista:
+@ stdcall -version=0x600+ CheckDesktopByThreadId(ptr)
+@ stdcall -version=0x600+ DwmStartRedirection(ptr)
+@ stdcall -version=0x600+ DwmStopRedirection()
+@ stdcall -version=0x600+ InternalGetWindowIcon(ptr long)
+@ stdcall -version=0x600+ LogicalToPhysicalPoint(ptr ptr)
+@ stdcall -version=0x600+ OpenThreadDesktop(long long long long)
+@ stdcall -version=0x600+ RegisterErrorReportingDialog(ptr long)
+@ stdcall -version=0x600+ RegisterFrostWindow(ptr long)
+@ stdcall -version=0x600+ RegisterGhostWindow(ptr long)
+@ stdcall -version=0x600+ RegisterSessionPort( ptr ptr)
+@ stdcall -version=0x600+ UnregisterSessionPort()
+@ stdcall -version=0x600+ DwmHintDxUpdate(ptr long)
+@ stdcall -version=0x600+ GetWindowRgnEx(ptr long long)
+@ stdcall -version=0x600+ UpdateWindowTransform(ptr ptr long)
+@ stdcall -version=0x600+ SetWindowRgnEx(ptr long long)
+@ stdcall -version=0x600+ GetWindowMinimizeRect(ptr ptr)

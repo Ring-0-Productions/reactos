@@ -608,3 +608,7 @@
 608 stdcall bMakePathNameW(wstr wstr wstr long)
 609 stdcall cGetTTFFromFOT(long long long long long long long)
 610 stdcall gdiPlaySpoolStream(long long long long long long)
+
+; Vista+
+@ stdcall -version=0x600+ DwmGetDirtyRgn(long long long long long)
+@ stdcall -version=0x600+ DwmGetSurfaceData(ptr ptr)
