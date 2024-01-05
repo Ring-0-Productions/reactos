@@ -63,6 +63,16 @@ WINSTAAPI WinStationNameFromLogonIdW(PVOID A,
     UNIMPLEMENTED;
 }
 
+/* Vista *********************************************/
+
+BOOLEAN
+WINSTAAPI
+WinStationFreePropertyValue(PVOID value)
+{
+    UNIMPLEMENTED;
+	return TRUE;
+}
+
 /* EOF */
 
 
