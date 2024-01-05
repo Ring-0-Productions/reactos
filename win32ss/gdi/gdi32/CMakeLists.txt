@@ -42,6 +42,7 @@ list(APPEND SOURCE
     objects/region.c
     objects/text.c
     objects/utils.c
+    vista/dwm.c
     objects/path.c
     include/precomp.h)
 

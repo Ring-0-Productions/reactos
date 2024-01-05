@@ -10,7 +10,7 @@
  */
 
 #include <user32.h>
-
+#include <d3dtypes.h>
 WINE_DEFAULT_DEBUG_CHANNEL(user32);
 
 /*
@@ -627,3 +627,142 @@ Win32PoolAllocationStats(DWORD dw1, DWORD dw2, DWORD dw3, DWORD dw4, DWORD dw5)
     return FALSE;
 }
 
+/* VISTA+ */
+
+BOOL WINAPI GetWindowMinimizeRect (
+    HWND hwndToQuery,
+    RECT* pRect
+) 
+{
+	DbgPrint("GetWindowMinimizeRect is UNIMPLEMENTED\n");
+	return TRUE;
+}
+
+int 
+WINAPI 
+SetWindowRgnEx(HWND hWnd, HGDIOBJ hRgn, BOOL bRedraw)
+{
+  int obj = 0; // esi@1
+
+  if ( obj )
+    DeleteObject(hRgn);
+  return obj;
+}
+
+BOOL 
+WINAPI 
+UpdateWindowTransform(HWND hwnd, D3DMATRIX* pMatrix, DWORD unk) 
+{
+	DbgPrint("UpdateWindowTransform is UNIMPLEMENTED\n");
+	return TRUE;
+}
+
+int 
+WINAPI 
+GetWindowRgnEx(HWND hWnd, HGDIOBJ hRgn, BOOL bRedraw)
+{
+  int obj = 0;
+  return obj;
+}
+
+NTSTATUS WINAPI DwmHintDxUpdate(HANDLE window, DWORD option){
+	return STATUS_SUCCESS;
+}
+
+DWORD WINAPI RegisterSessionPort(HANDLE a1, HANDLE a2)
+{
+	DbgPrint("RegisterSessionPort is UNIMPLEMENTED\n"); 
+	return 0;
+}
+
+
+DWORD 
+WINAPI 
+RegisterGhostWindow(HWND a1, DWORD a2)
+{
+  UNIMPLEMENTED;
+	return 0;
+}
+
+DWORD 
+WINAPI 
+RegisterFrostWindow(HWND a1, DWORD a2)
+{
+  UNIMPLEMENTED;
+	return 0;
+}
+
+DWORD WINAPI RegisterErrorReportingDialog(HWND a1, DWORD a2)
+{
+	DbgPrint("DoSoundDisconnect is UNIMPLEMENTED. Need implement NtUserCallTwoParam");	
+	return 0;
+}
+
+HDESK WINAPI OpenThreadDesktop(DWORD desktop, BOOL verification, DWORD mask, ACCESS_MASK access)
+{
+  HDESK result;
+  PCSR_API_MESSAGE message = NULL;
+  NTSTATUS NtStatus = STATUS_SUCCESS;
+
+  CsrClientCallServer(message, 0, 197637, 8);
+  if ( NtStatus < 0 )
+  {
+    SetLastError(NtStatus);
+    result = 0;
+  }
+  else
+  {
+    result = GetThreadDesktop(desktop);
+  }
+  return result;
+}
+
+BOOL
+WINAPI
+LogicalToPhysicalPoint(_In_     HWND hWnd,
+                       _Inout_  LPPOINT lpPoint)
+{
+	DbgPrint("LogicalToPhysicalPoint is UNIMPLEMENTED\n");  
+	lpPoint->x = 0;
+	lpPoint->y = 0;
+	return TRUE;
+}
+
+
+INT WINAPI InternalGetWindowIcon(HWND hWnd, UINT iconType )
+{
+    return 0;
+}
+
+BOOL
+WINAPI
+CheckDesktopByThreadId(HANDLE desktop)
+{
+	DbgPrint("CheckDesktopByThreadId is UNIMPLEMENTED\n");  
+	return TRUE;
+}
+
+BOOL
+WINAPI
+UnregisterSessionPort()
+{
+	DbgPrint("UnregisterSessionPort is UNIMPLEMENTED\n");  
+	return TRUE;
+}
+
+BOOLEAN
+WINAPI
+DwmStartRedirection(HANDLE Handle)
+{
+  __debugbreak();
+  return 0;
+   // return NtUserDwmStartRedirection(Handle);
+}
+
+DWORD
+WINAPI
+DwmStopRedirection()
+{
+	DbgPrint("DwmStopRedirection is UNIMPLEMENTED\n");	
+	return 0;
+}

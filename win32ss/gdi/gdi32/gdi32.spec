@@ -611,3 +611,7 @@
 @ stdcall -stub GetFontFileInfo(ptr)
 @ stdcall -stub GetFontRealizationInfo(ptr)
 @ stdcall -stub GetFontFileData(ptr)
+
+; Vista+
+@ stdcall -version=0x600+ DwmGetDirtyRgn(long long long long long)
+@ stdcall -version=0x600+ DwmGetSurfaceData(ptr ptr)
