@@ -1,5 +1,23 @@
 #include "driver.h"
 
+#undef _InterlockedAdd
+#define _InterlockedAdd _InlineInterlockedAdd
+FORCEINLINE
+LONG
+_InlineInterlockedAdd(
+    _Inout_ _Interlocked_operand_ volatile LONG *Target,
+    _In_ LONG Value)
+{
+    LONG Old, Prev, New;
+    for (Old = *Target; ; Old = Prev)
+    {
+        New = Old + Value;
+        Prev = _InterlockedCompareExchange(Target, New, Old);
+        if (Prev == Old)
+            return New;
+    }
+}
+
 //New
 NTSTATUS ResetHDAController(PFDO_CONTEXT fdoCtx, BOOLEAN wakeup) {
 	UINT32 gctl;

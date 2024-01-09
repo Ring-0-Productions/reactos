@@ -192,6 +192,7 @@ Fdo_Initialize(
 }
 
 NTSTATUS
+STDCALL
 Fdo_EvtDevicePrepareHardware(
     _In_ WDFDEVICE Device,
     _In_ WDFCMRESLIST ResourcesRaw,
@@ -458,6 +459,7 @@ Fdo_EvtDevicePrepareHardware(
 }
 
 NTSTATUS
+STDCALL
 Fdo_EvtDeviceReleaseHardware(
     _In_ WDFDEVICE Device,
     _In_ WDFCMRESLIST ResourcesTranslated
@@ -471,7 +473,7 @@ Fdo_EvtDeviceReleaseHardware(
 
     SklHdAudBusPrint(DEBUG_LEVEL_INFO, DBG_INIT,
         "%s\n", __func__);
-
+#if 0
     if (fdoCtx->GraphicsDevicesCollection) {
         for (ULONG i = 0; i < WdfCollectionGetCount(fdoCtx->GraphicsDevicesCollection); i++) {
             WDFIOTARGET ioTarget = (WDFIOTARGET)WdfCollectionGetItem(fdoCtx->GraphicsDevicesCollection, i);
@@ -485,7 +487,7 @@ Fdo_EvtDeviceReleaseHardware(
             }
         }
     }
-
+#endif
     if (fdoCtx->GraphicsNotificationHandle) {
         IoUnregisterPlugPlayNotification(fdoCtx->GraphicsNotificationHandle);
     }
@@ -524,6 +526,7 @@ Fdo_EvtDeviceReleaseHardware(
 #define ENABLE_HDA 1
 
 NTSTATUS
+STDCALL
 Fdo_EvtDeviceD0Entry(
     _In_ WDFDEVICE Device,
     _In_ WDF_POWER_DEVICE_STATE PreviousState
@@ -580,6 +583,7 @@ Fdo_EvtDeviceD0Entry(
 }
 
 NTSTATUS
+STDCALL
 Fdo_EvtDeviceD0EntryPostInterrupts(
     _In_ WDFDEVICE Device,
     _In_ WDF_POWER_DEVICE_STATE PreviousState
@@ -617,6 +621,7 @@ Fdo_EvtDeviceD0EntryPostInterrupts(
 }
 
 NTSTATUS
+STDCALL
 Fdo_EvtDeviceD0Exit(
     _In_ WDFDEVICE Device,
     _In_ WDF_POWER_DEVICE_STATE TargetState
@@ -733,6 +738,7 @@ Fdo_EnumerateCodec(
 }
 
 NTSTATUS
+STDCALL
 Fdo_EvtDeviceSelfManagedIoInit(
     _In_ WDFDEVICE Device
 )

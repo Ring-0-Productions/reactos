@@ -317,7 +317,7 @@ _InlineInterlockedExchange64(
             return Prev;
     }
 }
-
+#if 0
 #undef _InterlockedAdd
 #define _InterlockedAdd _InlineInterlockedAdd
 FORCEINLINE
@@ -335,6 +335,7 @@ _InlineInterlockedAdd(
             return New;
     }
 }
+#endif
 
 #undef _InterlockedAdd64
 #define _InterlockedAdd64 _InlineInterlockedAdd64
