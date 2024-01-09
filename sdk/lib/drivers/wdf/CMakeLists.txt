@@ -216,7 +216,7 @@ target_include_directories(wdf01000
     )
 
 
-target_link_libraries(wdf01000 aux_klib usbdex ${PSEH_LIB})
+target_link_libraries(wdf01000 aux_klib ntoskrnl_vista usbdex ${PSEH_LIB})
 add_importlibs(wdf01000 wdfldr ntoskrnl hal)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
