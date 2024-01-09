@@ -45,7 +45,6 @@ EtwWriteTransfer(
     _In_ ULONG UserDataCount,
     _In_reads_opt_(UserDataCount) PEVENT_DATA_DESCRIPTOR UserData)
 {
-    UNIMPLEMENTED;
     return STATUS_NOT_IMPLEMENTED;
 }
 

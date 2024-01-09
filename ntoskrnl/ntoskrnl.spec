@@ -32,6 +32,7 @@
 @ stdcall CcSetBcbOwnerPointer(ptr ptr)
 @ stdcall CcSetDirtyPageThreshold(ptr long)
 @ stdcall CcSetDirtyPinnedData(ptr ptr)
+@ stdcall KeGetCurrentIrql()
 @ stdcall CcSetFileSizes(ptr ptr)
 @ stdcall CcSetLogHandleForFile(ptr ptr ptr)
 @ stdcall CcSetReadAheadGranularity(ptr long)
@@ -162,7 +163,7 @@
 @ fastcall ExRundownCompletedCacheAware(ptr) ExfRundownCompletedCacheAware
 @ extern ExSemaphoreObjectType
 @ stdcall ExSetResourceOwnerPointer(ptr ptr)
-@ stdcall -version=0x600+ ExSetTimer(ptr long long ptr)
+@ stdcall -stub -version=0x600+ ExSetTimer(ptr long long ptr)
 @ stdcall ExSetTimerResolution(long long)
 @ stdcall ExSizeOfRundownProtectionCacheAware()
 @ stdcall ExSystemExceptionFilter()

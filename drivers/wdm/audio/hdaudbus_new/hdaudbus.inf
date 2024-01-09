@@ -35,9 +35,7 @@ HKR,Settings,DeviceDescription_FUNC_01,,%AUDIOFG%
 HKR,Settings,DeviceDescription_FUNC_02,,%MODEMFG%
 HKR,Settings,DeviceDescription_Default,,%UNKNOWNFG%
 HKR,Settings,DeviceLocation,,%HDAudioBUS%
-HKR,Interrupt Management,,0x00000010
-HKR,Interrupt Management\MessageSignaledInterruptProperties,,0x00000010
-HKR,Interrupt Management\MessageSignaledInterruptProperties,MSISupported,0x00010001,1
+HKR,Settings,"ConnectInterrupt",0x00010001,0
 
 ;-------------- Service installation
 [HDAudio_Device.NT.Services]

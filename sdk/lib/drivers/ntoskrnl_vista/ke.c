@@ -124,14 +124,8 @@ USHORT
 NTAPI
 KeGetCurrentNodeNumber()
 {
-    WatchdogInformation->DpcTimeLimit = 0;
-    WatchdogInformation->DpcTimeCount = 0;
-    WatchdogInformation->DpcWatchdogLimit = 0;
-    WatchdogInformation->DpcWatchdogCount = 0;
-    WatchdogInformation->Reserved = 0;
-
-    UNIMPLEMENTED_ONCE;
-    return STATUS_UNSUCCESSFUL;
+    //UNIMPLEMENTED;
+	return 0;
 }
 #if 1
 _IRQL_requires_max_(DISPATCH_LEVEL)
