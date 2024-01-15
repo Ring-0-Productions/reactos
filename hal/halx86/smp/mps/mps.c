@@ -9,7 +9,7 @@
 
 #include <hal.h>
 #include <smp.h>
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 /* GLOBALS ********************************************************************/

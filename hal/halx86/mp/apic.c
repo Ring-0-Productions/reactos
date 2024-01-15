@@ -29,7 +29,7 @@
 #include <hal.h>
 #include <halfuncs.h> /* Not in PCH because only used for MP HAL */
 #include <rtlfuncs.h> /* Not in PCH because only used for MP HAL */
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 /* GLOBALS ***********************************************************************/

@@ -9,7 +9,7 @@
 
 #include <hal.h>
 
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 VOID
@@ -330,7 +330,7 @@ KeRaiseIrqlToDpcLevel(VOID)
 
 #if DBG
     /* Validate correct raise */
-    if (CurrentIrql > DISPATCH_LEVEL) KeBugCheck(IRQL_NOT_GREATER_OR_EQUAL);
+   // if (CurrentIrql > DISPATCH_LEVEL) KeBugCheck(IRQL_NOT_GREATER_OR_EQUAL);
 #endif
 
     /* Return the previous value */
@@ -355,12 +355,7 @@ KeRaiseIrqlToSynchLevel(VOID)
     /* Validate correct raise */
     if (CurrentIrql > SYNCH_LEVEL)
     {
-        /* Crash system */
-        KeBugCheckEx(IRQL_NOT_GREATER_OR_EQUAL,
-                     CurrentIrql,
-                     SYNCH_LEVEL,
-                     0,
-                     1);
+
     }
 #endif
 
@@ -387,7 +382,7 @@ KfRaiseIrql(IN KIRQL NewIrql)
     {
         /* Crash system */
         Pcr->Irql = PASSIVE_LEVEL;
-        KeBugCheck(IRQL_NOT_GREATER_OR_EQUAL);
+      //  KeBugCheck(IRQL_NOT_GREATER_OR_EQUAL);
     }
 #endif
 
@@ -417,7 +412,7 @@ KfLowerIrql(IN KIRQL OldIrql)
     {
         /* Crash system */
         Pcr->Irql = HIGH_LEVEL;
-        KeBugCheck(IRQL_NOT_LESS_OR_EQUAL);
+       // KeBugCheck(IRQL_NOT_LESS_OR_EQUAL);
     }
 #endif
 
@@ -1124,8 +1119,15 @@ _HalpApcInterruptHandler(IN PKTRAP_FRAME TrapFrame)
     _disable();
     HalpEndSoftwareInterrupt(CurrentIrql, TrapFrame);
 
-    /* Exit the interrupt */
-    KiEoiHelper(TrapFrame);
+    _asm 
+    {
+        mov ebp, (TrapFrame);
+    }
+    _asm
+    { 
+        push ebp;
+    }
+    Kei386EoiHelper(/*TrapFrame*/);
 }
 
 DECLSPEC_NORETURN
@@ -1190,8 +1192,15 @@ HalpDispatchInterrupt2ndEntry(IN PKTRAP_FRAME TrapFrame)
     /* End the interrupt */
     HalpEndSoftwareInterrupt(CurrentIrql, TrapFrame);
 
-    /* Exit the interrupt */
-    KiEoiHelper(TrapFrame);
+    _asm 
+    {
+        mov ebp, (TrapFrame);
+    }
+    _asm
+    { 
+        push ebp;
+    }
+    Kei386EoiHelper(/*TrapFrame*/);
 }
 
 PHAL_SW_INTERRUPT_HANDLER

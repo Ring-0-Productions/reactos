@@ -74,7 +74,7 @@
 #include <hal.h>
 #include <suppress.h>
 
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 #define MAX_SG_ELEMENTS 0x10

@@ -12,6 +12,7 @@
 #include <smp.h>
 
 #define NDEBUG
+
 #include <debug.h>
 
 /* GLOBALS *******************************************************************/

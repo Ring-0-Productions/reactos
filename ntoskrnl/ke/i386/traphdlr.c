@@ -129,19 +129,50 @@ KiEoiHelper(IN PKTRAP_FRAME TrapFrame)
     KiCommonExit(TrapFrame, TRUE);
 
     /* Check if this was a V8086 trap */
-    if (TrapFrame->EFlags & EFLAGS_V86_MASK) KiTrapReturnNoSegments(TrapFrame);
+    if (TrapFrame->EFlags & EFLAGS_V86_MASK)
+        KiTrapReturnNoSegments(TrapFrame);
 
     /* Check for user mode exit */
-    if (KiUserTrap(TrapFrame)) KiTrapReturn(TrapFrame);
+    if (KiUserTrap(TrapFrame))
+        KiTrapReturn(TrapFrame);
 
     /* Check for edited frame */
-    if (KiIsFrameEdited(TrapFrame)) KiEditedTrapReturn(TrapFrame);
+    if (KiIsFrameEdited(TrapFrame))
+        KiEditedTrapReturn(TrapFrame);
 
     /* Check if we have single stepping enabled */
-    if (TrapFrame->EFlags & EFLAGS_TF) KiTrapReturnNoSegments(TrapFrame);
+    if (TrapFrame->EFlags & EFLAGS_TF)
+        KiTrapReturnNoSegments(TrapFrame);
 
     /* Exit the trap to kernel mode */
     KiTrapReturnNoSegmentsRet8(TrapFrame);
+}
+//#else
+DECLSPEC_NORETURN
+VOID
+__cdecl
+Kei386EoiHelper(VOID)
+{
+    ULONG_PTR Stack;
+
+    /* NT actually uses the stack to place the pointer to the TrapFrame */
+
+    /* Get current ESP */
+#if defined(_M_IX86)
+  #if defined __GNUC__
+    __asm__("mov %%ebp, %0" : "=r" (Stack) : );
+  #elif defined(_MSC_VER)
+    __asm mov Stack, ebp
+  #endif
+#else
+  #error Unknown architecture
+#endif
+
+    KiEoiHelper((PKTRAP_FRAME)(Stack+4));
+
+    /* We should never see this call happening */
+    ASSERT(FALSE);//KeDbgBreakPointEx();
+    KeBugCheck(0xFFFFFFFF);
 }
 
 DECLSPEC_NORETURN
@@ -1863,12 +1894,5 @@ KiCheckForSListAddress(IN PKTRAP_FRAME TrapFrame)
 /*
  * @implemented
  */
-VOID
-NTAPI
-Kei386EoiHelper(VOID)
-{
-    /* We should never see this call happening */
-    KeBugCheck(MISMATCHED_HAL);
-}
 
 /* EOF */

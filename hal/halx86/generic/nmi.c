@@ -10,7 +10,7 @@
 #include <hal.h>
 #include <drivers/bootvid/display.h>
 
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 /* GLOBALS  *******************************************************************/

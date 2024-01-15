@@ -29,6 +29,7 @@ ULONG HalpCurrentTimeIncrement, HalpNextTimeIncrement, HalpNextIntervalCount;
 VOID
 HalpClockInterrupt(VOID)
 {
+    __debugbreak();
     /* Clear the interrupt */
     ASSERT(KeGetCurrentIrql() == CLOCK2_LEVEL);
     WRITE_REGISTER_ULONG(TIMER0_INT_CLEAR, 1);

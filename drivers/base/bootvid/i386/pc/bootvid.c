@@ -362,6 +362,7 @@ NTAPI
 VidInitialize(
     _In_ BOOLEAN SetMode)
 {
+    return FALSE;
     ULONG_PTR Context = 0;
     PHYSICAL_ADDRESS TranslatedAddress;
     PHYSICAL_ADDRESS NullAddress = {{0, 0}}, VgaAddress;

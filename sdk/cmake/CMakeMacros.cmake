@@ -832,7 +832,6 @@ function(create_registry_hives)
              ${CMAKE_BINARY_DIR}/boot/bootdata/software
              ${CMAKE_BINARY_DIR}/boot/bootdata/default
              ${CMAKE_BINARY_DIR}/boot/bootdata/sam
-             ${CMAKE_BINARY_DIR}/boot/bootdata/security
         TARGET livecd_hives
         DESTINATION reactos/system32/config
         FOR livecd)

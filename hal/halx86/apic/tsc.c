@@ -11,7 +11,7 @@
 #include <hal.h>
 #include "tsc.h"
 #include "apicp.h"
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 LARGE_INTEGER HalpCpuClockFrequency = {{INITIAL_STALL_COUNT * 1000000}};

@@ -12,7 +12,7 @@
 /* ACPI_BIOS_ERROR defined in acoutput.h and bugcodes.h */
 #undef ACPI_BIOS_ERROR
 #include <smp.h>
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 /* GLOBALS ********************************************************************/

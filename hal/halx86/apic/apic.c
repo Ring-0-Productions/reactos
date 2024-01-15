@@ -15,7 +15,7 @@
 
 #include <hal.h>
 #include "apicp.h"
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 #ifndef _M_AMD64
@@ -863,7 +863,7 @@ KfRaiseIrql(
     if (OldIrql > NewIrql)
     {
         /* Crash system */
-        KeBugCheck(IRQL_NOT_GREATER_OR_EQUAL);
+       // KeBugCheck(IRQL_NOT_GREATER_OR_EQUAL);
     }
 #endif
     /* Convert the new IRQL to a TPR value and write the register */

@@ -13,7 +13,7 @@
 
 #include <hal.h>
 #include "apicp.h"
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 /* GLOBALS ********************************************************************/

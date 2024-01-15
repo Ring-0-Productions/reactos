@@ -11,7 +11,7 @@
 /* This file is compiled twice. Once for UP and once for MP */
 
 #include <hal.h>
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 #include <internal/spinlock.h>

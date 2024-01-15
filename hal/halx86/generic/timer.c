@@ -10,7 +10,7 @@
 
 #include <hal.h>
 
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 /* GLOBALS *******************************************************************/
@@ -121,6 +121,7 @@ VOID
 FASTCALL
 HalpClockInterruptHandler(IN PKTRAP_FRAME TrapFrame)
 {
+  //  __debugbreak();
     ULONG LastIncrement;
     KIRQL Irql;
 
@@ -152,11 +153,20 @@ HalpClockInterruptHandler(IN PKTRAP_FRAME TrapFrame)
         }
 
         /* Update the system time -- the kernel will exit this trap  */
-        KeUpdateSystemTime(TrapFrame, LastIncrement, Irql);
+      //  KeUpdateSystemTime(TrapFrame, LastIncrement, Irql);
     }
 
+    _asm 
+    {
+        mov ebp, (TrapFrame);
+    }
+    _asm
+    { 
+        push ebp;
+    }
+    Kei386EoiHelper(/*TrapFrame*/);
     /* Spurious, just end the interrupt */
-    KiEoiHelper(TrapFrame);
+     //   Kei386EoiHelper(/*TrapFrame*/);
 }
 
 VOID
@@ -195,8 +205,15 @@ HalpProfileInterruptHandler(IN PKTRAP_FRAME TrapFrame)
         HalEndSystemInterrupt(Irql, TrapFrame);
     }
 
-    /* Spurious, just end the interrupt */
-    KiEoiHelper(TrapFrame);
+    _asm 
+    {
+        mov ebp, (TrapFrame);
+    }
+    _asm
+    { 
+        push ebp;
+    }
+    Kei386EoiHelper(/*TrapFrame*/);
 }
 #endif /* !_MINIHAL_ */
 

@@ -9,6 +9,9 @@
 
 #include <hal.h>
 
+//#define NDEBUG
+#include <debug.h>
+
 /* PRIVATE FUNCTIONS *********************************************************/
 
 #ifndef _MINIHAL_

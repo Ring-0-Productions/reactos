@@ -12,6 +12,6 @@ target_link_libraries(vgapnp libcntpr)
 
 # pc98vid takes place of vga service on PC-98 platform
 if(NOT SARCH STREQUAL "pc98")
-    add_cd_file(TARGET vgapnp DESTINATION reactos/system32/drivers FOR all)
+    #add_cd_file(TARGET vgapnp DESTINATION reactos/system32/drivers FOR all)
     add_registry_inf(vbemp_reg.inf)
 endif()

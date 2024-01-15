@@ -80,3 +80,7 @@
 #include "halacpi.h"
 
 #endif /* _HAL_PCH_ */
+DECLSPEC_NORETURN
+VOID
+__cdecl
+Kei386EoiHelper(VOID);

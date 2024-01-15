@@ -10,7 +10,7 @@
 
 #include <hal.h>
 
-#define NDEBUG
+//#define NDEBUG
 #include <debug.h>
 
 #include <setjmp.h>
@@ -215,7 +215,15 @@ HalpTrap0DHandler(IN PKTRAP_FRAME TrapFrame)
     {
         /* Dispatch the opcode and exit the trap */
         HalpDispatchV86Opcode(TrapFrame);
-        KiEoiHelper(TrapFrame);
+            _asm 
+            {
+                mov ebp, (TrapFrame);
+            }
+            _asm
+            { 
+                push ebp;
+            }
+            Kei386EoiHelper(/*TrapFrame*/);
     }
 
     /* Strange, it isn't! This can happen during NMI */

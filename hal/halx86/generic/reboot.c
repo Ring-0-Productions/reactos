@@ -11,6 +11,9 @@
 
 #include <hal.h>
 
+//#define NDEBUG
+#include <debug.h>
+
 /* PRIVATE FUNCTIONS *********************************************************/
 
 static VOID
