@@ -381,7 +381,8 @@ KfRaiseIrql(IN KIRQL NewIrql)
     if (CurrentIrql > NewIrql)
     {
         /* Crash system */
-        Pcr->Irql = PASSIVE_LEVEL;
+       // Pcr->Irql = PASSIVE_LEVEL;
+        __debugbreak();
       //  KeBugCheck(IRQL_NOT_GREATER_OR_EQUAL);
     }
 #endif
@@ -411,7 +412,8 @@ KfLowerIrql(IN KIRQL OldIrql)
     if (OldIrql > Pcr->Irql)
     {
         /* Crash system */
-        Pcr->Irql = HIGH_LEVEL;
+        //Pcr->Irql = HIGH_LEVEL;
+        __debugbreak();
        // KeBugCheck(IRQL_NOT_LESS_OR_EQUAL);
     }
 #endif

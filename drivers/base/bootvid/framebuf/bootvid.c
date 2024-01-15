@@ -104,6 +104,7 @@ NTAPI
 VidInitialize(
     _In_ BOOLEAN SetMode)
 {
+    return FALSE;
     NTSTATUS Status;
     INTERFACE_TYPE Interface;
     ULONG BusNumber;

@@ -31,4 +31,4 @@ target_link_libraries(ntkrnlmp cportlib csq ${PSEH_LIB} arbiter cmlib ntlsalib r
 add_importlibs(ntkrnlmp hal kdcom bootvid)
 add_pch(ntkrnlmp ${REACTOS_SOURCE_DIR}/ntoskrnl/include/ntoskrnl.h "${NTKRNLMP_PCH_SKIP_SOURCE}")
 add_dependencies(ntkrnlmp psdk asm)
-add_cd_file(TARGET ntkrnlmp DESTINATION reactos/system32 NO_CAB FOR all)
+#add_cd_file(TARGET ntkrnlmp DESTINATION reactos/system32 NO_CAB FOR all)

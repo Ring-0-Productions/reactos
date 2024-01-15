@@ -98,7 +98,8 @@ HalpInitializeClock(VOID)
 
 #if defined(SARCH_PC98)
     HalpInitializeClockPc98();
-#endif
+#endif 
+    __debugbreak();
 
     /* Get increment and rollover for the largest time clock ms possible */
     Increment = HalpRolloverTable[HalpLargestClockMS - 1].Increment;

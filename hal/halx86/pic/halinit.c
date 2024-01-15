@@ -50,7 +50,8 @@ HalpInitPhase1(VOID)
                                    Latched);
 
         /* Initialize DMA. NT does this in Phase 0 */
-        HalpInitDma();
+        //TODO: change this?
+    //    HalpInitDma();
 }
 
 /* EOF */
