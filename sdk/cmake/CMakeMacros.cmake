@@ -255,8 +255,10 @@ macro(dir_to_num dir var)
         set(${var} 81)
 	elseif(${dir} STREQUAL reactos/Resources/Themes/Reactive)
         set(${var} 82)
+	elseif(${dir} STREQUAL reactos/Resources/Themes/Aero)
+        set(${var} 6002)
     else()
-    
+
         message(FATAL_ERROR "Wrong destination: ${dir}")
     endif()
 endmacro()
