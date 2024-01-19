@@ -9,7 +9,7 @@
 //
 // Define this if you want debugging support
 //
-#define _LPC_DEBUG_                                         0x00
+#define _LPC_DEBUG_                                         1
 
 //
 // These define the Debug Masks Supported

@@ -3613,7 +3613,7 @@ BOOLEAN
 APIENTRY
 NtUserDwmStopRedirection(VOID);
 
-UINT32
+DWORD_PTR
 APIENTRY
 NtUserRegisterSessionPort(HANDLE Handle);
 

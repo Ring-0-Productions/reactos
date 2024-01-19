@@ -174,16 +174,19 @@ NtUserDwmStopRedirection(VOID)
  *  Setup and connect the global DWM port
  *  @ UNIMPLEMENTED
  */
-UINT32
+DWORD_PTR
 APIENTRY
 NtUserRegisterSessionPort(HANDLE Handle)
 {
+    DWORD_PTR Ret = 1;
+    UserEnterExclusive();
     NTSTATUS Status;
 
     Status = 0;
     if (GlobalDwmProcess)
     {
         DPRINT1("Already Initialized Session Port\n");
+        UserLeave();
         return STATUS_ALREADY_INITIALIZED;
     }
 
@@ -191,6 +194,7 @@ NtUserRegisterSessionPort(HANDLE Handle)
     if (Status != STATUS_SUCCESS)
     {
         DPRINT1("NtUserRegisterSessionPort: ObReferenceObjectByHandle failed with Status: %d\n", Status);
+        UserLeave();
         return Status;
     }
     GlobalDwmApiPort = (PVOID)Handle;
@@ -200,14 +204,13 @@ NtUserRegisterSessionPort(HANDLE Handle)
     if (Status != STATUS_SUCCESS)
     {
         DPRINT1("NtUserRegisterSessionPort: ObReferenceObjectByHandle failed with Status: %d\n", Status);
+        UserLeave();
         return 0;
     }
-    //LockObjectAssignment(&grpdeskDwmCouldCompose, *(PVOID *)(v7 + 60));
-   DwmNotifyProtocolChange(-1, 1);
-    //DwmNotifyProtocolChange(gProtocolType, gbConnected);
-    //__debugbreak();
+    DwmNotifyProtocolChange(-1, 1); //These parameters are odd..
+    UserLeave();
     EngSetLastError(ERROR_SUCCESS);
-    return 0;
+    return Ret;
 }
 #if 0
 INT 

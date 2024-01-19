@@ -394,14 +394,14 @@ HRESULT WINAPI DbgExTraceHR(HRESULT hrTest, BOOL fIgnore, __in PCSTR pstrExpr, _
                 pstrExpr, pstrFile, line, hrTest);
     if (hrTest != S_OK)
         __debugbreak();
-    return S_OK;
+    return(hrTest);
 }
 
 HRESULT WINAPI _DbgExTraceOLE(HRESULT hrTest, BOOL fIgnore, __in LPSTR pstrExpr, __in LPSTR pstrFile, int line, LPVOID lpsite)
 {
     DPRINT1("Trace:\n pstrExpr: %s\n  pstrFile:  %s\n  line: %d\n",
             pstrExpr, pstrFile, line);
-    return S_OK;
+    return(hrTest);
 }
 
 void WINAPI DbgExSetSimFailCounts(int firstFailure, int cInterval)
