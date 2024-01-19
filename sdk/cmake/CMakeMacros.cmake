@@ -249,8 +249,10 @@ macro(dir_to_num dir var)
         set(${var} 82)
     elseif(${dir} STREQUAL reactos/winsxs/amd64_microsoft-windows-comdlg32_31bf3856ad364e35_6.0.2600.2982_none_deadbeef)
         set(${var} 83)
+	elseif(${dir} STREQUAL reactos/Resources/Themes/Aero)
+        set(${var} 6002)
     else()
-    
+
         message(FATAL_ERROR "Wrong destination: ${dir}")
     endif()
 endmacro()
