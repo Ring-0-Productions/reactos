@@ -1546,3 +1546,81 @@ HRESULT WINAPI CheckThemeSignature(LPCWSTR pszThemeFileName)
     MSSTYLES_CloseThemeFile(pt);
     return S_OK;
 }
+
+HRESULT
+WINAPI
+GetThemeStream(
+  _In_  HTHEME    hTheme,
+  _In_  int       iPartId,
+  _In_  int       iStateId,
+  _In_  int       iPropId,
+  _Out_ VOID      **ppvStream,
+  _Out_ DWORD     *pcbStream,
+  _In_  HINSTANCE hInst
+)
+{
+    ERR("GetThemeStream(%p, %i, %i, %i, %p, %p, %p)\n", hTheme, iPartId, iStateId, iPropId, ppvStream, pcbStream, hInst);
+    UNREFERENCED_PARAMETER(hTheme);
+    UNREFERENCED_PARAMETER(iPartId);
+    UNREFERENCED_PARAMETER(iStateId);
+    if (!IsThemeActive())
+        return E_FAIL; //E_HANDLE;
+
+    /*if (!IsCompositionActive())
+        return DWM_E_COMPOSITIONDISABLED;*/
+    
+    PTHEME_CLASS ptcDwmWindow = ValidateHandle(hTheme);
+    
+    if (!ptcDwmWindow)
+        return E_PROP_ID_UNSUPPORTED;
+
+    PTHEME_PROPERTY ptpDiskStream = MSSTYLES_FindProperty(ptcDwmWindow, 0, 0, TMT_FILENAME, iPropId);
+    
+    if (!ptpDiskStream)
+        return 2;
+    LPCWSTR lpDsValue = ptpDiskStream->lpValue;
+    DWORD dwDsValueLen = ptpDiskStream->dwValueLen + 1;
+    
+    if (lpDsValue)
+    {
+        //wprintf(L"lpDsValue: '%s'\n", lpDsValue);
+        for (DWORD i = 0; i < dwDsValueLen; i++)
+        {
+            putchar(lpDsValue[i]);
+        }
+    }
+    else
+        return 102;
+    
+    //int nameLength = wcslen(lpDsValue)
+    WCHAR szFile[MAX_PATH];
+    LPWSTR tmp;
+    lstrcpynW(szFile, lpDsValue, dwDsValueLen);
+    wprintf(L"szFile: '%s'\n", szFile);
+    tmp = szFile;
+    do {
+        if(*tmp == '\\') *tmp = '_';
+        if(*tmp == '/') *tmp = '_';
+        if(*tmp == '.') *tmp = '_';
+    } while(*tmp++);
+    //wprintf(L"tmp: '%s'\n", tmp);
+    wprintf(L"szFile: '%s'\n", szFile);
+    HRSRC hRes = FindResourceW(hInst, szFile, TEXT(L"STREAM"));
+    if (!hRes)
+        return 3;
+
+    HGLOBAL hAlloc = LoadResource(hInst, hRes);
+    if (!hAlloc)
+        return 4;
+
+    DWORD dwSize = SizeofResource(hInst, hRes);
+    LPVOID pData = LockResource(hAlloc);
+    if ((!pData) || (dwSize <= 0))
+    {
+        FreeResource(hAlloc);
+        return 5;
+    }
+    *ppvStream = pData;
+    *pcbStream = dwSize;
+    return S_OK;
+}
