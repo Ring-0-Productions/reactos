@@ -118,6 +118,19 @@ HRESULT WINAPI GetThemePartSize(HTHEME,HDC,int,int,RECT*,THEMESIZE,SIZE*);
 HRESULT WINAPI GetThemePosition(HTHEME,int,int,int,POINT*);
 HRESULT WINAPI GetThemePropertyOrigin(HTHEME,int,int,int,PROPERTYORIGIN*);
 HRESULT WINAPI GetThemeRect(HTHEME,int,int,int,RECT*);
+#if (DLL_EXPORT_VERSION >= _WIN32_WINNT_VISTA)
+HRESULT
+WINAPI
+GetThemeStream(
+  _In_  HTHEME    hTheme,
+  _In_  int       iPartId,
+  _In_  int       iStateId,
+  _In_  int       iPropId,
+  _Out_ VOID      **ppvStream,
+  _Out_ DWORD     *pcbStream,
+  _In_  HINSTANCE hInst
+);
+#endif /* _WIN32_WINNT_VISTA */
 HRESULT WINAPI GetThemeString(HTHEME,int,int,int,LPWSTR,int);
 BOOL WINAPI GetThemeSysBool(HTHEME,int);
 COLORREF WINAPI GetThemeSysColor(HTHEME,int);

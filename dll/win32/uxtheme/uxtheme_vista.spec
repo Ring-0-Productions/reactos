@@ -99,7 +99,7 @@
 99 stdcall GetThemePosition(ptr long long long ptr)
 100 stdcall GetThemePropertyOrigin(ptr long long long ptr)
 101 stdcall GetThemeRect(ptr long long long ptr)
-102 stub GetThemeStream
+102 stdcall GetThemeStream(ptr long long long ptr ptr ptr)
 103 stdcall GetThemeString(ptr long long long wstr long)
 104 stdcall GetThemeSysBool(ptr long)
 105 stdcall GetThemeSysColor(ptr long)
