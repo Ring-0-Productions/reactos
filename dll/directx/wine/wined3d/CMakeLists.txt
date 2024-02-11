@@ -46,6 +46,10 @@ add_library(d3dwine MODULE
     version.rc
     ${CMAKE_CURRENT_BINARY_DIR}/d3dwine.def)
 
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(d3dwine PRIVATE -Wno-incompatible-pointer-types -Wno-unused-but-set-variable -Wno-switch -Wno-error) # Our favourite compiler :)
+endif()
+
 set_module_type(d3dwine win32dll)
 target_link_libraries(d3dwine wine)
 add_importlibs(d3dwine user32 opengl32 gdi32 gdi32_vista advapi32 msvcrt kernel32 ntdll)

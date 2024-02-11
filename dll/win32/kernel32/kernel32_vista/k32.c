@@ -792,25 +792,3 @@ struct _PROC_THREAD_ATTRIBUTE_LIST
     struct proc_thread_attr attrs[10];
 };
 
-
-BOOL
-K32QueryWorkingSet(
-        HANDLE hProcess,
-        PVOID  pv,
-        DWORD  cb
-)
-{
-    UNIMPLEMENTED;
-    return TRUE;
-}
-
-BOOL
-K32QueryWorkingSetEx(
-        HANDLE hProcess,
-        PVOID  pv,
-        DWORD  cb
-)
-{
-    UNIMPLEMENTED;
-    return TRUE;
-}
