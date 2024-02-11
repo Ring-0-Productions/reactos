@@ -1,10 +1,14 @@
 //
 //    Copyright (C) Microsoft.  All rights reserved.
 //
-#include "fxusbpch.hpp"
+#include "../fxusbpch.hpp"
 
 extern "C" {
+#if defined(EVENT_TRACING)
 #include "FxUsbPipeKm.tmh"
+#endif
+
+#define RtlSizeTToULong RtlULongPtrToULong
 }
 
 #include "Fxglobals.h"

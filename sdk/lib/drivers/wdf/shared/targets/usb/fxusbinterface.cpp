@@ -21,7 +21,9 @@ Revision History:
 #include "fxusbpch.hpp"
 
 extern "C" {
+#if defined(EVENT_TRACING)
 #include "FxUsbInterface.tmh"
+#endif
 }
 
 FxUsbInterface::FxUsbInterface(
