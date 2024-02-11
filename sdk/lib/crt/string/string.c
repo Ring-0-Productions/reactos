@@ -63,6 +63,48 @@ int CDECL strcat_s( char* dst, size_t elem, const char* src )
     return ERANGE;
 }
 
+/******************************************************************
+ *                  strncpy_s (MSVCRT.@)
+ */
+int __cdecl strncpy_s( char *dst, size_t elem, const char *src, size_t count )
+{
+    char *p = dst;
+    BOOL truncate = (count == _TRUNCATE);
+
+    if (!count)
+    {
+        if (dst && elem) *dst = 0;
+        return 0;
+    }
+
+    if (!MSVCRT_CHECK_PMT(dst != NULL)) return EINVAL;
+    if (!MSVCRT_CHECK_PMT(elem != 0)) return EINVAL;
+    if (!MSVCRT_CHECK_PMT(src != NULL))
+    {
+        *dst = 0;
+        return EINVAL;
+    }
+
+    while (elem && count && *src)
+    {
+        *p++ = *src++;
+        elem--;
+        count--;
+    }
+    if (!elem && truncate)
+    {
+        *(p-1) = 0;
+        return STRUNCATE;
+    }
+    else if (!elem)
+    {
+        *dst = 0;
+        return ERANGE;
+    }
+    *p = 0;
+    return 0;
+}
+
 /*********************************************************************
  *      strcpy_s (MSVCRT.@)
  */

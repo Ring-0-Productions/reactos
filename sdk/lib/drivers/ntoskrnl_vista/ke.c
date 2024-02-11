@@ -8,6 +8,18 @@
 
 #include <ntdef.h>
 #include <ntifs.h>
+#include <debug.h>
+
+NTKRNLVISTAAPI
+ULONG 
+NTAPI
+KeGetCurrentProcessorNumberEx(
+  _Out_opt_ PPROCESSOR_NUMBER ProcNumber
+)
+{
+    UNIMPLEMENTED;
+    return 1;
+}
 
 NTKRNLVISTAAPI
 ULONG
@@ -27,10 +39,37 @@ KeQueryActiveProcessorCount(OUT PKAFFINITY ActiveProcessors OPTIONAL)
 }
 
 NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+KeQueryDpcWatchdogInformation(
+  OUT PKDPC_WATCHDOG_INFORMATION WatchdogInformation
+)
+{
+    UNIMPLEMENTED;
+    WatchdogInformation->DpcTimeLimit = 100000;
+    WatchdogInformation->DpcTimeCount = 0;
+    WatchdogInformation->DpcWatchdogLimit = 100000;
+    WatchdogInformation->DpcWatchdogCount = 0;
+    WatchdogInformation->Reserved = 0;
+    
+    return STATUS_UNSUCCESSFUL;
+}
+
+NTKRNLVISTAAPI
+ULONG
+NTAPI
+KeQueryActiveProcessorCountEx(_In_ USHORT GroupNumber)
+{
+    UNIMPLEMENTED;
+	return 1;
+}
+
+NTKRNLVISTAAPI
 USHORT
 NTAPI
 KeQueryHighestNodeNumber()
 {
+    UNIMPLEMENTED;
 	return 0;
 }
 
@@ -39,6 +78,7 @@ USHORT
 NTAPI
 KeGetCurrentNodeNumber()
 {
+    UNIMPLEMENTED;
 	return 0;
 }
 
@@ -53,5 +93,6 @@ KeSetCoalescableTimer(
     _In_ ULONG TolerableDelay,
     _In_opt_ PKDPC Dpc)
 {
+    UNIMPLEMENTED;
     return KeSetTimerEx(Timer, DueTime, Period, Dpc);
 }
