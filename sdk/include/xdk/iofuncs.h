@@ -2640,6 +2640,14 @@ IoSetMasterIrpStatus(
   _In_ NTSTATUS Status);
 $endif (_NTDDK_)
 
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoSetActivityIdIrp(
+  _In_ PIRP    Irp,
+  _In_opt_ LPCGUID Guid
+);
+
 #endif /* (NTDDI_VERSION >= NTDDI_WIN8) */
 
 $if (_WDMDDK_)
