@@ -1095,6 +1095,7 @@ void context_gl_resource_released(struct wined3d_device *device,
 {
     context_enum_fbo_entries(device, name, rb_namespace, context_queue_fbo_entry_destruction);
 }
+#define DCX_USESTYLE     0x00010000
 
 void context_surface_update(struct wined3d_context *context, const struct wined3d_surface *surface)
 {
