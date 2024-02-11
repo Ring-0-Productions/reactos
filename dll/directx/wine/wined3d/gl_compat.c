@@ -30,7 +30,8 @@
 
 WINE_DEFAULT_DEBUG_CHANNEL(gl_compat);
 WINE_DECLARE_DEBUG_CHANNEL(d3d_perf);
-
+void (WINE_GLAPI *glDisableWINE)(GLenum cap) DECLSPEC_HIDDEN;
+void (WINE_GLAPI *glEnableWINE)(GLenum cap) DECLSPEC_HIDDEN;
 /* Start GL_ARB_multitexture emulation */
 static void WINE_GLAPI wine_glMultiTexCoord1fARB(GLenum target, GLfloat s) {
     if(target != GL_TEXTURE0) {
