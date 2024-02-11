@@ -17,6 +17,8 @@
 /* See also mm/ARM3/miarm.h */
 #define MM_READONLY     1   // PAGE_READONLY
 #define MM_READWRITE    4   // PAGE_WRITECOPY
+#define SELECT_LOGO_ID(LogoIdDefault, Cond, LogoIdAlt) (LogoIdDefault)
+
 
 /* GLOBALS *******************************************************************/
 
@@ -767,4 +769,80 @@ FinalizeBootLogo(VOID)
     RotBarThreadActive = FALSE;
 #endif
     InbvReleaseLock();
+}
+
+
+VOID
+NTAPI
+DisplayShutdownBitmap(VOID)
+{
+    PUCHAR Logo1, Logo2;
+#ifdef REACTOS_FANCY_BOOT
+    /* Decide whether this is a good time to change our logo ;^) */
+    BOOLEAN IsXmas = IsXmasTime();
+#endif
+
+#if 0
+    /* Is the boot driver installed? */
+    if (!InbvBootDriverInstalled)
+        return;
+#endif
+
+    /* Yes we do, cleanup for shutdown screen */
+    // InbvResetDisplay();
+    InbvInstallDisplayStringFilter(NULL);
+    InbvEnableDisplayString(TRUE);
+    InbvSolidColorFill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BV_COLOR_BLACK);
+    InbvSetScrollRegion(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
+
+    /* Display shutdown logo and message */
+    Logo1 = InbvGetResourceAddress(IDB_SHUTDOWN_MSG);
+    Logo2 = InbvGetResourceAddress(
+        SELECT_LOGO_ID(IDB_LOGO_DEFAULT, IsXmas, IDB_LOGO_XMAS));
+
+    if (Logo1 && Logo2)
+    {
+        InbvBitBlt(Logo1, VID_SHUTDOWN_MSG_LEFT, VID_SHUTDOWN_MSG_TOP);
+#ifndef REACTOS_FANCY_BOOT
+        InbvBitBlt(Logo2, VID_SHUTDOWN_LOGO_LEFT, VID_SHUTDOWN_LOGO_TOP);
+#else
+        /* Draw the logo at the center of the screen */
+        BitBltAligned(Logo2,
+                      FALSE,
+                      AL_HORIZONTAL_CENTER,
+                      AL_VERTICAL_BOTTOM,
+                      0, 0, 0, SCREEN_HEIGHT - VID_SHUTDOWN_MSG_TOP + 16);
+
+        /* We've got a logo shown, change the scroll region to get
+         * the rest of the text down below the shutdown message */
+        InbvSetScrollRegion(0,
+                            VID_SHUTDOWN_MSG_TOP + ((PBITMAPINFOHEADER)Logo1)->biHeight + 32,
+                            SCREEN_WIDTH - 1,
+                            SCREEN_HEIGHT - 1);
+#endif
+    }
+
+#ifdef REACTOS_FANCY_BOOT
+    InbvDisplayString("\r\"");
+    InbvDisplayString(GetFamousQuote());
+    InbvDisplayString("\"");
+#endif
+}
+
+VOID
+NTAPI
+DisplayShutdownText(VOID)
+{
+    ULONG i;
+
+    for (i = 0; i < 25; ++i) InbvDisplayString("\r\n");
+    InbvDisplayString("                       ");
+    InbvDisplayString("The system may be powered off now.\r\n");
+
+#ifdef REACTOS_FANCY_BOOT
+    for (i = 0; i < 3; ++i) InbvDisplayString("\r\n");
+    InbvDisplayString("\r\"");
+    InbvDisplayString(GetFamousQuote());
+    InbvDisplayString("\"");
+#endif
 }
