@@ -22,11 +22,13 @@ extern "C" {
 #include <initguid.h>
 }
 
-#include "fxusbpch.hpp"
+#include "../fxusbpch.hpp"
 
 
 extern "C" {
+#if defined(EVENT_TRACING)
 #include "FxUsbDeviceKm.tmh"
+#endif
 }
 
 

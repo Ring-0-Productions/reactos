@@ -26,7 +26,11 @@ extern "C" {
 
 
 extern "C" {
+#if defined(EVENT_TRACING)
 #include "FxUsbDevice.tmh"
+#endif
+
+#define RtlSizeTToULong RtlULongPtrToULong
 }
 
 #if (FX_CORE_MODE == FX_CORE_KERNEL_MODE)
