@@ -9,9 +9,11 @@ list(APPEND SOURCE
     etw.c
     fsrtl.c
     io.c
+    ob.c
     po.c
     pofx.c
     ke.c
+    rtl.c
     ${REACTOS_SOURCE_DIR}/sdk/lib/rtl/utf8.c)
 
 add_library(ntoskrnl_vista ${SOURCE})
