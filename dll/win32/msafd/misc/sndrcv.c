@@ -133,15 +133,17 @@ WSPGetOverlappedResult(
     return Ret;
 }
 
+static
 VOID
 NTAPI
-AfdRecvAPC(PVOID ApcContext,
-       PIO_STATUS_BLOCK IoStatusBlock,
-       ULONG Reserved)
+MsafdRecvAPC(
+    _In_ PVOID ApcContext,
+    _In_ PIO_STATUS_BLOCK IoStatusBlock,
+    _In_ ULONG Reserved)
 {
-    PAFDRECVAPCCONTEXT Context = ApcContext;
+    PMSAFD_RECV_APC_CONTEXT Context = ApcContext;
 
-    TRACE("AfdRecvAPC %p %lx %lx\n", ApcContext, IoStatusBlock->Status, IoStatusBlock->Information);
+    TRACE("MsafdRecvAPC(%p %lx %lx)\n", ApcContext, IoStatusBlock->Status, IoStatusBlock->Information);
 
     /* Re-enable Async Event */
     if (IoStatusBlock->Status == STATUS_RECEIVE_EXPEDITED ||
@@ -163,15 +165,17 @@ AfdRecvAPC(PVOID ApcContext,
     HeapFree(GlobalHeap, 0, ApcContext);
 }
 
+static
 VOID
 NTAPI
-AfdSendAPC(PVOID ApcContext,
-    PIO_STATUS_BLOCK IoStatusBlock,
-    ULONG Reserved)
+MsafdSendAPC(
+    _In_ PVOID ApcContext,
+    _In_ PIO_STATUS_BLOCK IoStatusBlock,
+    _In_ ULONG Reserved)
 {
-    PAFDSENDAPCCONTEXT Context = ApcContext;
+    PMSAFD_SEND_APC_CONTEXT Context = ApcContext;
 
-    TRACE("AfdSendAPC %p %lx %lx\n", ApcContext, IoStatusBlock->Status, IoStatusBlock->Information);
+    TRACE("MsafdSendAPC(%p %lx %lx)\n", ApcContext, IoStatusBlock->Status, IoStatusBlock->Information);
 
     /* Re-enable Async Event */
     SockReenableAsyncSelectEvent(Context->lpSocket, FD_WRITE);
@@ -202,14 +206,14 @@ WSPRecv(SOCKET Handle,
     IO_STATUS_BLOCK         DummyIOSB;
     PAFD_RECV_INFO          RecvInfo;
     NTSTATUS                Status;
-    PAFDRECVAPCCONTEXT      APCContext;
+    PMSAFD_RECV_APC_CONTEXT APCContext;
     PIO_APC_ROUTINE         APCFunction;
     HANDLE                  Event = NULL;
     HANDLE                  SockEvent;
     PSOCKET_INFORMATION     Socket;
     DWORD                   NumberOfBytesRead;
 
-    TRACE("Called (%x)\n", Handle);
+    TRACE("WSPRecv(%x)\n", Handle);
 
     /* Get the Socket Structure associate to this Socket*/
     Socket = GetSocketStructure(Handle);
@@ -233,7 +237,7 @@ WSPRecv(SOCKET Handle,
     }
 
     /* Allocate a recv info buffer */
-    RecvInfo = HeapAlloc(GlobalHeap, 0, sizeof(AFD_RECV_INFO));
+    RecvInfo = HeapAlloc(GlobalHeap, 0, sizeof(*RecvInfo));
     if (!RecvInfo)
     {
         if (lpErrno)
@@ -299,7 +303,7 @@ WSPRecv(SOCKET Handle,
             return MsafdReturnWithErrno(STATUS_SUCCESS, lpErrno, 0, lpNumberOfBytesRead);
         }
 
-        APCContext = HeapAlloc(GlobalHeap, 0, sizeof(AFDRECVAPCCONTEXT));
+        APCContext = HeapAlloc(GlobalHeap, 0, sizeof(*APCContext));
         if (!APCContext)
         {
             ERR("Not enough memory for APC Context\n");
@@ -311,7 +315,7 @@ WSPRecv(SOCKET Handle,
         APCContext->lpOverlapped = lpOverlapped;
         APCContext->lpSocket = Socket;
         APCContext->lpRecvInfo = RecvInfo;
-        APCFunction = &AfdRecvAPC;
+        APCFunction = &MsafdRecvAPC;
 
         if (lpCompletionRoutine)
         {
@@ -337,7 +341,7 @@ WSPRecv(SOCKET Handle,
                                    IOSB,
                                    IOCTL_AFD_RECV,
                                    RecvInfo,
-                                   sizeof(AFD_RECV_INFO),
+                                   sizeof(*RecvInfo),
                                    NULL,
                                    0);
     if (Status == STATUS_PENDING)
@@ -403,7 +407,7 @@ WSPRecv(SOCKET Handle,
         SockReenableAsyncSelectEvent(Socket, FD_READ);
     }
 
-    TRACE("Leaving (%lx, %ld)\n", Status, NumberOfBytesRead);
+    TRACE("Leaving (%lx %ld)\n", Status, NumberOfBytesRead);
     return MsafdReturnWithErrno(Status, lpErrno, NumberOfBytesRead, lpNumberOfBytesRead);
 }
 
@@ -425,14 +429,14 @@ WSPRecvFrom(SOCKET Handle,
     IO_STATUS_BLOCK             DummyIOSB;
     PAFD_RECV_INFO_UDP          RecvInfo;
     NTSTATUS                    Status;
-    PAFDRECVAPCCONTEXT          APCContext;
+    PMSAFD_RECV_APC_CONTEXT     APCContext;
     PIO_APC_ROUTINE             APCFunction;
     HANDLE                      Event = NULL;
     HANDLE                      SockEvent;
     PSOCKET_INFORMATION         Socket;
     DWORD                       NumberOfBytesRead;
 
-    TRACE("WSPRecvFrom Called (%x)\n", Handle);
+    TRACE("WSPRecvFrom(%x)\n", Handle);
 
     /* Get the Socket Structure associate to this Socket*/
     Socket = GetSocketStructure(Handle);
@@ -480,7 +484,7 @@ WSPRecvFrom(SOCKET Handle,
             return SOCKET_ERROR;
     }
     /* Allocate a recv info buffer */
-    RecvInfo = HeapAlloc(GlobalHeap, 0, sizeof(AFD_RECV_INFO_UDP));
+    RecvInfo = HeapAlloc(GlobalHeap, 0, sizeof(*RecvInfo));
     if (!RecvInfo)
     {
         if (lpErrno)
@@ -548,7 +552,7 @@ WSPRecvFrom(SOCKET Handle,
             return MsafdReturnWithErrno(STATUS_SUCCESS, lpErrno, 0, lpNumberOfBytesRead);
         }
 
-        APCContext = HeapAlloc(GlobalHeap, 0, sizeof(AFDRECVAPCCONTEXT));
+        APCContext = HeapAlloc(GlobalHeap, 0, sizeof(*APCContext));
         if (!APCContext)
         {
             ERR("Not enough memory for APC Context\n");
@@ -560,7 +564,7 @@ WSPRecvFrom(SOCKET Handle,
         APCContext->lpOverlapped = lpOverlapped;
         APCContext->lpSocket = Socket;
         APCContext->lpRecvInfo = RecvInfo;
-        APCFunction = &AfdRecvAPC;
+        APCFunction = &MsafdRecvAPC;
 
         if (lpCompletionRoutine)
         {
@@ -586,7 +590,7 @@ WSPRecvFrom(SOCKET Handle,
                                     IOSB,
                                     IOCTL_AFD_RECV_DATAGRAM,
                                     RecvInfo,
-                                    sizeof(AFD_RECV_INFO_UDP),
+                                    sizeof(*RecvInfo),
                                     NULL,
                                     0);
     if (Status == STATUS_PENDING)
@@ -594,7 +598,7 @@ WSPRecvFrom(SOCKET Handle,
         /* Wait for completion if not overlapped */
         if (!lpOverlapped)
         {
-            /* BUGBUG, shouldn't wait infinitely for receive... */
+            /* FIXME: Shouldn't wait infinitely for receive... */
             WaitForSingleObject(SockEvent, INFINITE);
         }
 
@@ -651,7 +655,7 @@ WSPRecvFrom(SOCKET Handle,
         SockReenableAsyncSelectEvent(Socket, FD_READ);
     }
 
-    TRACE("Leaving (%lx, %ld)\n", Status, NumberOfBytesRead);
+    TRACE("Leaving (%lx %ld)\n", Status, NumberOfBytesRead);
     return MsafdReturnWithErrno(Status, lpErrno, NumberOfBytesRead, lpNumberOfBytesRead);
 }
 
@@ -672,14 +676,14 @@ WSPSend(SOCKET Handle,
     IO_STATUS_BLOCK         DummyIOSB;
     PAFD_SEND_INFO          SendInfo;
     NTSTATUS                Status;
-    PAFDSENDAPCCONTEXT      APCContext;
+    PMSAFD_SEND_APC_CONTEXT APCContext;
     PIO_APC_ROUTINE         APCFunction;
     HANDLE                  Event = NULL;
     HANDLE                  SockEvent;
     PSOCKET_INFORMATION     Socket;
     DWORD                   NumberOfBytesSent;
     
-    TRACE("WSPSend Called (%x)\n", Handle);
+    TRACE("WSPSend(%x)\n", Handle);
 
     /* Get the Socket Structure associate to this Socket*/
     Socket = GetSocketStructure(Handle);
@@ -697,7 +701,7 @@ WSPSend(SOCKET Handle,
     }
 
     /* Allocate a send info buffer */
-    SendInfo = HeapAlloc(GlobalHeap, 0, sizeof(AFD_SEND_INFO));
+    SendInfo = HeapAlloc(GlobalHeap, 0, sizeof(*SendInfo));
     if (!SendInfo)
     {
         if (lpErrno)
@@ -753,7 +757,7 @@ WSPSend(SOCKET Handle,
             return MsafdReturnWithErrno(STATUS_SUCCESS, lpErrno, 0, lpNumberOfBytesSent);
         }
 
-        APCContext = HeapAlloc(GlobalHeap, 0, sizeof(AFDSENDAPCCONTEXT));
+        APCContext = HeapAlloc(GlobalHeap, 0, sizeof(*APCContext));
         if (!APCContext)
         {
             ERR("Not enough memory for APC Context\n");
@@ -766,7 +770,7 @@ WSPSend(SOCKET Handle,
         APCContext->lpSocket = Socket;
         APCContext->lpSendInfo = SendInfo;
         APCContext->lpRemoteAddress = NULL;
-        APCFunction = &AfdSendAPC;
+        APCFunction = &MsafdSendAPC;
 
         if (lpCompletionRoutine)
         {
@@ -792,7 +796,7 @@ WSPSend(SOCKET Handle,
                                     IOSB,
                                     IOCTL_AFD_SEND,
                                     SendInfo,
-                                    sizeof(AFD_SEND_INFO),
+                                    sizeof(*SendInfo),
                                     NULL,
                                     0);
     if (Status == STATUS_PENDING)
@@ -800,7 +804,7 @@ WSPSend(SOCKET Handle,
         /* Wait for completion if not overlapped */
         if (!lpOverlapped)
         {
-            /* BUGBUG, shouldn't wait infinitely for send... */
+            /* FIXME: Shouldn't wait infinitely for send... */
             WaitForSingleObject(SockEvent, INFINITE);
         }
 
@@ -830,7 +834,7 @@ WSPSend(SOCKET Handle,
     /* Re-enable Async Event */
     SockReenableAsyncSelectEvent(Socket, FD_WRITE);
 
-    TRACE("Leaving (%lx, %ld)\n", Status, NumberOfBytesSent);
+    TRACE("Leaving (%lx %ld)\n", Status, NumberOfBytesSent);
     return MsafdReturnWithErrno(Status, lpErrno, NumberOfBytesSent, lpNumberOfBytesSent);
 }
 
@@ -852,7 +856,7 @@ WSPSendTo(SOCKET Handle,
     IO_STATUS_BLOCK         DummyIOSB;
     PAFD_SEND_INFO_UDP      SendInfo;
     NTSTATUS                Status;
-    PAFDSENDAPCCONTEXT      APCContext;
+    PMSAFD_SEND_APC_CONTEXT APCContext;
     PIO_APC_ROUTINE         APCFunction;
     HANDLE                  Event = NULL;
     PTRANSPORT_ADDRESS      RemoteAddress;
@@ -860,7 +864,7 @@ WSPSendTo(SOCKET Handle,
     PSOCKET_INFORMATION     Socket;
     DWORD                   NumberOfBytesSent;
 
-    TRACE("WSPSendTo Called (%x)\n", Handle);
+    TRACE("WSPSendTo(%x)\n", Handle);
 
     /* Get the Socket Structure associate to this Socket */
     Socket = GetSocketStructure(Handle);
@@ -923,7 +927,7 @@ WSPSendTo(SOCKET Handle,
         return MsafdReturnWithErrno(STATUS_INSUFFICIENT_RESOURCES, lpErrno, 0, NULL);
     }
 
-    SendInfo = HeapAlloc(GlobalHeap, 0, sizeof(AFD_SEND_INFO_UDP));
+    SendInfo = HeapAlloc(GlobalHeap, 0, sizeof(*SendInfo));
     if (!SendInfo)
     {
         HeapFree(GlobalHeap, 0, RemoteAddress);
@@ -974,7 +978,7 @@ WSPSendTo(SOCKET Handle,
             return MsafdReturnWithErrno(STATUS_SUCCESS, lpErrno, 0, lpNumberOfBytesSent);
         }
 
-        APCContext = HeapAlloc(GlobalHeap, 0, sizeof(AFDSENDAPCCONTEXT));
+        APCContext = HeapAlloc(GlobalHeap, 0, sizeof(*APCContext));
         if (!APCContext)
         {
             ERR("Not enough memory for APC Context\n");
@@ -988,7 +992,7 @@ WSPSendTo(SOCKET Handle,
         APCContext->lpSocket = Socket;
         APCContext->lpSendInfo = SendInfo;
         APCContext->lpRemoteAddress = RemoteAddress;
-        APCFunction = &AfdSendAPC;
+        APCFunction = &MsafdSendAPC;
 
         if (lpCompletionRoutine)
         {
@@ -1014,7 +1018,7 @@ WSPSendTo(SOCKET Handle,
                                    IOSB,
                                    IOCTL_AFD_SEND_DATAGRAM,
                                    SendInfo,
-                                   sizeof(AFD_SEND_INFO_UDP),
+                                   sizeof(*SendInfo),
                                    NULL,
                                    0);
     if (Status == STATUS_PENDING)
@@ -1022,7 +1026,7 @@ WSPSendTo(SOCKET Handle,
         /* Wait for completion if not overlapped */
         if (!lpOverlapped)
         {
-            /* BUGBUG, shouldn't wait infinitely for send... */
+            /* FIXME: Shouldn't wait infinitely for send... */
             WaitForSingleObject(SockEvent, INFINITE);
         }
 
@@ -1053,7 +1057,7 @@ WSPSendTo(SOCKET Handle,
     /* Re-enable Async Event */
     SockReenableAsyncSelectEvent(Socket, FD_WRITE);
 
-    TRACE("Leaving (%lx, %ld)\n", Status, NumberOfBytesSent);
+    TRACE("Leaving (%lx %ld)\n", Status, NumberOfBytesSent);
     return MsafdReturnWithErrno(Status, lpErrno, NumberOfBytesSent, lpNumberOfBytesSent);
 }
 
