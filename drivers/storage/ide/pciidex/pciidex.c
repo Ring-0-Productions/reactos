@@ -134,6 +134,11 @@ PciIdeXGetConfigurationInfo(
                 (PciConfig->ProgIf & PCIIDE_PROGIF_PRIMARY_CHANNEL_NATIVE_MODE) &&
                 (PciConfig->ProgIf & PCIIDE_PROGIF_SECONDARY_CHANNEL_NATIVE_MODE);
         }
+        else if (PciConfig->SubClass == PCI_SUBCLASS_MSC_AHCI_CTLR)
+        {
+            FdoExtension->InNativeMode = TRUE;
+            FdoExtension->IsAhci = TRUE;
+        }
         else if (PciConfig->SubClass == PCI_SUBCLASS_MSC_RAID_CTLR)
         {
             FdoExtension->InNativeMode = TRUE;
@@ -236,6 +241,12 @@ PciIdeXAddDevice(
     if (!NT_SUCCESS(Status))
     {
         DPRINT1("Unable to retrieve the configuration info %lx\n", Status);
+        goto Failure;
+    }
+
+    if (FdoExtension->IsAhci)
+    {
+        DPRINT1("ACHI support not implemented yet\n");
         goto Failure;
     }
 
