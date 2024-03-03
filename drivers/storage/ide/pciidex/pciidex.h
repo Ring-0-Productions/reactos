@@ -16,6 +16,8 @@
 #include <wdmguid.h>
 #include <ide.h>
 
+#include <reactos/drivers/ntddata.h>
+
 #define TAG_PCIIDEX    'XedI'
 
 #define IS_FDO(p)    (((PCOMMON_DEVICE_EXTENSION)(p))->IsFDO)
@@ -76,17 +78,31 @@ typedef struct _FDO_DEVICE_EXTENSION
 
     ULONG ControllerNumber;
     BOOLEAN InNativeMode;
+    BOOLEAN IsAhci;
     BOOLEAN IoBaseMapped;
     BOOLEAN MiniportStarted;
 
     FAST_MUTEX DeviceSyncMutex;
     _Guarded_by_(DeviceSyncMutex)
-    PPDO_DEVICE_EXTENSION Channels[MAX_IDE_CHANNEL];
+    PPDO_DEVICE_EXTENSION Channels[MAX_AHCI_DEVICES];
 
     USHORT VendorId;
     USHORT DeviceId;
     PDRIVER_OBJECT DriverObject;
-    PUCHAR BusMasterPortBase;
+    union
+    {
+        PUCHAR BusMasterPortBase;
+        PVOID Abar;
+    };
+    ULONG IoLength;
+    ULONG MaxDevices;
+
+    PKINTERRUPT InterruptObject;
+    KINTERRUPT_MODE InterruptMode;
+    KAFFINITY InterruptAffinity;
+    ULONG InterruptVector;
+    KIRQL InterruptLevel;
+    BOOLEAN InterruptShared;
 
     KSPIN_LOCK BusDataLock;
     BUS_INTERFACE_STANDARD BusInterface;
@@ -104,6 +120,8 @@ typedef struct _PDO_DEVICE_EXTENSION
     PFDO_DEVICE_EXTENSION ParentController;
     BOOLEAN ReportedMissing;
     PUCHAR IoBase;
+    PHYSICAL_ADDRESS CommandListPhys;
+    PHYSICAL_ADDRESS ReceivedFisPhys;
 } PDO_DEVICE_EXTENSION, *PPDO_DEVICE_EXTENSION;
 
 CODE_SEG("PAGE")
