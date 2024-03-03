@@ -79,6 +79,14 @@ HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#ROOT_HUB20","C
 ;
 ;HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#USB30_HUB","Service",0x00000000,"usbhub3"
 ;HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\USB#USB30_HUB","ClassGUID",0x00000000,"{36FC9E60-C465-11CF-8056-444553540000}"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PCI#CC_0101","Service",0x00000000,"pciide"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PCI#CC_0101","ClassGUID",0x00000000,"{4D36E96A-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PCI#CC_0106","Service",0x00000000,"pciahci"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\PCI#CC_0106","ClassGUID",0x00000000,"{4D36E96A-E325-11CE-BFC1-08002BE10318}"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0600","Service",0x00000000,"atapi"
+HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\*PNP0600","ClassGUID",0x00000000,"{4D36E96A-E325-11CE-BFC1-08002BE10318}"
 
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\GenCdRom","Service",0x00000000,"cdrom"
 HKLM,"SYSTEM\CurrentControlSet\Control\CriticalDeviceDatabase\GenCdRom","ClassGUID",0x00000000,"{4D36E965-E325-11CE-BFC1-08002BE10318}"
@@ -379,6 +387,11 @@ HKLM,"SYSTEM\CurrentControlSet\Control\Class\{36FC9E60-C465-11CF-8056-4445535400
 HKLM,"SYSTEM\CurrentControlSet\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}","Class",0x00000000,"USB"
 HKLM,"SYSTEM\CurrentControlSet\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}","Icon",0x00000000,"-20"
 HKLM,"SYSTEM\CurrentControlSet\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}","NoInstallClass",0x00000000,"1"
+
+HKLM,"SYSTEM\CurrentControlSet\Control\Class\{4D36E96A-E325-11CE-BFC1-08002BE10318}",,0x00000000,"IDE ATA/ATAPI controllers"
+HKLM,"SYSTEM\CurrentControlSet\Control\Class\{4D36E96A-E325-11CE-BFC1-08002BE10318}","Class",0x00000000,"hdc"
+HKLM,"SYSTEM\CurrentControlSet\Control\Class\{4D36E96A-E325-11CE-BFC1-08002BE10318}","Icon",0x00000000,"-9"
+HKLM,"SYSTEM\CurrentControlSet\Control\Class\{4D36E96A-E325-11CE-BFC1-08002BE10318}","Installer32",0x00000000,"SysSetup.Dll,HdcClassInstaller"
 
 HKLM,"SYSTEM\CurrentControlSet\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}",,0x00000000,"DVD/CD-ROM drives"
 HKLM,"SYSTEM\CurrentControlSet\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}","Class",0x00000000,"CDROM"
