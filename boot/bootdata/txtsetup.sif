@@ -94,6 +94,7 @@ nmidebug.sys = 1,,,,,,x,4,,,,1,4
 sacdrv.sys   = 1,,,,,,x,4,,,,1,4
 storahci.sys   = 1,,,,,,x,4,,,,1,4
 nvme.sys     = 1,,,,,,x,4,,,,1,4
+atapi.sys   = 1,,,,,,x,4,,,,1,4
 buslogic.sys = 1,,,,,,x,4,,,,1,4
 blue.sys     = 1,,,,,,x,4,,,,1,4
 vgafonts.cab = 1,,,,,,,1,,,,1,1
@@ -132,7 +133,8 @@ ucx01000.sys = 1,,,,,,x,4,,,,1,4
 fastfat.sys  = 1,,,,,,x,4,,,,1,4 
 btrfs.sys    = 1,,,,,,x,4,,,,1,4
 ramdisk.sys  = 1,,,,,,x,4,,,,1,4
-pciide.sys   = 1,,,,,,,4,,,,1,4
+pciahci.sys  = 1,,,,,,x,4,,,,1,4
+pciide.sys   = 1,,,,,,x,4,,,,1,4
 pciidex.sys  = 1,,,,,,,4,,,,1,4
 pcix.sys     = 1,,,,,,,4,,,,1,4
 pcmcia.sys   = 1,,,,,,,4,,,,1,4
@@ -175,11 +177,9 @@ ROOT\SWENUM = swenum
 *PNP0303 = i8042prt,{4D36E96B-E325-11CE-BFC1-08002BE10318}
 PCI\VEN_104B&CC_0100 = buslogic
 PCI\CC_0101 = pciide
-PCI\CC_0104 = storahci
-PCI\CC_0105 = storahci
 PCI\CC_0106 = storahci
 ;PCI\CC_0106 = storahci
-*PNP0600 = storahci
+*PNP0600 = atapi
 USB\CLASS_09 = usbhub
 USB\ROOT_HUB = usbhub
 USB\ROOT_HUB20 = usbhub
@@ -218,8 +218,10 @@ i8042prt = i8042prt.sys
 
 [BusExtenders.Load]
 pciide = pciide.sys
+pciahci = pciahci.sys
 
 [SCSI.Load]
+atapi = atapi.sys
 storahci = storahci.sys
 buslogic = buslogic.sys
 disk = disk.sys
