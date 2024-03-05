@@ -9300,7 +9300,7 @@ typedef enum _SCSI_NOTIFICATION_TYPE {
 
 
 
-#if 1//(NTDDI_VERSION < NTDDI_WIN8)
+#if (NTDDI_VERSION < NTDDI_WIN8)
 
 //
 // Structure passed between miniport initialization
@@ -9669,7 +9669,7 @@ typedef struct _VIRTUAL_HW_INITIALIZATION_DATA {
 } VIRTUAL_HW_INITIALIZATION_DATA, *PVIRTUAL_HW_INITIALIZATION_DATA;
 
 
-#if 0//(NTDDI_VERSION >= NTDDI_WIN8)
+#if NTDDI_VERSION >= NTDDI_WIN8
 
 //
 // Define new HW_INITIALIZATION_DATA to support extended SRB type. Going

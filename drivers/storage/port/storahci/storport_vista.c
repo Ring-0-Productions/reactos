@@ -33,6 +33,10 @@ StorPortEtwLevelError
 StorPortEtwEventDiagnostic
 #endif
 
+typedef struct _TIMERHANDLE
+{
+  UINT32 bruh;
+} TIMEHANDLE,  *PTIMEHANDLE;
 ULONG StorPortFreeTimer(
   PVOID HwDeviceExtension,
   PVOID TimerHandle
@@ -62,7 +66,10 @@ ULONG StorPortInitializeTimer(
   PVOID *TimerHandle
 )
 {
+    TIMEHANDLE TimerHandleLoc = {0};
+    *TimerHandle = &TimerHandleLoc;
     UNIMPLEMENTED;
+
     __debugbreak();
     return 0;
 }

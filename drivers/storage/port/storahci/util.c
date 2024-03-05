@@ -543,29 +543,17 @@ PortBusChangeProcess (
     // If the state change notification fails, set a timer to retry the notification after a delay
     if (status == STOR_STATUS_UNSUCCESSFUL) {
 
-        if (ChannelExtension->BusChangeTimer == NULL) {
-            StorPortInitializeTimer(ChannelExtension->AdapterExtension, &ChannelExtension->BusChangeTimer);
-        }
+        KeStallExecutionProcessor(10000);
+        status = StorPortStateChangeDetected(ChannelExtension->AdapterExtension,
+                                         STATE_CHANGE_TARGET,
+                                         (PSTOR_ADDRESS)&ChannelExtension->DeviceExtension[0].DeviceAddress,
+                                         0,
+                                         AhciBusChangeCallback,
+                                         NULL);
+            if (status == STOR_STATUS_UNSUCCESSFUL) {
+                __debugbreak();
+            }
 
-        status = StorPortRequestTimer(ChannelExtension->AdapterExtension, 
-                                     ChannelExtension->BusChangeTimer, 
-                                     AhciBusChangeTimerCallback,
-                                     ChannelExtension, 
-                                     100000, // 100 milliseconds
-                                     0);
-
-        if (status != STOR_STATUS_SUCCESS) {
-            PortReleaseActiveReference(ChannelExtension, NULL);
-        }
-    } else {
-
-        if (ChannelExtension->BusChangeTimer != NULL) {
-
-            StorPortFreeTimer(ChannelExtension->AdapterExtension, ChannelExtension->BusChangeTimer);
-            ChannelExtension->BusChangeTimer = NULL;
-        }
-
-        PortReleaseActiveReference(ChannelExtension, NULL);
     }
 }
 

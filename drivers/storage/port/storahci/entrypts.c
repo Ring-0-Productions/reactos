@@ -438,6 +438,7 @@ Note:
 
 --*/
 {
+    __debugbreak();
     ULONG storStatus = STOR_STATUS_UNSUCCESSFUL;
     PAHCI_ADAPTER_EXTENSION adapterExtension = NULL;
     PAHCI_MEMORY_REGISTERS  abar = NULL;
@@ -491,7 +492,7 @@ Note:
             return SP_RETURN_ERROR;
         }
     }
-
+    __debugbreak();
     //1.2 Gather Vendor,Device,Revision IDs from PCI
     if (!dumpMode) {
 
@@ -503,13 +504,13 @@ Note:
             ULONG pcicfgLen = 0;
             UCHAR pcicfgBuffer[0x30] = {0};
 
-            pcicfgLen = StorPortGetBusData(adapterExtension,
-                                           PCIConfiguration,
-                                           ConfigInfo->SystemIoBusNumber,
-                                           (ULONG)ConfigInfo->SlotNumber,
-                                           (PVOID)pcicfgBuffer,
-                                           (ULONG)0x30);
-            if (pcicfgLen == 0x30) {
+
+                 pcicfgLen = HalGetBusData(PCIConfiguration,
+                                       ConfigInfo->SystemIoBusNumber  ,
+                                       (ULONG)ConfigInfo->SlotNumber,
+                                       pcicfgBuffer,
+                                       (ULONG)0x30);
+            if (1) {
                 PPCI_COMMON_CONFIG pciConfigData = (PPCI_COMMON_CONFIG)pcicfgBuffer;
                 adapterExtension->VendorID = pciConfigData->VendorID;
                 adapterExtension->DeviceID = pciConfigData->DeviceID;
