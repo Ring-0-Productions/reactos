@@ -936,8 +936,8 @@ typedef struct _KINTERRUPT
     CSHORT Size;
     LIST_ENTRY InterruptListEntry;
     PKSERVICE_ROUTINE ServiceRoutine;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
-    PKSERVICE_ROUTINE MessageServiceRoutine;
+#if 1 //(NTDDI_VERSION >= NTDDI_LONGHORN)
+    PKMESSAGE_SERVICE_ROUTINE MessageServiceRoutine;
     ULONG MessageIndex;
 #endif
     PVOID ServiceContext;
@@ -950,21 +950,41 @@ typedef struct _KINTERRUPT
     KIRQL SynchronizeIrql;
     BOOLEAN FloatingSave;
     BOOLEAN Connected;
+#if (NTDDI_VERSION >= NTDDI_WIN7)
+    ULONG Number;
+#else
     CCHAR Number;
+#endif
     BOOLEAN ShareVector;
+#if (NTDDI_VERSION >= NTDDI_WIN7)
+    CHAR Pad [3];
+#endif
+#if (NTDDI_VERSION >= NTDDI_WINBLUE)
+    BOOLEAN EmulateActiveBoth;
+#endif
+#if (NTDDI_VERSION >= NTDDI_WIN8)
+    USHORT ActiveCount;
+    LONG InternalState;
+#endif
     KINTERRUPT_MODE Mode;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 1 //(NTDDI_VERSION >= NTDDI_LONGHORN)
     KINTERRUPT_POLARITY Polarity;
 #endif
     ULONG ServiceCount;
     ULONG DispatchCount;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if (NTDDI_VERSION == NTDDI_LONGHORN || NTDDI_VERSION == NTDDI_WIN7)
     ULONGLONG Rsvd1;
+#endif
+#if (NTDDI_VERSION >= NTDDI_WIN8)
+    PKEVENT PassiveEvent;
 #endif
 #ifdef _M_AMD64
     PKTRAP_FRAME TrapFrame;
+#if (NTDDI_VERSION <= NTDDI_WIN7)
     PVOID Reserved;
 #endif
+#endif
+    //TODO: From here is NT6.2+ changes so we can wait
     ULONG DispatchCode[DISPATCH_LENGTH];
 } KINTERRUPT;
 
