@@ -7,6 +7,8 @@
 
 #include <ntdef.h>
 #include <ntifs.h>
+#include <debug.h>
+
 
 NTSTATUS
 NTKRNLVISTAAPI
