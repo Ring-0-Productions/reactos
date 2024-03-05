@@ -70,6 +70,19 @@ IoCreateArcName(
     return STATUS_SUCCESS;
 }
 
+
+NTKRNLVISTAAPI
+NTSTATUS
+NTAPI
+IoGetActivityIdIrp(
+    _In_ PIRP    Irp,
+    _Out_ LPCGUID Guid
+)
+{
+    UNIMPLEMENTED;
+    return STATUS_NOT_FOUND;
+}
+
 NTKRNLVISTAAPI
 NTSTATUS
 NTAPI
@@ -118,6 +131,31 @@ IoQueueWorkItemEx(
     IoQueueWorkItem(IoWorkItem, IopWorkItemExCallback, QueueType, newContext);
 }
 
+typedef struct _IO_WORKITEM
+{
+    WORK_QUEUE_ITEM Item;
+    PDEVICE_OBJECT DeviceObject;
+    PIO_WORKITEM_ROUTINE WorkerRoutine;
+    PVOID Context;
+} IO_WORKITEM;
+
+
+NTKRNLVISTAAPI
+ULONG
+NTAPI
+IoSizeofWorkItem()
+{
+	return sizeof(IO_WORKITEM);
+}
+
+NTKRNLVISTAAPI
+VOID
+NTAPI
+IoUninitializeWorkItem(_In_ PIO_WORKITEM IoWorkItem)
+{
+    UNIMPLEMENTED;
+}
+
 NTSTATUS
 NTAPI
 IoAllocateSfioStreamIdentifier(
@@ -140,16 +178,6 @@ IoGetSfioStreamIdentifier(
 {
     UNIMPLEMENTED;
     return NULL;
-}
-
-NTSTATUS
-NTAPI
-IoFreeSfioStreamIdentifier(
-    _In_ PFILE_OBJECT FileObject,
-    _In_ PVOID Signature)
-{
-    UNIMPLEMENTED;
-    return STATUS_SUCCESS;
 }
 
 NTKRNLVISTAAPI
@@ -228,6 +256,16 @@ IoGetIoPriorityHint(
     return IoPriorityNormal;
 }
 
+NTSTATUS
+NTAPI
+IoFreeSfioStreamIdentifier(
+    _In_ PFILE_OBJECT FileObject,
+    _In_ PVOID Signature)
+{
+    UNIMPLEMENTED;
+    return STATUS_SUCCESS;
+}
+
 NTKRNLVISTAAPI
 VOID
 NTAPI
@@ -250,17 +288,6 @@ IoSetMasterIrpStatus(
     }
 }
 
-NTKRNLVISTAAPI
-NTSTATUS
-NTAPI
-IoGetActivityIdIrp(
-    _In_ PIRP    Irp,
-    _Out_ LPCGUID Guid
-)
-{
-    UNIMPLEMENTED;
-    return STATUS_NOT_FOUND;
-}
 
 NTSTATUS
 NTAPI

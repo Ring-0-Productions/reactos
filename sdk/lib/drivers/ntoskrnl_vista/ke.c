@@ -135,23 +135,6 @@ KeQueryUnbiasedInterruptTime(VOID)
     return 1;
 }
 
-NTKRNLVISTAAPI
-NTSTATUS
-NTAPI
-KeQueryDpcWatchdogInformation(
-  OUT PKDPC_WATCHDOG_INFORMATION WatchdogInformation
-)
-{
-    WatchdogInformation->DpcTimeLimit = 0;
-    WatchdogInformation->DpcTimeCount = 0;
-    WatchdogInformation->DpcWatchdogLimit = 0;
-    WatchdogInformation->DpcWatchdogCount = 0;
-    WatchdogInformation->Reserved = 0;
-
-    UNIMPLEMENTED_ONCE;
-    return STATUS_UNSUCCESSFUL;
-}
-
 _IRQL_requires_max_(DISPATCH_LEVEL)
 NTKRNLVISTAAPI
 BOOLEAN
@@ -164,6 +147,20 @@ KeSetCoalescableTimer(
     _In_opt_ PKDPC Dpc)
 {
     return KeSetTimerEx(Timer, DueTime, Period, Dpc);
+}
+
+KAFFINITY
+NTAPI
+KeSetSystemAffinityThreadEx(
+    _In_ KAFFINITY Affinity
+)
+{
+#if 0
+    PKTHREAD CurrentThread = KeGetCurrentThread();
+    KAFFINITY PreviousAffinityCurrentThread->Affinity;
+#endif
+	KeSetSystemAffinityThread(Affinity);
+	return 0; //PreviousAffinity;
 }
 
 NTKRNLVISTAAPI

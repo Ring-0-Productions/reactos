@@ -520,20 +520,6 @@ IopConnectInterruptEx()
 
 
 NTSTATUS
-IopConnectInterruptExMessage(
-    _Inout_ PIO_CONNECT_INTERRUPT_PARAMETERS Parameters)
-{
-    NTSTATUS Status;
-    PAGED_CODE();
-
-    DPRINT1("FIXME: Message based interrupts are WIP!\n");
-    Status = 1;
-    DPRINT("IopConnectInterruptEx_IopConnectInterruptExMessage: has failed with status %X", Status);
-    return Status;
-}
-
-
-NTSTATUS
 NTAPI
 IoConnectInterruptEx(
     _Inout_ PIO_CONNECT_INTERRUPT_PARAMETERS Parameters)

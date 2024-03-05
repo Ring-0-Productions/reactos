@@ -566,9 +566,9 @@
 @ stdcall NtTerminateProcess(ptr long)
 @ stdcall NtTerminateThread(ptr long)
 @ stdcall NtTestAlert()
-@ stub -version=0x600+ NtThawRegistry
-@ stub -version=0x600+ NtThawTransactions
-@ stub -version=0x600+ NtTraceControl
+;@ stdcall -stub -version=0x600+ NtThawRegistry ; CHECKME
+;@ stdcall -stub -version=0x600+ NtThawTransactions ; CHECKME
+@ stdcall -version=0x600+ NtTraceControl(long ptr long ptr long long)
 @ stdcall NtTraceEvent(long long long ptr)
 @ stdcall NtTranslateFilePath(ptr long ptr long)
 @ stdcall NtUnloadDriver(ptr)
