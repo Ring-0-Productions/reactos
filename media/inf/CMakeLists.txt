@@ -33,8 +33,11 @@ list(APPEND INF_FILES
     usbport.inf
     volume.inf
     wdmaudio.inf
+    wdma_usb.inf
+    usbvideo.inf
+    usbprint.inf
     wmiacpi.inf)
-
+#
 list(APPEND UTF8_INF_FILES
     defltwk.inf
     font.inf

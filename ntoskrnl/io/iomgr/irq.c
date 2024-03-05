@@ -315,7 +315,7 @@ IopConnectInterruptExMessage(
     PAGED_CODE();
 
     DPRINT1("FIXME: Message based interrupts are WIP!\n");
-    Status = 1;
+    Status = STATUS_UNSUCCESSFUL;
     DPRINT("IopConnectInterruptEx_IopConnectInterruptExMessage: has failed with status %X", Status);
     return Status;
 }

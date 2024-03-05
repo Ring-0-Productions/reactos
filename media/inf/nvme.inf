@@ -43,15 +43,6 @@ HKR,,TypesSupported,%REG_DWORD%,7
 HKR, "Parameters\PnpInterface", "5", %REG_DWORD%, 0x00000001
 HKR, "Parameters", "BusType", %REG_DWORD%, 0x00000011
 
-[msi_addreg]
-HKR, Interrupt Management, 0x00000010
-HKR, Interrupt Management\MessageSignaledInterruptProperties, 0x00000010
-HKR, Interrupt Management\MessageSignaledInterruptProperties, MSISupported,       %REG_DWORD%,   1
-HKR, Interrupt Management\MessageSignaledInterruptProperties, MessageNumberLimit, %REG_DWORD%,   120
-HKR, Interrupt Management\Affinity Policy, 0x00000010
-HKR, Interrupt Management\Affinity Policy, DevicePolicy, %REG_DWORD%, 5 ;IrqPolicySpreadMessagesAcrossAllProcessors
-HKR, Interrupt Management\Affinity Policy, DevicePriority, %REG_DWORD%, 3
-HKR, Interrupt Management\Affinity Policy, GroupPolicy, %REG_DWORD%, 1
 
 [Parameters]
 HKR, Parameters\Device, Namespaces,         %REG_DWORD%, 0x00000010 ; max number of namespaces supported
@@ -80,7 +71,6 @@ nvme.sys = 1,,,
 CopyFiles=@nvme.sys
 
 [nvme_inst.ntx86.HW]
-AddReg = msi_addreg
 
 [nvme_inst.ntx86.Services]
 AddService = nvme, 0x00000002 , nvme_Service_Inst, nvme_EventLog_Inst
