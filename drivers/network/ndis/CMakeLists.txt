@@ -41,4 +41,4 @@ add_library(ndis MODULE
 set_module_type(ndis kernelmodedriver)
 add_importlibs(ndis ntoskrnl hal)
 add_pch(ndis include/ndissys.h SOURCE)
-add_cd_file(TARGET ndis DESTINATION reactos/system32/drivers FOR all)
+#add_cd_file(TARGET ndis DESTINATION reactos/system32/drivers FOR all)
