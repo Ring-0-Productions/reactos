@@ -299,6 +299,9 @@ NTAPI
 IoSynchronousCallDriver(_In_ PDEVICE_OBJECT DeviceObject,
                         _In_ PIRP Irp)
 {
+
+    DPRINT1("IoSynchronousCallDriver: Entry\n");
+    __debugbreak();
     KEVENT Event;
     PIO_STACK_LOCATION IrpStack;
     NTSTATUS Status;
