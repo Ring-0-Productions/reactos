@@ -133,7 +133,6 @@ ucx01000.sys = 1,,,,,,x,4,,,,1,4
 fastfat.sys  = 1,,,,,,x,4,,,,1,4 
 btrfs.sys    = 1,,,,,,x,4,,,,1,4
 ramdisk.sys  = 1,,,,,,x,4,,,,1,4
-pciahci.sys  = 1,,,,,,x,4,,,,1,4
 pciide.sys   = 1,,,,,,x,4,,,,1,4
 pciidex.sys  = 1,,,,,,,4,,,,1,4
 pcix.sys     = 1,,,,,,,4,,,,1,4
@@ -218,7 +217,7 @@ i8042prt = i8042prt.sys
 
 [BusExtenders.Load]
 pciide = pciide.sys
-pciahci = pciahci.sys
+storahci = storahci.sys
 
 [SCSI.Load]
 atapi = atapi.sys

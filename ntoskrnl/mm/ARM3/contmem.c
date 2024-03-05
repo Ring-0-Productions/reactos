@@ -618,6 +618,18 @@ MmAllocateContiguousMemorySpecifyCache(IN SIZE_T NumberOfBytes,
                                       CacheType);
 }
 
+PVOID NTAPI MmAllocateContiguousNodeMemory(
+       SIZE_T           NumberOfBytes,
+       PHYSICAL_ADDRESS LowestAcceptableAddress,
+       PHYSICAL_ADDRESS HighestAcceptableAddress,
+       PHYSICAL_ADDRESS BoundaryAddressMultiple,
+       ULONG            Protect,
+       NODE_REQUIREMENT PreferredNode
+)
+{
+    return MmAllocateContiguousMemorySpecifyCache(NumberOfBytes, LowestAcceptableAddress, 
+                                                    HighestAcceptableAddress, BoundaryAddressMultiple, 0);
+}
 /*
  * @implemented
  */

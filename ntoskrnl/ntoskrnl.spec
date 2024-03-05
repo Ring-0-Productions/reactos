@@ -820,7 +820,7 @@
 @ stdcall MmAdjustWorkingSetSize(long long long long)
 @ stdcall MmAdvanceMdl(ptr long)
 @ stdcall MmAllocateContiguousMemory(long long long)
-@ stdcall -stub MmAllocateContiguousNodeMemory(long ptr ptr ptr long long)
+@ stdcall MmAllocateContiguousNodeMemory(long ptr ptr ptr long long)
 @ stdcall MmAllocateContiguousMemorySpecifyCache(long long long long long long long long)
 @ stdcall -version=0x600+ MmAllocateContiguousMemorySpecifyCacheNode(long long long long long long long long long)
 @ stdcall MmAllocateMappingAddress(long long)

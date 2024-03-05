@@ -34,6 +34,8 @@ list(APPEND INF_FILES
     volume.inf
     wdmaudio.inf
     wdma_usb.inf
+    sdbus.inf
+    sdstor.inf
     usbvideo.inf
     usbprint.inf
     wmiacpi.inf)
