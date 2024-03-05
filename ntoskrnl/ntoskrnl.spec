@@ -22,7 +22,7 @@
 @ stdcall CcMdlWriteComplete(ptr ptr ptr)
 @ stdcall CcPinMappedData(ptr ptr long long ptr)
 @ stdcall CcPinRead(ptr ptr long long ptr ptr)
-stdcall KeRegisterProcessorChangeCallback(ptr ptr long)
+@ stdcall KeRegisterProcessorChangeCallback(ptr ptr long)
 @ stdcall CcPrepareMdlWrite(ptr ptr long ptr ptr)
 @ stdcall CcPreparePinWrite(ptr ptr long long long ptr ptr)
 @ stdcall KeRevertToUserGroupAffinityThread(ptr)
