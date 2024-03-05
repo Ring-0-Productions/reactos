@@ -138,15 +138,6 @@ KeQueryGroupAffinity(
     return 0;
 }
 
-NTKRNLVISTAAPI
-USHORT
-NTAPI
-KeQueryHighestNodeNumber()
-{
-    UNIMPLEMENTED;
-	return 0;
-}
-
 _IRQL_requires_max_(DISPATCH_LEVEL)
 NTKRNLVISTAAPI
 NTSTATUS
@@ -181,15 +172,6 @@ KeQueryUnbiasedInterruptTime(VOID)
     return 1;
 }
 
-NTKRNLVISTAAPI
-USHORT
-NTAPI
-KeGetCurrentNodeNumber()
-{
-    //UNIMPLEMENTED;
-	return 0;
-}
-#if 1
 _IRQL_requires_max_(DISPATCH_LEVEL)
 NTKRNLVISTAAPI
 BOOLEAN
@@ -206,6 +188,7 @@ KeSetCoalescableTimer(
 }
 
 KAFFINITY
+NTAPI
 KeSetSystemAffinityThreadEx(
     _In_ KAFFINITY Affinity
 )

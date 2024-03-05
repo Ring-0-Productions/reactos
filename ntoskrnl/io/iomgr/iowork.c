@@ -90,4 +90,15 @@ IoAllocateWorkItem(IN PDEVICE_OBJECT DeviceObject)
     return IoWorkItem;
 }
 
+VOID
+NTAPI
+IoInitializeWorkItem(
+    _In_ PVOID IoObject,
+    _In_ PIO_WORKITEM IoWorkItem)
+{
+    /* Initialize it */
+    IoWorkItem->DeviceObject = IoObject;
+    ExInitializeWorkItem(&IoWorkItem->Item, IopWorkItemCallback, IoWorkItem);
+}
+
 /* EOF */

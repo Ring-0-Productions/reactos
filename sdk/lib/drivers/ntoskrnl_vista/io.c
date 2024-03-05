@@ -55,20 +55,6 @@ IoCreateArcName(
     return STATUS_SUCCESS;
 }
 
-NTKRNLVISTAAPI
-ULONG NTAPI
-IoSizeofWorkItem()
-{
-    return 0;
-}
-
-NTKRNLVISTAAPI
-VOID NTAPI
-IoUninitializeWorkItem(_In_ PIO_WORKITEM IoWorkItem)
-{
-    UNIMPLEMENTED;
-    __debugbreak();
-}
 
 NTKRNLVISTAAPI
 NTSTATUS
@@ -143,18 +129,6 @@ IoQueueWorkItemEx(
 }
 
 NTKRNLVISTAAPI
-VOID
-NTAPI
-IoInitializeWorkItem(
-    _In_ PVOID IoObject,
-    _In_ PIO_WORKITEM IoWorkItem)
-{
-    /* Initialize it */
-    IoWorkItem->DeviceObject = IoObject;
-    ExInitializeWorkItem(&IoWorkItem->Item, IopWorkItemCallback, IoWorkItem);
-}
-
-NTKRNLVISTAAPI
 ULONG
 NTAPI
 IoSizeofWorkItem()
@@ -192,16 +166,6 @@ IoGetSfioStreamIdentifier(
 {
     UNIMPLEMENTED;
     return NULL;
-}
-
-NTSTATUS
-NTAPI
-IoFreeSfioStreamIdentifier(
-    _In_ PFILE_OBJECT FileObject,
-    _In_ PVOID Signature)
-{
-    UNIMPLEMENTED;
-    return STATUS_SUCCESS;
 }
 
 NTKRNLVISTAAPI
@@ -279,29 +243,6 @@ IoGetIoPriorityHint(
 {
     UNIMPLEMENTED;
     return IoPriorityNormal;
-}
-
-NTSTATUS
-NTAPI
-IoAllocateSfioStreamIdentifier(
-  _In_ PFILE_OBJECT FileObject,
-  _In_ ULONG Length,
-  _In_ PVOID Signature,
-  _Out_ PVOID *StreamIdentifier)
-{
-    *StreamIdentifier = NULL;
-    return STATUS_SUCCESS;
-}
-    
-
-PVOID
-NTAPI
-IoGetSfioStreamIdentifier(
-    _In_ PFILE_OBJECT FileObject,
-    _In_ PVOID Signature)
-{
-    UNIMPLEMENTED;
-    return NULL;
 }
 
 NTSTATUS
