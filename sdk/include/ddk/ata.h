@@ -1505,7 +1505,6 @@ typedef struct _GP_LOG_NCQ_SEND_RECEIVE {
 #define IDE_COMMAND_SECURITY_FREEZE_LOCK      0xF5
 #define IDE_COMMAND_NOT_VALID                 0xFF
 
-<<<<<<< HEAD
 
 
 #include <pshpack1.h>
@@ -1536,18 +1535,5 @@ typedef struct _GP_LOG_HYBRID_INFORMATION_HEADER {
     UCHAR   Reserved[28];
 } GP_LOG_HYBRID_INFORMATION_HEADER, *PGP_LOG_HYBRID_INFORMATION_HEADER;
 #include <poppack.h>
-=======
-#define IDE_FEATURE_ENABLE_WRITE_CACHE          0x2
-#define IDE_FEATURE_SET_TRANSFER_MODE           0x3
-#define IDE_FEATURE_ENABLE_PUIS                 0x6
-#define IDE_FEATURE_PUIS_SPIN_UP                0x7
-#define IDE_FEATURE_ENABLE_SATA_FEATURE         0x10
-#define IDE_FEATURE_DISABLE_MSN                 0x31
-#define IDE_FEATURE_DISABLE_REVERT_TO_POWER_ON  0x66
-#define IDE_FEATURE_DISABLE_WRITE_CACHE         0x82
-#define IDE_FEATURE_DISABLE_PUIS                0x86
-#define IDE_FEATURE_DISABLE_SATA_FEATURE        0x90
-#define IDE_FEATURE_ENABLE_MSN                  0x95
->>>>>>> b7456232f2b ([DDK] Update IDENTIFY data and other ATA definitions)
 
 #endif

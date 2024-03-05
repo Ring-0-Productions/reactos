@@ -363,9 +363,7 @@ LoadOrderGroup = System Bus Extender
 CopyFiles = PciAhci_CopyFiles.NT
 
 [PciAhci_CopyFiles.NT]
-atapi.sys
-pciahci.sys
-pciidex.sys
+storahci.sys
 
 [PciAhci_Inst.NT.Services]
 AddService = pciahci, 0x00000002, PciAhci_Service_Inst
