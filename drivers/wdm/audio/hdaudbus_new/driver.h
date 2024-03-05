@@ -101,7 +101,7 @@ static inline void udelay(LONG usec) {
 static ULONG SklHdAudBusDebugLevel = 100;
 static ULONG SklHdAudBusDebugCatagories = DBG_INIT || DBG_PNP || DBG_IOCTL;
 
-#if 1
+#if 0
 #define SklHdAudBusPrint(dbglevel, dbgcatagory, fmt, ...) {          \
     if (SklHdAudBusDebugLevel >= dbglevel &&                         \
         (SklHdAudBusDebugCatagories && dbgcatagory))                 \
