@@ -785,7 +785,6 @@ HalpAdjustPCIResourceList(IN PBUS_HANDLER BusHandler,
                                          pResourceList);
 #else
     DPRINT1("HAL: No PCI Resource Adjustment done! Hardware may malfunction\n");
-    __debugbreak();
     Status = STATUS_SUCCESS;
 #endif
 

@@ -79,7 +79,7 @@ Return Value:
 {
     ULONG status;
     HW_INITIALIZATION_DATA hwInitializationData = {0};
-
+    return STOR_STATUS_UNSUCCESSFUL
     DPRINT1("\tSTORAHCI, Storport AHCI Miniport Driver.\n");
 
     hwInitializationData.HwInitializationDataSize = sizeof(HW_INITIALIZATION_DATA);
