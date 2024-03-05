@@ -315,8 +315,152 @@ KiInterruptTemplateHandler(IN PKTRAP_FRAME TrapFrame,
     ((PKI_INTERRUPT_DISPATCH)Interrupt->DispatchAddress)(TrapFrame, Interrupt);
 }
 
+BOOLEAN
+NTAPI
+KiInterruptMessageDispatch(PKINTERRUPT Interrupt, PVOID ServiceContext)
+{
+    return Interrupt->MessageServiceRoutine(Interrupt,
+                                            ServiceContext,
+                                            Interrupt->MessageIndex);
+}
+
 
 /* PUBLIC FUNCTIONS **********************************************************/
+
+
+#if (NTDDI_VERSION >= NTDDI_WIN10)
+/*
+ * this thing starts majorly getting sucked into the "HAL IN NTOSKRNL drama"
+ * There's some majorly architecture specifc garbage mixed into the structures.
+ * As well as internal HAL structures that get used here now.
+ *
+ * THIS IS MAJORLY A DONT BREAK GLASS MOMENT, IF YOU FIND A DRIVER THAT NEEDS THIS STUFF WE'VE REACHED THE POINT
+ * OF NO RETURN AND REACTOS WILL REQUIRE MAJOR ARCHITECTURE CHANGES TO SUPPORT THOSE DRIVERS
+ */
+
+typedef struct _INTERRUPT_CONNECTION_DATA
+{
+    ULONG Count;
+    struct INTERRUPT_VECTOR_DATA Vectors[1];
+} INTERRUPT_CONNECTION_DATA, *PINTERRUPT_CONNECTION_DATA;
+
+VOID
+NTAPI
+KeInitializeInterruptEx(_Out_ PKINTERRUPT Interrupt,
+                        _In_  PKSERVICE_ROUTINE ServiceRoutine,
+                        _In_  PKMESSAGE_SERVICE_ROUTINE MessageServiceRoutine,
+                        _In_  PVOID ServiceContext,
+                        _In_  ULONG MessageIndex,
+                        _In_  PKSPIN_LOCK SpinLock,
+                        _In_  PKEVENT PassiveEvent,
+                        _In_  ULONG Vector,
+                        _In_  KIRQL Irql,
+                        _In_  KIRQL SynchronizeIrql,
+                        _In_  KINTERRUPT_MODE InterruptMode,
+                        _In_  BOOLEAN ShareVector,
+                        _In_  CHAR ProcessorNumber,
+                        _In_  BOOLEAN FloatingSave,
+                        _In_  BOOLEAN EmulateActiveBoth,
+                        _In_  PINTERRUPT_VECTOR_DATA ConnectionData)
+#else
+VOID
+NTAPI
+KeInitializeInterruptEx(_Out_ PKINTERRUPT Interrupt,
+                        _In_  PKSERVICE_ROUTINE ServiceRoutine,
+                        _In_  PKMESSAGE_SERVICE_ROUTINE MessageServiceRoutine,
+                        _In_  PVOID ServiceContext,
+                        _In_  ULONG MessageIndex,
+                        _In_  PKSPIN_LOCK SpinLock,
+                        _In_  ULONG Vector,
+                        _In_  KIRQL Irql,
+                        _In_  KIRQL SynchronizeIrql,
+                        _In_  KINTERRUPT_MODE InterruptMode,
+                        _In_  BOOLEAN ShareVector,
+                        _In_  CHAR ProcessorNumber,
+                        _In_  BOOLEAN FloatingSave)
+#endif
+{
+    ULONG i;
+    PULONG DispatchCode = &Interrupt->DispatchCode[0], Patch = DispatchCode;
+
+    /* Set the Interrupt Header */
+    Interrupt->Type = InterruptObject;
+    Interrupt->Size = sizeof(KINTERRUPT);
+
+    /* Check if we got a spinlock */
+    if (SpinLock)
+    {
+        Interrupt->ActualLock = SpinLock;
+    }
+    else
+    {
+        /* This means we'll be usin the built-in one */
+        KeInitializeSpinLock(&Interrupt->SpinLock);
+        Interrupt->ActualLock = &Interrupt->SpinLock;
+    }
+
+    /* Are we Message or Standard? */
+    if (ServiceRoutine)
+    {
+        /* if the caller passes a valid service routine, it CAN'T pass a valid mesagee routine. This is what
+         * MSDN quite specifically states.
+         */
+        Interrupt->ServiceRoutine = ServiceRoutine;
+    }
+    else
+    {
+      Interrupt->MessageServiceRoutine = MessageServiceRoutine;
+      Interrupt->ServiceRoutine = KiInterruptMessageDispatch;
+      Interrupt->MessageIndex = MessageIndex;
+    }
+
+    /* Standard elements */
+    Interrupt->Vector = Vector;
+    Interrupt->Mode = InterruptMode;
+    Interrupt->ShareVector = ShareVector;
+    Interrupt->SynchronizeIrql = SynchronizeIrql;
+    Interrupt->Irql = Irql;
+    Interrupt->Number = ProcessorNumber;
+    Interrupt->TickCount = MAXULONG;
+    Interrupt->DispatchCount = MAXULONG;
+    Interrupt->FloatingSave = FloatingSave;
+
+#if (NTDDI_VERSION >= NTDDI_WIN8)
+    /* if SynchIrql is Null create a passive event */
+    if (!SynchronizeIrql)
+    {
+      KeInitializeEvent(PassiveEvent, SynchronizationEvent, TRUE);
+      Interrupt->PassiveEvent = PassiveEvent;
+    }
+    Interrupt->InternalState = FALSE;
+#endif
+
+#if (NTDDI_VERSION >= NTDDI_WINBLUE)
+    Interrupt->EmulateActiveBoth = EmulateActiveBoth;
+#endif
+
+#if (NTDDI_VERSION >= NTDDI_WIN10)
+    Interrupt->ConnectionData = ConnectionData;
+#endif
+
+    /* Loop the template in memory */
+    for (i = 0; i < DISPATCH_LENGTH; i++)
+    {
+        /* Copy the dispatch code */
+        *DispatchCode++ = ((PULONG)KiInterruptTemplate)[i];
+    }
+
+    /* Jump to the last 4 bytes */
+    Patch = (PULONG)((ULONG_PTR)Patch +
+                     ((ULONG_PTR)&KiInterruptTemplateObject -
+                      (ULONG_PTR)KiInterruptTemplate) - 4);
+
+    /* Apply the patch */
+    *Patch = PtrToUlong(Interrupt);
+
+    /* Disconnect it at first */
+    Interrupt->Connected = 0;
+}
 
 /*
  * @implemented

@@ -217,6 +217,23 @@ KeInitializeInterrupt(
     _In_ BOOLEAN FloatingSave
 );
 
+
+VOID
+NTAPI
+KeInitializeInterruptEx(_Out_ PKINTERRUPT Interrupt,
+                        _In_  PKSERVICE_ROUTINE ServiceRoutine,
+                        _In_  PKMESSAGE_SERVICE_ROUTINE MessageServiceRoutine,
+                        _In_  PVOID ServiceContext,
+                        _In_  ULONG MessageIndex,
+                        _In_  PKSPIN_LOCK SpinLock,
+                        _In_  ULONG Vector,
+                        _In_  KIRQL Irql,
+                        _In_  KIRQL SynchronizeIrql,
+                        _In_  KINTERRUPT_MODE InterruptMode,
+                        _In_  BOOLEAN ShareVector,
+                        _In_  CHAR ProcessorNumber,
+                        _In_  BOOLEAN FloatingSave);
+
 BOOLEAN
 NTAPI
 KeConnectInterrupt(
