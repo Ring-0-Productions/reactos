@@ -632,6 +632,9 @@ WSPCloseSocket(IN SOCKET Handle,
     LONG LingerWait = -1;
     DWORD References;
 
+    /* Allow APC to be processed */
+    SleepEx(0, TRUE);
+
     /* Get the Socket Structure associate to this Socket*/
     Socket = GetSocketStructure(Handle);
     if (!Socket)
@@ -1083,6 +1086,9 @@ WSPSelect(IN int nfds,
     ULONG               Events;
     fd_set              selectfds;
 
+    /* Allow APC to be processed */
+    SleepEx(0, TRUE);
+
     /* Find out how many sockets we have, and how large the buffer needs
      * to be */
     FD_ZERO(&selectfds);
@@ -1363,14 +1369,8 @@ WSPSelect(IN int nfds,
                     TRACE("Event %x on handle %x\n",
                         Events,
                         Handle);
-                    if( Socket->SharedData->NonBlocking != 0 )
-                    {
-                        if (writefds)
-                            FD_SET(Handle, writefds);
-
-                        /* Allow APC to be processed */
-                        SleepEx(0, TRUE);
-                    }
+                    if( writefds && Socket->SharedData->NonBlocking != 0 )
+                        FD_SET(Handle, writefds);
                     break;
                 case AFD_EVENT_OOB_RECEIVE:
                     TRACE("Event %x on handle %x\n",
@@ -1385,14 +1385,8 @@ WSPSelect(IN int nfds,
                     TRACE("Event %x on handle %x\n",
                         Events,
                         Handle);
-                    if( Socket->SharedData->NonBlocking != 0 )
-                    {
-                        if (exceptfds)
-                            FD_SET(Handle, exceptfds);
-
-                        /* Allow APC to be processed */
-                        SleepEx(0, TRUE);
-                    }
+                    if( exceptfds && Socket->SharedData->NonBlocking != 0 )
+                        FD_SET(Handle, exceptfds);
                     break;
             }
         }
@@ -3493,12 +3487,7 @@ GetSocketInformation(PSOCKET_INFORMATION Socket,
     }
 
     NtClose(SockEvent);
-    if (Overlapped && Status != STATUS_PENDING)
-    {
-        /* Allow APC to be processed */
-        SleepEx(0, TRUE);
-    }
-    else if (!Overlapped)
+    if (!APCFunction)
     {
         /* When using APC, this will be freed by the APC function */
         HeapFree(GlobalHeap, 0, InfoData);
@@ -3622,12 +3611,7 @@ SetSocketInformation(PSOCKET_INFORMATION Socket,
     TRACE("Status %lx\n", Status);
 
     NtClose(SockEvent);
-    if (Overlapped && Status != STATUS_PENDING)
-    {
-        /* Allow APC to be processed */
-        SleepEx(0, TRUE);
-    }
-    else if (!Overlapped)
+    if (!APCFunction)
     {
         /* When using APC, this will be freed by the APC function */
         HeapFree(GlobalHeap, 0, InfoData);

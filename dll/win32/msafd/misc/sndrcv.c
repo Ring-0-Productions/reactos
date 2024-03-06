@@ -24,6 +24,9 @@ WSPAsyncSelect(IN  SOCKET Handle,
     PASYNC_DATA                 AsyncData;
     BOOLEAN                     BlockMode;
 
+    /* Allow APC to be processed */
+    SleepEx(0, TRUE);
+
     /* Get the Socket Structure associated to this Socket */
     Socket = GetSocketStructure(Handle);
     if (!Socket)
@@ -106,6 +109,9 @@ WSPGetOverlappedResult(
 
     TRACE("Called (%x)\n", Handle);
 
+    /* Allow APC to be processed */
+    SleepEx(0, TRUE);
+
     /* Get the Socket Structure associate to this Socket*/
     Socket = GetSocketStructure(Handle);
     if (!Socket)
@@ -126,8 +132,10 @@ WSPGetOverlappedResult(
     {
         *lpdwFlags = 0;
 
-        /* Allow APC to be processed */
-        SleepEx(0, TRUE);
+        /* Re-enable Async Event */
+        SockReenableAsyncSelectEvent(Socket, FD_OOB);
+        SockReenableAsyncSelectEvent(Socket, FD_WRITE);
+        SockReenableAsyncSelectEvent(Socket, FD_READ);
     }
 
     return Ret;
@@ -360,12 +368,7 @@ WSPRecv(SOCKET Handle,
     NumberOfBytesRead = (DWORD)IOSB->Information;
 
     NtClose(SockEvent);
-    if (lpOverlapped && Status != STATUS_PENDING)
-    {
-        /* Allow APC to be processed */
-        SleepEx(0, TRUE);
-    }
-    else if (!lpOverlapped)
+    if (!APCFunction)
     {
         /* When using APC, this will be freed by the APC function */
         HeapFree(GlobalHeap, 0, RecvInfo);
@@ -608,12 +611,7 @@ WSPRecvFrom(SOCKET Handle,
     NumberOfBytesRead = (DWORD)IOSB->Information;
 
     NtClose(SockEvent);
-    if (lpOverlapped && Status != STATUS_PENDING)
-    {
-        /* Allow APC to be processed */
-        SleepEx(0, TRUE);
-    }
-    else if (!lpOverlapped)
+    if (!APCFunction)
     {
         /* When using APC, this will be freed by the APC function */
         HeapFree(GlobalHeap, 0, RecvInfo);
@@ -814,12 +812,7 @@ WSPSend(SOCKET Handle,
     NumberOfBytesSent = (DWORD)IOSB->Information;
 
     NtClose(SockEvent);
-    if (lpOverlapped && Status != STATUS_PENDING)
-    {
-        /* Allow APC to be processed */
-        SleepEx(0, TRUE);
-    }
-    else if (!lpOverlapped)
+    if (!APCFunction)
     {
         /* When using APC, this will be freed by the APC function */
         HeapFree(GlobalHeap, 0, SendInfo);
@@ -1036,12 +1029,7 @@ WSPSendTo(SOCKET Handle,
     NumberOfBytesSent = (DWORD)IOSB->Information;
 
     NtClose(SockEvent);
-    if (lpOverlapped && Status != STATUS_PENDING)
-    {
-        /* Allow APC to be processed */
-        SleepEx(0, TRUE);
-    }
-    else if (!lpOverlapped)
+    if (!APCFunction)
     {
         /* When using APC, this will be freed by the APC function */
         HeapFree(GlobalHeap, 0, SendInfo);

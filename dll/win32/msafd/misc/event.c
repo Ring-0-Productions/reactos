@@ -29,6 +29,9 @@ WSPEventSelect(
 
     TRACE("WSPEventSelect (%lx) %lx %lx\n", Handle, hEventObject, lNetworkEvents);
 
+    /* Allow APC to be processed */
+    SleepEx(0, TRUE);
+
     /* Get the Socket Structure associate to this Socket*/
     Socket = GetSocketStructure(Handle);
     if (!Socket)
