@@ -30,6 +30,65 @@ ULONG KiDPCTimeout = 110;
 
 VOID
 NTAPI
+KeSetSystemGroupAffinityThread(
+  _In_ PGROUP_AFFINITY Affinity,
+  _Out_opt_ PGROUP_AFFINITY PreviousAffinity)
+
+  {
+    if (PreviousAffinity)
+    {
+        GROUP_AFFINITY PreviousAffinityLoc;
+        PreviousAffinityLoc.Mask = 1;
+        PreviousAffinityLoc.Group = 1;
+    
+        PreviousAffinity = &PreviousAffinityLoc;
+    }
+  }
+NTSTATUS
+NTAPI
+IoGetDeviceNumaNode(
+  _In_ PDEVICE_OBJECT Pdo,
+  _Out_ PUSHORT NodeNumber)
+  {
+    return 1;
+  }
+USHORT
+NTAPI
+KeQueryMaximumGroupCount(VOID)
+{
+    return 1;
+}
+PVOID
+NTAPI
+KeRegisterProcessorChangeCallback(
+  _In_ PPROCESSOR_CALLBACK_FUNCTION CallbackFunction,
+  _In_opt_ PVOID CallbackContext,
+  _In_ ULONG Flags)
+{
+    UNIMPLEMENTED_ONCE;
+    return NULL;
+}
+
+NTSTATUS
+NTAPI
+KeGetProcessorNumberFromIndex(
+  _In_ ULONG ProcIndex,
+  _Out_ PPROCESSOR_NUMBER ProcNumber)
+{
+    ProcNumber->Group = 1;
+    ProcNumber->Number = 1;
+    return 0;
+}
+
+VOID
+NTAPI
+KeRevertToUserGroupAffinityThread(
+  _In_ PGROUP_AFFINITY PreviousAffinity)
+  {
+
+  }
+VOID
+NTAPI
 KiCheckTimerTable(IN ULARGE_INTEGER CurrentTime)
 {
 #if DBG

@@ -20,24 +20,18 @@ list(APPEND INF_FILES
     msmouse.inf
     NET_NIC.inf
     nettcpip.inf
-    nvme.inf
     ports.inf
     scsi.inf
     shortcuts.inf
     #hdaudio.inf
     unknown.inf
     usb.inf
-    usbxhci.inf
-    usbhub3.inf
-    uaspstor.inf
     usbport.inf
     volume.inf
     wdmaudio.inf
-    wdma_usb.inf
-    sdbus.inf
-    sdstor.inf
-    usbvideo.inf
-    usbprint.inf
+    net1q32.inf
+    nete1g32.inf
+    netw5v32.inf
     wmiacpi.inf)
 
 list(APPEND UTF8_INF_FILES

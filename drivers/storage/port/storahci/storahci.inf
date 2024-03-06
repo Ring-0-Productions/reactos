@@ -1,7 +1,7 @@
 ;
 ; PROJECT:        ROS Kernel
 ; LICENSE:        GNU GPLv2 only as published by the Free Software Foundation
-; PURPOSE:        Storahci Driver INF
+; PURPOSE:        uniata Driver INF
 ; PROGRAMMERS:    Aman Priyadarshi (aman.eureka@gmail.com)
 ;
 
@@ -15,43 +15,43 @@ Provider=%ROS%
 1 = %DeviceDesc%,,,
 
 [SourceDisksFiles]
-storahci.sys = 1
+uniata.sys = 1
 
 [DestinationDirs]
 DefaultDestDir = 12 ; DIRID_DRIVERS
 
 [Manufacturer]
-%ROS%=STORAHCI,NTx86
+%ROS%=uniata,NTx86
 
-[STORAHCI]
+[uniata]
 
-[STORAHCI.NTx86]
-%SATA_AHCI.DeviceDesc%=storahci_Inst, PCI\CC_010601; Standard SATA AHCI Controller
+[uniata.NTx86]
+%SATA_AHCI.DeviceDesc%=uniata_Inst, PCI\CC_010601; Standard SATA AHCI Controller
 
 [ControlFlags]
 ExcludeFromSelect = *
 
-[storahci_Inst]
-CopyFiles = storahci_CopyFiles
+[uniata_Inst]
+CopyFiles = uniata_CopyFiles
 
-[storahci_Inst.HW]
+[uniata_Inst.HW]
 ; Enables Storport IPM for this adapter
 HKR, "StorPort", "EnableIdlePowerManagement", %REG_DWORD%, 0x01
 
-[storahci_Inst.Services]
-AddService = storahci, %SPSVCINST_ASSOCSERVICE%, storahci_Service_Inst, Miniport_EventLog_Inst
+[uniata_Inst.Services]
+AddService = uniata, %SPSVCINST_ASSOCSERVICE%, uniata_Service_Inst, Miniport_EventLog_Inst
 
-[storahci_Service_Inst]
+[uniata_Service_Inst]
 DisplayName    = %DeviceDesc%
 ServiceType    = %SERVICE_KERNEL_DRIVER%
 StartType      = %SERVICE_BOOT_START%
 ErrorControl   = %SERVICE_ERROR_CRITICAL%
-ServiceBinary  = %12%\storahci.sys
+ServiceBinary  = %12%\uniata.sys
 LoadOrderGroup = SCSI Miniport
 AddReg         = ahci_addreg
 
-[storahci_CopyFiles]
-storahci.sys,,,1
+[uniata_CopyFiles]
+uniata.sys,,,1
 
 [ahci_addreg]
 HKR, "Parameters\PnpInterface", "5", %REG_DWORD%, 0x00000001

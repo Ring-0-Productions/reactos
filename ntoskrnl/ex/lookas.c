@@ -325,6 +325,41 @@ ExInitializeLookasideListEx(PLOOKASIDE_LIST_EX Lookaside,
                             ULONG Tag,
                             USHORT Depth)
 {
+
+    if (PoolType == NonPagedPool)
+    {
+
+        ExInitializeNPagedLookasideList((PNPAGED_LOOKASIDE_LIST)Lookaside,
+                                       (PALLOCATE_FUNCTION)Allocate,
+                                      (PFREE_FUNCTION)Free,
+                                       Flags,
+                                        Size,
+                                      Tag,
+                                      Depth);
+    }
+    else if(PoolType == PagedPool)
+    {
+        ExInitializePagedLookasideList((PPAGED_LOOKASIDE_LIST)Lookaside,
+                                       (PALLOCATE_FUNCTION)Allocate,
+                                      (PFREE_FUNCTION)Free,
+                                       Flags,
+                                        Size,
+                                      Tag,
+                                      Depth);
+    }
+    else
+    {
+        ExInitializePagedLookasideList((PPAGED_LOOKASIDE_LIST)Lookaside,
+                                       (PALLOCATE_FUNCTION)Allocate,
+                                      (PFREE_FUNCTION)Free,
+                                       Flags,
+                                        Size,
+                                      Tag,
+                                      Depth);
+    }
+   
+
+
     UNIMPLEMENTED;
     return STATUS_SUCCESS;
 }

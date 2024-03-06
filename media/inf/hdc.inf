@@ -112,7 +112,7 @@ HKR, , Installer32,    0, "syssetup.dll,HdcClassInstaller"
 ; %PCI\VEN_8086&DEV_2824.DeviceDesc%=PciIde_Inst, PCI\VEN_8086&DEV_2824
 ; %PCI\VEN_8086&DEV_2825.DeviceDesc%=PciIde_Inst, PCI\VEN_8086&DEV_2825
 ; %PCI\VEN_8086&DEV_2828.DeviceDesc%=PciIde_Inst, PCI\VEN_8086&DEV_2828
-; %PCI\VEN_8086&DEV_2829.DeviceDesc%=storahci_Inst, PCI\VEN_8086&DEV_2829
+; %PCI\VEN_8086&DEV_2829.DeviceDesc%=uniata_Inst, PCI\VEN_8086&DEV_2829
 ; %PCI\VEN_8086&DEV_2850.DeviceDesc%=PciIde_Inst, PCI\VEN_8086&DEV_2850
 ; %PCI\VEN_8086&DEV_282a.DeviceDesc%=PciIde_Inst, PCI\VEN_8086&DEV_282a
 ; %PCI\VEN_8086&DEV_2920.DeviceDesc%=PciIde_Inst, PCI\VEN_8086&DEV_2920
@@ -326,7 +326,7 @@ HKR, , Installer32,    0, "syssetup.dll,HdcClassInstaller"
 %PCI\CC_0101.DeviceDesc%=PciIde_Inst,PCI\CC_0101                       ; Device ID for generic Dual PCI IDE  (UNKNOWN_PCI_IDE)
 %PCI\CC_0104.DeviceDesc%=PciIde_Inst,PCI\CC_0104                       ; Device ID for generic Dual PCI IDE  (UNKNOWN_PCI_IDE)
 %PCI\CC_0105.DeviceDesc%=PciIde_Inst,PCI\CC_0105                       ; Device ID for generic Dual PCI IDE  (UNKNOWN_PCI_IDE)
-%PCI\CC_0106.DeviceDesc%=storahcii_Inst,PCI\CC_0106                      ; Device ID for generic Dual PCI IDE  (UNKNOWN_PCI_IDE)
+%PCI\CC_0106.DeviceDesc%=uniatai_Inst,PCI\CC_0106                      ; Device ID for generic Dual PCI IDE  (UNKNOWN_PCI_IDE)
 %*PNP0600.PriDeviceDesc%=Atapi_Inst, Primary_IDE_Channel
 %*PNP0600.SecDeviceDesc%=Atapi_Inst, Secondary_IDE_Channel
 %*PNP0600.DeviceDesc%=Atapi_Inst, *PNP0600                            ; Generic_ESDI_Hard_Disk_Controller   (BAD_IDE)
@@ -359,20 +359,20 @@ LoadOrderGroup = System Bus Extender
 
 ;---------------------------- PCI AHCI DRIVER ---------------------------
 
-[storahci_Inst.NT]
-CopyFiles = storahci_CopyFiles.NT
+[uniata_Inst.NT]
+CopyFiles = uniata_CopyFiles.NT
 
-[storahci_CopyFiles.NT]
-storahci.sys
+[uniata_CopyFiles.NT]
+uniata.sys
 
-[storahci_Inst.NT.Services]
-AddService = storahci, 0x00000002, storahci_Service_Inst
+[uniata_Inst.NT.Services]
+AddService = uniata, 0x00000002, uniata_Service_Inst
 
-[storahci_Service_Inst]
+[uniata_Service_Inst]
 ServiceType    = 1
 StartType      = 0
 ErrorControl   = 1
-ServiceBinary  = %12%\storahci.sys
+ServiceBinary  = %12%\uniata.sys
 LoadOrderGroup = System Bus Extender
 
 ;---------------------------- ATA PORT DRIVER ----------------------------

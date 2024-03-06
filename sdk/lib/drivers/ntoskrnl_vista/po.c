@@ -20,7 +20,7 @@ PoRegisterPowerSettingCallback(
     _Outptr_opt_ PVOID *Handle)
 {
     UNIMPLEMENTED;
-    return STATUS_INSUFFICIENT_RESOURCES;
+    return STATUS_SUCCESS;
 }
 
 _IRQL_requires_max_(APC_LEVEL)

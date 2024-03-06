@@ -26,13 +26,10 @@ ports.inf
 scsi.inf
 unknown.inf
 usbport.inf
-usbxhci.inf
-usbhub3.inf
-uaspstor.inf
 volume.inf
-sdstor.inf
-sdbus.inf
 audio.inf
+nete1g32.inf
+net1q32.inf
 ks.inf
 c_image.inf
 

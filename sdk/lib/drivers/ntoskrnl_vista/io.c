@@ -262,7 +262,7 @@ IoSetMasterIrpStatus(
     _Inout_ PIRP MasterIrp,
     _In_ NTSTATUS Status)
 {
-    UNIMPLEMENTED;
+    UNIMPLEMENTED_ONCE;
     NTSTATUS MasterStatus = MasterIrp->IoStatus.Status;
 
     if (Status == STATUS_FT_READ_FROM_COPY)

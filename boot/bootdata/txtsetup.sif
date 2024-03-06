@@ -92,7 +92,7 @@ acpi.sys     = 1,,,,,,,4,1,,,1,4
 i8042prt.sys = 1,,,,,,,4,,,,1,4
 nmidebug.sys = 1,,,,,,x,4,,,,1,4
 sacdrv.sys   = 1,,,,,,x,4,,,,1,4
-storahci.sys   = 1,,,,,,x,4,,,,1,4
+uniata.sys   = 1,,,,,,x,4,,,,1,4
 nvme.sys     = 1,,,,,,x,4,,,,1,4
 atapi.sys   = 1,,,,,,x,4,,,,1,4
 buslogic.sys = 1,,,,,,x,4,,,,1,4
@@ -177,8 +177,8 @@ ROOT\SWENUM = swenum
 PCI\VEN_104B&CC_0100 = buslogic
 PCI\CC_0101 = pciide
 PCI\CC_010802=nvme
-PCI\CC_0106 = storahci
-;PCI\CC_0106 = storahci
+PCI\CC_0106 = uniata
+;PCI\CC_0106 = uniata
 *PNP0600 = atapi
 USB\CLASS_09 = usbhub
 USB\ROOT_HUB = usbhub
@@ -218,12 +218,12 @@ i8042prt = i8042prt.sys
 
 [BusExtenders.Load]
 pciide = pciide.sys
-storahci = storahci.sys
+uniata = uniata.sys
 
 [SCSI.Load]
 atapi = atapi.sys
 nvme = nvme.sys
-storahci = storahci.sys
+uniata = uniata.sys
 buslogic = buslogic.sys
 disk = disk.sys
 
