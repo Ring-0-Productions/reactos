@@ -24,7 +24,16 @@ NTSTATUS
 NTAPI
 IopSynchronousCompletion(IN PDEVICE_OBJECT DeviceObject,
                          IN PIRP Irp,
-                         IN PVOID Context);
+                         IN PVOID Context)
+{
+    KeSetEvent((PKEVENT)Context, IO_NO_INCREMENT, FALSE);
+    return STATUS_MORE_PROCESSING_REQUIRED;
+}
+
+extern
+VOID
+NTAPI
+IopWorkItemCallback(IN PVOID Parameter);
 
 NTKRNLVISTAAPI
 NTSTATUS
@@ -274,16 +283,21 @@ IoSynchronousCallDriver(_In_ PDEVICE_OBJECT DeviceObject,
 
     IrpStack = Irp->Tail.Overlay.CurrentStackLocation;
     IrpStack->Context = &Event;
+<<<<<<< HEAD
     IrpStack->CompletionRoutine = IopSynchronousCompletion;
     IrpStack->Control = -1;
+=======
+    IrpStack->CompletionRoutine = IopSynchronousCompletionLoc;
+    IrpStack->Control = -32; // Why hell are we getting this with manual probing?
+>>>>>>> faad344e6df ([SDK] Make IoSynchronousCallDriver more accurate to test results)
 
     Status = IofCallDriver(DeviceObject, Irp);
-    DPRINT1("IofCallDriver status: %x\n", Status);
     if (Status == STATUS_PENDING)
     {
         /* Wait for it */
-        KeWaitForSingleObject(&Event, Executive, KernelMode, FALSE, NULL);
+        KeWaitForSingleObject(&Event, Suspended, KernelMode, FALSE, NULL);
         Status = Irp->IoStatus.Status;
     }
+
     return Status;
 }
