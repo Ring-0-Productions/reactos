@@ -412,8 +412,8 @@ WinLdrLoadBootDrivers(PLOADER_PARAMETER_BLOCK LoaderBlock,
         else
         {
             /* Loading failed: cry loudly */
-            ERR("Cannot load boot driver '%wZ'!\n", &BootDriver->FilePath);
-            UiMessageBox("Cannot load boot driver '%wZ'!", &BootDriver->FilePath);
+           // ERR("Cannot load boot driver '%wZ'!\n", &BootDriver->FilePath);
+           // UiMessageBox("Cannot load boot driver '%wZ'!", &BootDriver->FilePath);
             ret = FALSE;
 
             /* Remove it from the list and try to continue */

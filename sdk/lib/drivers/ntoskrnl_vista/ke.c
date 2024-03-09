@@ -107,7 +107,7 @@ KeQueryDpcWatchdogInformation(
     WatchdogInformation->DpcWatchdogCount = 0;
     WatchdogInformation->Reserved = 0;
     
-    return STATUS_UNSUCCESSFUL;
+    return 0;
 }
 
 #if 0

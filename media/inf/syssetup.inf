@@ -28,8 +28,6 @@ unknown.inf
 usbport.inf
 volume.inf
 audio.inf
-nete1g32.inf
-net1q32.inf
 ks.inf
 c_image.inf
 
