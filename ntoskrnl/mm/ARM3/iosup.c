@@ -39,6 +39,16 @@ MI_PFN_CACHE_ATTRIBUTE MiPlatformCacheAttributes[2][MmMaximumCacheType] =
 
 /* PUBLIC FUNCTIONS ***********************************************************/
 
+PVOID
+MmMapIoSpaceEx(
+  _In_ PHYSICAL_ADDRESS PhysicalAddress,
+  _In_ SIZE_T           NumberOfBytes,
+  _In_ ULONG            Protect)
+{
+    //TODO: handle uh... literally all protect fields
+    return MmMapIoSpace(PhysicalAddress, NumberOfBytes, MmNonCached);
+}
+
 /*
  * @implemented
  */
