@@ -997,6 +997,8 @@
 @ stdcall ObCreateObjectType(ptr ptr ptr ptr)
 @ stdcall ObDeleteCapturedInsertInfo(ptr)
 @ stdcall ObDereferenceObject(ptr)
+@ stdcall -version=0x600+ ObDereferenceObjectDeferDelete(ptr)
+@ stdcall -version=0x601+ ObDereferenceObjectDeferDeleteWithTag(ptr long)
 @ stdcall ObDereferenceSecurityDescriptor(ptr long)
 @ stdcall ObFindHandleForObject(ptr ptr ptr ptr ptr)
 @ fastcall -version=0x600+ ObfDereferenceObjectWithTag(ptr long)

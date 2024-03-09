@@ -728,4 +728,15 @@ ObfDereferenceObjectWithTag(
     return ObfDereferenceObject(Object);
 }
 
+NTKRNLVISTAAPI
+VOID
+FASTCALL
+ObDereferenceObjectDeferDeleteWithTag(_In_ PVOID Object,
+                                      _In_ ULONG Tag)
+{
+    UNREFERENCED_PARAMETER(Tag);
+    UNIMPLEMENTED;
+    ObDereferenceObjectDeferDelete(Object);
+}
+
 /* EOF */

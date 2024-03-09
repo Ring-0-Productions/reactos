@@ -29,9 +29,9 @@ list(APPEND INF_FILES
     usbport.inf
     volume.inf
     wdmaudio.inf
-    net1q32.inf
-    nete1g32.inf
-    netw5v32.inf
+    #net1q32.inf
+    #nete1g32.inf
+    #netw5v32.inf
     wmiacpi.inf)
 
 list(APPEND UTF8_INF_FILES
