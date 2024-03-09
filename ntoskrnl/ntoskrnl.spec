@@ -882,6 +882,7 @@
 @ stdcall MmLockPagableImageSection(ptr) MmLockPageableDataSection
 @ stdcall MmLockPagableSectionByHandle(ptr) MmLockPageableSectionByHandle
 @ stdcall MmMapIoSpace(long long long long)
+@ stdcall -version=0x600+ MmMapIoSpaceEx(int64 long long) ;win10
 @ stdcall MmMapLockedPages(ptr long)
 @ stdcall MmMapLockedPagesSpecifyCache(ptr long long ptr long long)
 @ stdcall MmMapLockedPagesWithReservedMapping(ptr long ptr long)
