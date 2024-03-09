@@ -30,8 +30,8 @@ stdcall KeRegisterProcessorChangeCallback(ptr ptr long)
 @ stdcall KeGetProcessorNumberFromIndex(long ptr)
 @ stdcall KeQueryMaximumGroupCount()
 @ stdcall -stub NtQuerySystemInformationEx(long ptr long ptr long long)
-@ stub PcwAddInstance
-@ stub PcwRegister
+@ stdcall -version=0x601+ PcwAddInstance(ptr wstr long long ptr)
+@ stdcall -version=0x601+ PcwRegister(ptr ptr)
 @ stdcall KeFreeCalloutStack(ptr)
 @ stdcall -stub RtlLookupEntryHashTable(ptr long)
 @ stdcall -stub RtlCreateHashTable(ptr long long)
