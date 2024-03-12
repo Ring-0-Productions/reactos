@@ -12,6 +12,7 @@
 #define NDEBUG
 #include <debug.h>
 
+#define MSI_MINIMAL_LINES 1
 /* FUNCTIONS *****************************************************************/
 
 /*
@@ -190,20 +191,37 @@ IopConnectInterruptExFullySpecific(
     return Status;
 }
 
-
-
-
-
-
-
-
-
+/* 
+ * In order for us to know how many message lines a device needs we need to look up
+ * into the drivers settings and retrieve it. 
+ * Sadly this is done by a function reactos is missing for now.
+ * 
+ * Required Function:
+ * https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-iogetdevicepropertydata
+ */
+NTSTATUS
+NTAPI
+IopGetMSIConnectionOptions(_In_ PDEVICE_OBJECT DeviceObject, _Out_ ULONG* MaxLines)
+{
+    return STATUS_UNSUCCESSFUL;
+}
 
 NTSTATUS
 NTAPI
-IopConnectInterruptEx()
+IopCreateInterruptObject(OUT PKINTERRUPT *InterruptObject,
+                          IN PKSERVICE_ROUTINE ServiceRoutine,
+                          IN PVOID ServiceContext,
+                          IN PKSPIN_LOCK SpinLock,
+                          IN ULONG Vector,
+                          IN KIRQL Irql,
+                          IN KIRQL SynchronizeIrql,
+                          IN KINTERRUPT_MODE InterruptMode,
+                          IN BOOLEAN ShareVector,
+                          IN KAFFINITY ProcessorEnableMask,
+                          IN BOOLEAN FloatingSave,
+                          PKMESSAGE_SERVICE_ROUTINE MessageServiceRoutine,
+                          ULONG MessageIndex)
 {
-    #if 0
     PKINTERRUPT Interrupt;
     PKINTERRUPT InterruptUsed;
     PIO_INTERRUPT IoInterrupt;
@@ -259,7 +277,9 @@ IopConnectInterruptEx()
             /* Initialize it */
             KeInitializeInterruptEx(InterruptUsed,
                                   ServiceRoutine,
+                                  MessageServiceRoutine,
                                   ServiceContext,
+                                  MessageIndex,
                                   SpinLockUsed,
                                   Vector,
                                   Irql,
@@ -268,27 +288,30 @@ IopConnectInterruptEx()
                                   ShareVector,
                                   Count,
                                   FloatingSave);
-#if 0
-            /* Connect it */
-            if (!KeConnectInterrupt(InterruptUsed))
+            //FIXME: This only handles fallback and is wrong!!
+            if (ServiceRoutine)
             {
-                /* Check how far we got */
-                if (FirstRun)
+            /* Connect it */
+                if (!KeConnectInterrupt(InterruptUsed))
                 {
-                    /* We failed early so just free this */
-                    ExFreePoolWithTag(IoInterrupt, TAG_KINTERRUPT);
-                }
-                else
-                {
-                    /* Far enough, so disconnect everything */
-                    IoDisconnectInterrupt(&IoInterrupt->FirstInterrupt);
-                }
+                    /* Check how far we got */
+                    if (FirstRun)
+                    {
+                        /* We failed early so just free this */
+                        ExFreePoolWithTag(IoInterrupt, TAG_KINTERRUPT);
+                    }
+                    else
+                    {
+                        /* Far enough, so disconnect everything */
+                        IoDisconnectInterrupt(&IoInterrupt->FirstInterrupt);
+                    }
 
-                /* And fail */
-                *InterruptObject = NULL;
-                return STATUS_INVALID_PARAMETER;
+                    /* And fail */
+                    *InterruptObject = NULL;
+                    return STATUS_INVALID_PARAMETER;
+                }
             }
-#endif
+
             /* Now we've used up our First Run */
             if (FirstRun)
             {
@@ -301,22 +324,78 @@ IopConnectInterruptEx()
             }
         }
     }
-#endif
+
     /* Return Success */
     return STATUS_SUCCESS;
 }
 
-
+/*
+ * Some "wonderful" FIXMEs:
+ * 1) Group processors are unimplemented.
+ * 2) xAPIC is broken and this depends majorly on it
+ * 3) Some more tests need to be written to sanity check against the edge cases of the different
+ * Interrupts that can be amde under the context to windows Vista, as Win8+ introduced major changes to how this
+ * function works. It tried to clever and handle some of the 8+ logic but fails miserably.
+ */
 NTSTATUS
+NTAPI
 IopConnectInterruptExMessage(
     _Inout_ PIO_CONNECT_INTERRUPT_PARAMETERS Parameters)
 {
     NTSTATUS Status;
-    PAGED_CODE();
+    ULONG MaxLines;
 
-    DPRINT1("FIXME: Message based interrupts are WIP!\n");
-    Status = STATUS_UNSUCCESSFUL;
-    DPRINT("IopConnectInterruptEx_IopConnectInterruptExMessage: has failed with status %X", Status);
+    PAGED_CODE();
+    DPRINT1("FIXME: Message based interrupts are WIP!\n");;
+
+    Status = IopGetMSIConnectionOptions(Parameters->MessageBased.PhysicalDeviceObject, &MaxLines);
+    if (Status != STATUS_SUCCESS)
+    {
+        DPRINT1("Could not obtain max line data, falling back to minimal value\n");
+        MaxLines = MSI_MINIMAL_LINES;
+    }
+
+    /* Allocate this mf */
+    PIO_INTERRUPT_MESSAGE_INFO InterruptMessageTable = ExAllocatePoolWithTag(NonPagedPool,
+                                                                             sizeof(IO_INTERRUPT_MESSAGE_INFO),
+                                                                             TAG_KINTERRUPT);
+
+    //FIXME: ugh
+    InterruptMessageTable->MessageCount = MaxLines;
+    InterruptMessageTable->UnifiedIrql = Parameters->MessageBased.SynchronizeIrql;
+    InterruptMessageTable->MessageInfo[0].Irql = Parameters->MessageBased.SynchronizeIrql;
+    InterruptMessageTable->MessageInfo[0].MessageData = 0;
+    InterruptMessageTable->MessageInfo[0].Mode = Latched;
+
+    //FIXME: Improve handling for more than one line.
+    for (ULONG i = 0; i < MaxLines; i++)
+    {
+        IopCreateInterruptObject(&InterruptMessageTable->MessageInfo[i].InterruptObject,
+                                 Parameters->MessageBased.FallBackServiceRoutine,
+                                 Parameters->MessageBased.ServiceContext,
+                                 Parameters->MessageBased.SpinLock,
+                                 0xFF,
+                                 Parameters->MessageBased.SynchronizeIrql,
+                                 Parameters->MessageBased.SynchronizeIrql,
+                                 Latched,
+                                 0xFF,
+                                 KeActiveProcessors,
+                                 FALSE,
+                                 Parameters->MessageBased.MessageServiceRoutine,
+                                 i);
+    }
+    
+    /*
+     *  We can have tons of failures along the way, but supposively according to my tests
+     * Windows can have a NULL interrupt line count and still pass success with a valid structure.
+     * TODO: figure out why that might be, because it's stupid.
+     */
+    if (InterruptMessageTable)
+    {
+        Parameters->MessageBased.ConnectionContext.InterruptMessageTable = &InterruptMessageTable;
+        return STATUS_SUCCESS;
+    }
+
     return Status;
 }
 
