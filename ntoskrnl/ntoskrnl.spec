@@ -1782,8 +1782,9 @@
 @ stdcall vDbgPrintEx(long long str ptr)
 @ stdcall vDbgPrintExWithPrefix(str long long str ptr)
 @ cdecl vsprintf(ptr str ptr)
-;@ stub -version=0x601+ vsprintf_s
-;@ cdecl -version=0x600+ vswprintf_s
+@ stub -version=0x601+ vsprintf_s
+@ stub -version=0x600+ vswprintf_s
+@ stub _vswprintf
 @ cdecl wcscat()
 @ cdecl wcschr()
 @ cdecl wcscmp()
