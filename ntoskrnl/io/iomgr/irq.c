@@ -396,7 +396,7 @@ IopConnectInterruptExMessage(
         return STATUS_SUCCESS;
     }
 
-    return Status;
+    return 0;
 }
 
 

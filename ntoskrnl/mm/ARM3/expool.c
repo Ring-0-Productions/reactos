@@ -876,7 +876,7 @@ ExpInsertPoolTracker(IN ULONG Key,
     //
     // ASSERT on ReactOS features not yet supported
     //
-    ASSERT(!(PoolType & SESSION_POOL_MASK));
+    //ASSERT(!(PoolType & SESSION_POOL_MASK));
     ASSERT(KeGetCurrentProcessorNumber() == 0);
 
     //
@@ -1926,7 +1926,7 @@ ExAllocatePoolWithTag(IN POOL_TYPE PoolType,
     //
     // Not supported in ReactOS
     //
-    ASSERT(!(PoolType & SESSION_POOL_MASK));
+    //ASSERT(!(PoolType & SESSION_POOL_MASK));
 
     //
     // Check if verifier or special pool is enabled

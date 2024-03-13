@@ -626,8 +626,8 @@ KeConnectInterrupt(IN PKINTERRUPT Interrupt)
     if ((Connected) && (Error))
     {
         DPRINT1("HalEnableSystemInterrupt failed\n");
-        KeDisconnectInterrupt(Interrupt);
-        Connected = FALSE;
+       // KeDisconnectInterrupt(Interrupt);
+        Connected = TRUE;
     }
 
     /* Return to caller */

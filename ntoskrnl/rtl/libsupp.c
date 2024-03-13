@@ -841,4 +841,20 @@ RtlpLookupDynamicFunctionEntry(
 
 #endif
 
+ULONGLONG
+NTAPI
+RtlCmDecodeMemIoResource(_In_ PCM_PARTIAL_RESOURCE_DESCRIPTOR Descriptor, _Out_ PULONGLONG Start)
+{
+    return 0;
+}
+
 /* EOF */
+
+NTSTATUS
+NTAPI
+EmProviderRegister(DRIVER_OBJECT *DriverObject, PVOID EntryRegistration, unsigned int NumberOfEntry, PVOID CallbackRegistration, unsigned int NumberOfCallback, PVOID *ProviderHandle)
+{
+    //HACK: ugh we need to implement this
+    *ProviderHandle = ExAllocatePoolWithTag(MmNonCached, 0x1000, 'FSSS');
+    return 0;
+}

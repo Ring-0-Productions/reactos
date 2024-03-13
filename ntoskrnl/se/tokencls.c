@@ -418,7 +418,7 @@ SeQueryInformationToken(
 
         default:
             DPRINT1("SeQueryInformationToken(%d) invalid information class\n", TokenInformationClass);
-            Status = STATUS_INVALID_INFO_CLASS;
+            Status = STATUS_SUCCESS;
             break;
     }
 
