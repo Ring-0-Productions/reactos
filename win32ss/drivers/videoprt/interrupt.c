@@ -115,35 +115,8 @@ VP_STATUS
 NTAPI
 VideoPortEnableInterrupt(IN PVOID HwDeviceExtension)
 {
-#ifndef _M_AMD64
-    PVIDEO_PORT_DEVICE_EXTENSION DeviceExtension;
-    BOOLEAN InterruptValid;
-
-    /* Get the device extension */
-    DeviceExtension = VIDEO_PORT_GET_DEVICE_EXTENSION(HwDeviceExtension);
-
-    /* Fail if the driver didn't register an ISR */
-    if (!DeviceExtension->DriverExtension->InitializationData.HwInterrupt)
-    {
-        /* No ISR, no interrupts */
-        return ERROR_INVALID_FUNCTION;
-    }
-
-    /* Re-enable the interrupt and return */
-    InterruptValid = HalEnableSystemInterrupt(DeviceExtension->InterruptVector,
-                                              0,
-                                              DeviceExtension->InterruptLevel);
-
-    /* Make sure the interrupt was valid */
-    ASSERT(InterruptValid == TRUE);
-
-    /* Return to caller */
-    return NO_ERROR;
-#else
-    /* FIXME: Function still present? If so what to use instead of HalEnableSystemInterrupt? */
     UNIMPLEMENTED;
     return ERROR_INVALID_FUNCTION;
-#endif
 }
 
 /*
@@ -153,25 +126,6 @@ VP_STATUS
 NTAPI
 VideoPortDisableInterrupt(IN PVOID HwDeviceExtension)
 {
-#ifndef _M_AMD64
-    PVIDEO_PORT_DEVICE_EXTENSION DeviceExtension;
-
-    /* Get the device extension */
-    DeviceExtension = VIDEO_PORT_GET_DEVICE_EXTENSION(HwDeviceExtension);
-
-    /* Fail if the driver didn't register an ISR */
-    if (!DeviceExtension->DriverExtension->InitializationData.HwInterrupt)
-    {
-        /* No ISR, no interrupts */
-        return ERROR_INVALID_FUNCTION;
-    }
-
-    /* Disable the interrupt and return */
-    HalDisableSystemInterrupt(DeviceExtension->InterruptVector, 0);
-    return NO_ERROR;
-#else
-    /* FIXME: Function still present? If so what to use instead of HalDisableSystemInterrupt? */
     UNIMPLEMENTED;
     return ERROR_INVALID_FUNCTION;
-#endif
 }

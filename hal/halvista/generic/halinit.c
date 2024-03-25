@@ -8,8 +8,13 @@
 
 /* GLOBALS *******************************************************************/
 
-/* PRIVATE FUNCTIONS *********************************************************/
+PUCHAR KdComPortInUse;
+KAFFINITY HalpActiveProcessors;
+KAFFINITY HalpDefaultInterruptAffinity;
 
+/* PUBLIC FUNCTIONS **********************************************************/
+
+EXTERN_C
 CODE_SEG("INIT")
 VOID
 NTAPI
@@ -22,7 +27,11 @@ HalInitializeProcessor(
 
     /* Set default stall count */
     KeGetPcr()->StallScaleFactor = INITIAL_STALL_COUNT;
-    __debugbreak();
+
+    /* Update the interrupt affinity and processor mask */
+    InterlockedBitTestAndSet((PLONG)&HalpActiveProcessors, ProcessorNumber);
+    InterlockedBitTestAndSet((PLONG)&HalpDefaultInterruptAffinity, ProcessorNumber);
+
 #if 0
     /* Update the interrupt affinity and processor mask */
     InterlockedBitTestAndSet((PLONG)&HalpActiveProcessors, ProcessorNumber);
