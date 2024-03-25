@@ -113,6 +113,21 @@ typedef NTSTATUS
 typedef NTSTATUS
 (NTAPI *pHalInitPnpDriver)(VOID);
 
+typedef NTSTATUS
+(NTAPI *pHalLoadMicrocode)(PVOID);
+
+typedef NTSTATUS
+(NTAPI *pHalUnloadMicrocode)(VOID);
+
+typedef NTSTATUS
+(NTAPI *pHalPostMicrocodeUpdate)(VOID);
+
+typedef NTSTATUS
+(NTAPI *pHalGetInterruptVector)(INTERFACE_TYPE InterfaceType,
+                                ULONG BusNumber, ULONG BusInterruptLevel,
+                                ULONG BusInterruptVector, PKIRQL Irql,
+                                PKAFFINITY Affinity);
+
 typedef struct _PM_DISPATCH_TABLE {
   ULONG Signature;
   ULONG Version;

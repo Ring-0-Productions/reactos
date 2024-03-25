@@ -158,11 +158,7 @@ BOOLEAN
 // See Version table at:
 // https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/ntos/hal/hal_private_dispatch.htm
 //
-#if (NTDDI_VERSION < NTDDI_WINXP)
-#define HAL_PRIVATE_DISPATCH_VERSION        1
-#elif (NTDDI_VERSION < NTDDI_LONGHORN)
-#define HAL_PRIVATE_DISPATCH_VERSION        2
-#elif (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 1
 #define HAL_PRIVATE_DISPATCH_VERSION        5
 #else
 /* Not yet defined */
@@ -189,11 +185,14 @@ typedef struct _HAL_PRIVATE_DISPATCH
     pHalVectorToIDTEntry HalVectorToIDTEntry;
     pKdMapPhysicalMemory64 KdMapPhysicalMemory64;
     pKdUnmapVirtualAddress KdUnmapVirtualAddress;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 1 
     pKdGetPciDataByOffset KdGetPciDataByOffset;
     pKdSetPciDataByOffset KdSetPciDataByOffset;
-    PVOID HalGetInterruptVectorOverride;
+    pHalGetInterruptVector HalGetInterruptVectorOverride;
     PVOID HalGetVectorInputOverride;
+    pHalLoadMicrocode HalLoadMicrocode;
+    pHalUnloadMicrocode HalUnloadMicrocode;
+    pHalPostMicrocodeUpdate HalPostMicrocodeUpdate;
 #endif
 } HAL_PRIVATE_DISPATCH, *PHAL_PRIVATE_DISPATCH;
 

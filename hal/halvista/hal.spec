@@ -28,36 +28,36 @@
 @ stdcall HalAllocateCrashDumpRegisters(ptr ptr)
 @ stdcall HalAssignSlotResources(ptr ptr ptr ptr long long long ptr)
 @ stdcall -arch=i386,arm HalBeginSystemInterrupt(long long ptr)
-; HalBugCheckSystem
+@ stub HalBugCheckSystem
 @ stdcall HalCalibratePerformanceCounter(ptr long long)
-; HalConvertIdtToIrql
-; HalDisableInterrupt
+@ stub HalConvertIdtToIrql
+@ stub HalDisableInterrupt
 @ stdcall HalDisplayString(str)
-; HalDynamicProcessorStarted
-; HalEnableInterrupt
+@ stub HalDynamicProcessorStarted
+@ stub HalEnableInterrupt
 @ stdcall -arch=i386,arm HalEndSystemInterrupt(long long)
-; HalEnumerateEnvironmentVariablesEx
+@ stub HalEnumerateEnvironmentVariablesEx
 @ stdcall HalFlushCommonBuffer(long long long long long)
 @ stdcall HalFreeCommonBuffer(ptr long long long ptr long)
 @ stdcall HalGetAdapter(ptr ptr)
 @ stdcall HalGetBusData(long long long ptr long)
 @ stdcall HalGetBusDataByOffset(long long long ptr long long)
 @ stdcall HalGetEnvironmentVariable(str long str)
-; HalGetEnvironmentVariableEx
-; HalGetInterruptTargetInformation
+@ stub HalGetEnvironmentVariableEx
+@ stub HalGetInterruptTargetInformation
 @ stdcall HalGetInterruptVector(long long long long ptr ptr)
-; HalGetMessageRoutingInfo
-; HalGetVectorInput
+@ stub HalGetMessageRoutingInfo
+@ stub HalGetVectorInput
 @ stdcall -arch=i386,x86_64 HalHandleNMI(ptr)
 @ stdcall HalInitSystem(long ptr)
-; HalInitializeBios
+@ stub HalInitializeBios
 @ stdcall HalInitializeProcessor(long ptr)
 @ stdcall HalMakeBeep(long)
 @ stdcall HalProcessorIdle()
 @ stdcall HalQueryDisplayParameters(ptr ptr ptr ptr)
 @ stdcall HalQueryRealTimeClock(ptr)
 @ stdcall HalReadDmaCounter(ptr)
-; HalRegisterErrataCallbacks
+@ stub HalRegisterErrataCallbacks
 @ stdcall HalReportResourceUsage()
 @ stdcall HalRequestIpi(long)
 @ stdcall HalReturnToFirmware(long)
@@ -65,11 +65,11 @@
 @ stdcall HalSetBusDataByOffset(long long long ptr long long)
 @ stdcall HalSetDisplayParameters(long long)
 @ stdcall HalSetEnvironmentVariable(str str)
-;HalSetEnvironmentVariableEx
+@ stub HalSetEnvironmentVariableEx
 @ stdcall HalSetProfileInterval(long)
 @ stdcall HalSetRealTimeClock(ptr)
 @ stdcall HalSetTimeIncrement(long)
-; HalStartDynamicProcessor
+@ stub HalStartDynamicProcessor
 @ stdcall HalStartNextProcessor(ptr ptr)
 @ stdcall HalStartProfileInterrupt(long)
 @ stdcall HalStopProfileInterrupt(long)
