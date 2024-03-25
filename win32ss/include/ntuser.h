@@ -391,7 +391,7 @@ typedef struct tagITEM
     /* ReactOS */
     UNICODE_STRING lpstr;
 } ITEM, *PITEM;
-
+#include <imm32_undoc.h>
 typedef struct tagMENULIST
 {
     struct tagMENULIST *pNext;
