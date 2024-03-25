@@ -64,4 +64,4 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/system32/)
     foreach(item ${EXTRA_FILES})
         add_cd_file(FILE ${CMAKE_CURRENT_SOURCE_DIR}/system32/${item} DESTINATION reactos/system32 NO_CAB NAME_ON_CD ${item} FOR all)
     endforeach(item)
-endif()
+endif()#

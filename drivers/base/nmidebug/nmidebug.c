@@ -47,7 +47,7 @@ NmiDbgCallback(IN PVOID Context,
 
     /* Handle the NMI safely */
 #ifdef _M_IX86
-    KiEnableTimerWatchdog = (RtlCompareMemory(NmiBegin, NmiBegin + 4, 4) != 4);
+ //   KiEnableTimerWatchdog = (RtlCompareMemory(NmiBegin, NmiBegin + 4, 4) != 4);
 #endif
     return TRUE;
 }
