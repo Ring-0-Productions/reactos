@@ -1071,7 +1071,7 @@
 @ stdcall -stub -version=0x600+ RtlProcessFlsData(long long)
 @ stdcall RtlProtectHeap(ptr long)
 @ stdcall RtlPushFrame(ptr)
-@ stdcall -stub -version=0x600+ RtlQueryActivationContextApplicationSettings(long long wstr wstr ptr long ptr)
+@ stdcall -version=0x600+ RtlQueryActivationContextApplicationSettings(long ptr wstr wstr ptr ptr ptr)
 @ stdcall RtlQueryAtomInAtomTable(ptr long ptr ptr ptr ptr)
 @ stdcall -stub -version=0x600+ RtlQueryCriticalSectionOwner(ptr)
 @ stdcall RtlQueryDepthSList(ptr)

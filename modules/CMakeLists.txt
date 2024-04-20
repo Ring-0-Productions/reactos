@@ -11,14 +11,12 @@ if(ENABLE_ROSTESTS)
     add_subdirectory(rostests)
 endif()
 
-if(ENABLE_WALLPAPERS)
-    add_subdirectory(wallpapers)
-endif()
+add_subdirectory(wallpapers)
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/AHK_Tests/)
     add_subdirectory(AHK_Tests)
 endif()
-#
+##
 ## Extra files for Boot/Live/Hybrid CD. You need to put them under [boot|live|hybrid]cd_extras
 ## in the same layout as you want them to be in the CD.
 ## If you change the content of any of the following folders later on,
@@ -54,7 +52,7 @@ endif()
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/drivers/)
     file(GLOB_RECURSE EXTRA_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ ${CMAKE_CURRENT_SOURCE_DIR}/drivers/*)
     foreach(item ${EXTRA_FILES})
-        add_cd_file(FILE ${CMAKE_CURRENT_SOURCE_DIR}/drivers/${item} DESTINATION reactos/system32/drivers NO_CAB NAME_ON_CD ${item} FOR all)
+        add_cd_file(FILE ${CMAKE_CURRENT_SOURCE_DIR}/drivers/${item} DESTINATION reactos/system32/drivers NAME_ON_CD ${item} FOR all)
     endforeach(item)
 endif()
 
@@ -62,6 +60,6 @@ endif()
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/system32/)
     file(GLOB_RECURSE EXTRA_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/system32/ ${CMAKE_CURRENT_SOURCE_DIR}/system32/*)
     foreach(item ${EXTRA_FILES})
-        add_cd_file(FILE ${CMAKE_CURRENT_SOURCE_DIR}/system32/${item} DESTINATION reactos/system32 NO_CAB NAME_ON_CD ${item} FOR all)
+        add_cd_file(FILE ${CMAKE_CURRENT_SOURCE_DIR}/system32/${item} DESTINATION reactos/system32 NAME_ON_CD ${item} FOR all)
     endforeach(item)
 endif()
