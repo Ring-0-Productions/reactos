@@ -193,6 +193,7 @@ SaveDesktopSettings(PDESKTOP_DATA pData);
 VOID
 SetDesktopSettings(PDESKTOP_DATA pData);
 
+#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
 LONG
 RegLoadMUIStringW(IN HKEY hKey,
                   IN LPCWSTR pszValue  OPTIONAL,
@@ -201,5 +202,6 @@ RegLoadMUIStringW(IN HKEY hKey,
                   OUT LPDWORD pcbData OPTIONAL,
                   IN DWORD Flags,
                   IN LPCWSTR pszDirectory  OPTIONAL);
+#endif
 
 #endif /* _DESK_H */

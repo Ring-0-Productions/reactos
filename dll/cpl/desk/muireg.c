@@ -1,5 +1,6 @@
 #include "desk.h"
 
+#if (_WIN32_WINNT < _WIN32_WINNT_VISTA)
 /******************************************************************************
  * load_string [Internal]
  *
@@ -142,3 +143,4 @@ cleanup:
     HeapFree(GetProcessHeap(), 0, pwszExpandedBuffer);
     return result;
 }
+#endif
