@@ -11,7 +11,7 @@ include_directories(
 add_definitions(
     -D_NTOSKRNL_
     -D_NTSYSTEM_
-    -DNTDDI_VERSION=0x05020400)
+    -DNTDDI_VERSION=0x06000000)
 
 if(NOT DEFINED NEWCC)
     set(NEWCC FALSE)

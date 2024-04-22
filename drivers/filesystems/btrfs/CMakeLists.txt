@@ -3,6 +3,10 @@ include_directories(${REACTOS_SOURCE_DIR}/sdk/include/reactos/drivers
                     ${REACTOS_SOURCE_DIR}/sdk/include/reactos/libs/zlib
                     inc)
 
+                    
+remove_definitions(-D_WIN32_WINNT=0x600 -DWINVER=0x600)
+add_definitions(-D_WIN32_WINNT=0x502 -DWINVER=0x502)
+
 set(ZSTD_SRC_FILES
     zstd/entropy_common.c
     zstd/error_private.c
