@@ -1,7 +1,7 @@
 /*
  * PROJECT:     ReactOS NT Layer/System API
  * LICENSE:     GPL-2.0-or-later (https://spdx.org/licenses/GPL-2.0-or-later)
- * PURPOSE:     Dll Notification Implementation
+ * PURPOSE:     DLL Load Notification Implementation
  * COPYRIGHT:   Copyright 2024 Ratin Gao <ratin@knsoft.org>
  */
 
@@ -61,9 +61,9 @@ LdrRegisterDllNotification(
     RtlEnterCriticalSection(&LdrpDllNotificationLock);
     if (LdrpDllNotificationList.Blink->Flink != &LdrpDllNotificationList)
     {
-        FatalListEntryError(LdrpDllNotificationList.Blink,
-                            &LdrpDllNotificationList,
-                            LdrpDllNotificationList.Flink);
+        FatalListEntryError(LdrpDllNotificationList.Blink->Blink,
+                            LdrpDllNotificationList.Blink,
+                            &LdrpDllNotificationList);
     }
     InsertTailList(&LdrpDllNotificationList, &NewEntry->List);
     RtlLeaveCriticalSection(&LdrpDllNotificationLock);
@@ -125,6 +125,7 @@ VOID NTAPI LdrpSendDllNotifications(
     LdrpAssertDllNotificationDataMember(BaseDllName);
     LdrpAssertDllNotificationDataMember(DllBase);
     LdrpAssertDllNotificationDataMember(SizeOfImage);
+
 #undef LdrpAssertDllNotificationDataMember
 
     NotificationData.Loaded.Flags = 0;

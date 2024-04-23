@@ -12,7 +12,7 @@ include_directories(
 
 list(APPEND SOURCE
     ldr/ldrinit.c
-    ldr/dllnotify.c)
+    ldr/ldrnotify.c)
 
 add_library(ntdll_vista_static ${SOURCE})
 target_link_libraries(ntdll_vista_static ${PSEH_LIB})
