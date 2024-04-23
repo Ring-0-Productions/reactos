@@ -1560,8 +1560,10 @@ LdrUnloadDll(
         /* Unload the alternate resource module, if any */
         LdrUnloadAlternateResourceModule(CurrentEntry->DllBase);
 
-        /* FIXME: Send shutdown notification */
-        //LdrpSendDllNotifications(CurrentEntry, 2, LdrpShutdownInProgress);
+        /* Send shutdown notification */
+#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA) || (DLL_EXPORT_VERSION >= _WIN32_WINNT_VISTA)
+        LdrpSendDllNotifications(CurrentEntry, LDR_DLL_NOTIFICATION_REASON_UNLOADED);
+#endif
 
         /* Check if a Hotpatch is active */
         if (LdrEntry->PatchInformation)
