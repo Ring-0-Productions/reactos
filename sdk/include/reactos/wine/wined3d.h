@@ -404,7 +404,6 @@ static inline enum wined3d_render_state WINED3D_RS_COLORWRITE(int index)
     if (index <= 7) return WINED3D_RS_COLORWRITEENABLE4 + index - 4;
     return WINED3D_RS_COLORWRITEENABLE;
 }
-#define WINEHIGHEST_RENDER_STATE                                WINED3D_RS_BLENDOPALPHA
 
 enum wined3d_blend
 {

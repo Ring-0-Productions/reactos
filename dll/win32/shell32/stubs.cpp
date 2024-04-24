@@ -955,16 +955,6 @@ DWORD WINAPI SHGetComputerDisplayNameW(DWORD param1, DWORD param2, DWORD param3,
     return E_FAIL;
 }
 
-/*
- * Unimplemented
- */
-EXTERN_C HINSTANCE
-WINAPI
-SHGetShellStyleHInstance(VOID)
-{
-    FIXME("SHGetShellStyleHInstance() stub\n");
-    return NULL;
-}
 EXTERN_C HRESULT
 WINAPI
 GetAppPathFromLink(IShellItem* pItem,
