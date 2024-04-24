@@ -996,15 +996,15 @@ LoadAndBootWindows(
     if (_stricmp(ArgValue, "Windows") == 0 ||
         _stricmp(ArgValue, "Windows2003") == 0)
     {
-        OperatingSystemVersion = _WIN32_WINNT_WS03;
+        OperatingSystemVersion = _WIN32_WINNT_WIN7;
     }
     else if (_stricmp(ArgValue, "WindowsNT40") == 0)
     {
-        OperatingSystemVersion = _WIN32_WINNT_NT4;
+        OperatingSystemVersion = _WIN32_WINNT_WIN7;
     }
     else if (_stricmp(ArgValue, "WindowsVista") == 0)
     {
-        OperatingSystemVersion = _WIN32_WINNT_VISTA;
+        OperatingSystemVersion = _WIN32_WINNT_WIN7;
     }
     else
     {
