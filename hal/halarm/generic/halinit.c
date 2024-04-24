@@ -55,7 +55,7 @@ HalInitSystem(IN ULONG BootPhase,
 #if DBG
         if (!(Prcb->BuildType & PRCB_BUILD_DEBUG))
         {
-            /* No match, bugcheck */
+           // /* No match, bugcheck */
             KeBugCheckEx(MISMATCHED_HAL, 2, Prcb->BuildType, PRCB_BUILD_DEBUG, 0);
         }
 #else
@@ -63,7 +63,7 @@ HalInitSystem(IN ULONG BootPhase,
         if (Prcb->BuildType & PRCB_BUILD_DEBUG)
         {
             /* No match, bugcheck */
-            KeBugCheckEx(MISMATCHED_HAL, 2, Prcb->BuildType, 0, 0);
+           // KeBugCheckEx(MISMATCHED_HAL, 2, Prcb->BuildType, 0, 0);
         }
 #endif
 
@@ -72,7 +72,7 @@ HalInitSystem(IN ULONG BootPhase,
         if (Prcb->BuildType & PRCB_BUILD_UNIPROCESSOR)
         {
             /* No match, bugcheck */
-            KeBugCheckEx(MISMATCHED_HAL, 2, Prcb->BuildType, 0, 0);
+          //  KeBugCheckEx(MISMATCHED_HAL, 2, Prcb->BuildType, 0, 0);
         }
 #endif
 
@@ -80,7 +80,7 @@ HalInitSystem(IN ULONG BootPhase,
         if (Prcb->MajorVersion != PRCB_MAJOR_VERSION)
         {
             /* Validation failed, bugcheck */
-            KeBugCheckEx(MISMATCHED_HAL, 1, Prcb->MajorVersion, PRCB_MAJOR_VERSION, 0);
+            //KeBugCheckEx(MISMATCHED_HAL, 1, Prcb->MajorVersion, PRCB_MAJOR_VERSION, 0);
         }
 
         /* Initialize interrupts */
