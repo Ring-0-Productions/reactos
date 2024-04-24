@@ -1,0 +1,82 @@
+# 1 "wmdrmsdk.idl" 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "mfobjects.idl";
+import "mfidl.idl";
+
+typedef struct _DRM_MINIMUM_OUTPUT_PROTECTION_LEVELS
+{
+    WORD wCompressedDigitalVideo;
+    WORD wUncompressedDigitalVideo;
+    WORD wAnalogVideo;
+    WORD wCompressedDigitalAudio;
+    WORD wUncompressedDigitalAudio;
+} DRM_MINIMUM_OUTPUT_PROTECTION_LEVELS;
+
+typedef struct _DRM_VIDEO_OUTPUT_PROTECTION
+{
+    GUID guidId;
+    BYTE bConfigData;
+} DRM_VIDEO_OUTPUT_PROTECTION;
+
+typedef struct _DRM_VIDEO_OUTPUT_PROTECTION_IDS
+{
+    WORD                        cEntries;
+    DRM_VIDEO_OUTPUT_PROTECTION *rgVop;
+} DRM_VIDEO_OUTPUT_PROTECTION_IDS;
+
+typedef struct _DRM_OPL_OUTPUT_IDS
+{
+    WORD cIds;
+    GUID *rgIds;
+} DRM_OPL_OUTPUT_IDS;
+
+typedef struct __tagDRM_COPY_OPL
+{
+    WORD               wMinimumCopyLevel;
+    DRM_OPL_OUTPUT_IDS oplIdIncludes;
+    DRM_OPL_OUTPUT_IDS oplIdExcludes;
+} DRM_COPY_OPL;
+
+typedef struct __tagDRM_PLAY_OPL
+{
+    DRM_MINIMUM_OUTPUT_PROTECTION_LEVELS minOPL;
+    DRM_OPL_OUTPUT_IDS                   oplIdReserved;
+    DRM_VIDEO_OUTPUT_PROTECTION_IDS      vopi;
+} DRM_PLAY_OPL;
+
+
+[
+    uuid(82435be0-f7c1-4df9-8103-eeabebf3d6e1),
+    version(1.0)
+]
+library WMDRMContentEnablerLib
+{
+    importlib("stdole2.tlb");
+
+    [
+        uuid(82435bdf-f7c1-4df9-8103-eeabebf3d6e1)
+    ]
+    coclass WMDRMContentEnablerActivate
+    {
+        [default] interface IPersistStream;
+    };
+};

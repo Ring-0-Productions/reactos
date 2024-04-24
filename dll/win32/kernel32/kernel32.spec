@@ -1293,8 +1293,8 @@
 @ stdcall -stub -version=0x600+ PowerCreateRequest(ptr)
 @ stdcall -stub -version=0x600+ PowerSetRequest(long long)
 @ stdcall -version=0x600+ K32GetPerformanceInfo(ptr long)
-@ stdcall -stub -version=0x600+ K32QueryWorkingSet(ptr ptr long)
-@ stdcall -stub -version=0x600+ K32QueryWorkingSetEx(ptr ptr long)
+@ stdcall -version=0x600+ K32QueryWorkingSet(ptr ptr long)
+@ stdcall -version=0x600+ K32QueryWorkingSetEx(ptr ptr long)
 @ stdcall -version=0x600+ K32GetMappedFileNameW(ptr ptr ptr long)
 @ stdcall -stub -version=0x600+ K32GetProcessImageFileNameW(ptr ptr long)
 
