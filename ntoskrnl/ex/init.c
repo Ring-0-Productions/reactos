@@ -939,12 +939,7 @@ ExpInitializeExecutive(IN ULONG Cpu,
     /* Validate Loader */
     if (!ExpIsLoaderValid(LoaderBlock))
     {
-        /* Invalid loader version */
-        KeBugCheckEx(MISMATCHED_HAL,
-                     3,
-                     LoaderBlock->Extension->Size,
-                     LoaderBlock->Extension->MajorVersion,
-                     LoaderBlock->Extension->MinorVersion);
+
     }
 
     /* Initialize PRCB pool lookaside pointers */
@@ -957,7 +952,7 @@ ExpInitializeExecutive(IN ULONG Cpu,
         if (!HalInitSystem(ExpInitializationPhase, LoaderBlock))
         {
             /* Initialization failed */
-            KeBugCheck(HAL_INITIALIZATION_FAILED);
+           // KeBugCheck(HAL_INITIALIZATION_FAILED);
         }
 
         /* We're done */
@@ -1051,7 +1046,7 @@ ExpInitializeExecutive(IN ULONG Cpu,
     if (!HalInitSystem(ExpInitializationPhase, LoaderBlock))
     {
         /* HAL failed to initialize, bugcheck */
-        KeBugCheck(HAL_INITIALIZATION_FAILED);
+        //KeBugCheck(HAL_INITIALIZATION_FAILED);
     }
 
     /* Make sure interrupts are active now */

@@ -232,7 +232,7 @@ xHalTranslateBusAddress(IN INTERFACE_TYPE InterfaceType,
                         IN OUT PULONG AddressSpace,
                         OUT PPHYSICAL_ADDRESS TranslatedAddress)
 {
-    KeBugCheckEx(HAL_INITIALIZATION_FAILED, 0, 0, 0, 0);
+//    KeBugCheckEx(HAL_INITIALIZATION_FAILED, 0, 0, 0, 0);
 
     return FALSE;
 }

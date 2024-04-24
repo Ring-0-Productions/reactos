@@ -926,15 +926,9 @@ WinLdrInitErrataInf(
     WCHAR szFileName[80];
     CHAR ErrataFilePath[MAX_PATH];
 
-    /* Open either the 'BiosInfo' (Windows <= 2003) or the 'Errata' (Vista+) key */
-    if (OperatingSystemVersion >= _WIN32_WINNT_VISTA)
-    {
-        rc = RegOpenKey(CurrentControlSetKey, L"Control\\Errata", &hKey);
-    }
-    else // (OperatingSystemVersion <= _WIN32_WINNT_WS03)
-    {
+ 
         rc = RegOpenKey(CurrentControlSetKey, L"Control\\BiosInfo", &hKey);
-    }
+    
     if (rc != ERROR_SUCCESS)
     {
         WARN("Could not open the BiosInfo/Errata registry key (Error %u)\n", (int)rc);

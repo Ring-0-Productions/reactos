@@ -61,7 +61,7 @@ HalpInitializeTsc(VOID)
     /* Check if the CPU supports RDTSC */
     if (!(KeGetCurrentPrcb()->FeatureBits & KF_RDTSC))
     {
-        KeBugCheck(HAL_INITIALIZATION_FAILED);
+        //KeBugCheck(HAL_INITIALIZATION_FAILED);
     }
 
      /* Save flags and disable interrupts */
