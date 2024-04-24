@@ -35,7 +35,7 @@
 WINE_DEFAULT_DEBUG_CHANNEL(wuapi);
 
 typedef HRESULT (*fnCreateInstance)( LPVOID *ppObj );
-
+static HINSTANCE instance;
 typedef struct _wucf
 {
     IClassFactory IClassFactory_iface;
@@ -108,6 +108,7 @@ static const struct IClassFactoryVtbl wucf_vtbl =
     wucf_LockServer
 };
 
+GUID GuidHack_UpdateInstaller = {0xD2E0FE7F,0xD23E,0x48E1,0x93,0xC0,0x6F,0xA8,0xCC,0x34,0x64,0x74};
 static wucf sessioncf = { { &wucf_vtbl }, UpdateSession_create };
 static wucf updatescf = { { &wucf_vtbl }, AutomaticUpdates_create };
 static wucf sysinfocf = { { &wucf_vtbl }, SystemInformation_create };
@@ -131,10 +132,31 @@ HRESULT WINAPI DllGetClassObject( REFCLSID rclsid, REFIID iid, LPVOID *ppv )
     {
        cf = &sysinfocf.IClassFactory_iface;
     }
-    else if (IsEqualGUID( rclsid, &CLSID_UpdateInstaller ))
+    else if (IsEqualGUID( rclsid, &GuidHack_UpdateInstaller ))
     {
        cf = &installercf.IClassFactory_iface;
     }
     if (!cf) return CLASS_E_CLASSNOTAVAILABLE;
     return IClassFactory_QueryInterface( cf, iid, ppv );
+}
+
+HRESULT WINAPI DllCanUnloadNow( void )
+{
+    return S_FALSE;
+}
+
+/***********************************************************************
+ *              DllRegisterServer (WUAPI.@)
+ */
+HRESULT WINAPI DllRegisterServer(void)
+{
+    return __wine_register_resources( instance );
+}
+
+/***********************************************************************
+ *              DllUnregisterServer (WUAPI.@)
+ */
+HRESULT WINAPI DllUnregisterServer(void)
+{
+    return __wine_unregister_resources( instance );
 }
