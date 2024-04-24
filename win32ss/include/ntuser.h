@@ -2203,7 +2203,7 @@ NtUserGetClipboardOwner(VOID);
 DWORD
 NTAPI
 NtUserGetClipboardSequenceNumber(VOID);
-
+#include <imm32_undoc.h>
 HWND
 NTAPI
 NtUserGetClipboardViewer(VOID);
