@@ -62,7 +62,7 @@ SRSetRestorePointW(PRESTOREPOINTINFOW pRestorePtSpec, PSTATEMGRSTATUS pStateMgrS
     memset(pStateMgrStatus, 0, sizeof(STATEMGRSTATUS));
     pStateMgrStatus->nStatus = ERROR_SERVICE_DISABLED;
 
-    return FALSE;
+    return TRUE;
 }
 
 
