@@ -2,7 +2,7 @@
 
 #define NDEBUG
 #include <debug.h>
-definietions
+
 VOID
 WINAPI
 AcquireSRWLockExclusive(PSRWLOCK Lock)
