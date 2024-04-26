@@ -512,7 +512,7 @@ NTSTATUS
 NTAPI
 RtlSleepConditionVariableSRW(IN OUT PRTL_CONDITION_VARIABLE ConditionVariable,
                              IN OUT PRTL_SRWLOCK SRWLock,
-                             IN const PLARGE_INTEGER TimeOut OPTIONAL,
+                             IN PLARGE_INTEGER TimeOut OPTIONAL,
                              IN ULONG Flags)
 {
     return InternalSleep(ConditionVariable,
