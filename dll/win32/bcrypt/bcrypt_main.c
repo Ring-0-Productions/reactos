@@ -1974,11 +1974,11 @@ BOOL WINAPI DllMain( HINSTANCE hinst, DWORD reason, LPVOID reserved )
     case DLL_PROCESS_ATTACH:
         instance = hinst;
         DisableThreadLibraryCalls( hinst );
-        __wine_init_unix_lib( hinst, reason, NULL, &key_funcs );
+        __wine_init_unix_lib( hinst, reason, (const PVOID)NULL, (const PVOID)&key_funcs );
         break;
     case DLL_PROCESS_DETACH:
         if (reserved) break;
-        __wine_init_unix_lib( hinst, reason, NULL, NULL );
+        __wine_init_unix_lib( hinst, reason,(const PVOID) NULL, NULL );
         break;
     }
     return TRUE;

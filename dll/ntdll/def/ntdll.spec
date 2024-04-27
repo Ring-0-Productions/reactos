@@ -504,9 +504,9 @@
 @ stdcall NtRestoreKey(long long long)
 @ stdcall NtResumeProcess(ptr)
 @ stdcall NtResumeThread(long long)
-;@ stdcall -stub -version=0x600+ NtRollbackComplete ; CHECKME
+@ stdcall -stub -version=0x600+ NtRollbackComplete(ptr) ; CHECKME
 @ stdcall -stub -version=0x600+ NtRollbackEnlistment(ptr long ptr long)
-;@ stdcall -stub -version=0x600+ NtRollbackTransaction ; CHECKME
+@ stdcall -stub -version=0x600+ NtRollbackTransaction(ptr) ; CHECKME
 @ stdcall -stub -version=0x600+ NtRollforwardTransactionManager(ptr ptr)
 @ stdcall NtSaveKey(long long)
 @ stdcall NtSaveKeyEx(ptr ptr long)

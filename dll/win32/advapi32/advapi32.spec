@@ -734,3 +734,7 @@
 @ stub SetUserFileEncryptionKeyEx
 
 @ stdcall -stub -version=0x600+ SaferiIsExecutableFileType(wstr long)
+
+@ stdcall -stub RegLoadAppKeyW(ptr)
+@ stdcall RegDeleteKeyValueW(ptr wstr wstr)
+@ stdcall RegDeleteKeyValueA(ptr str str)
