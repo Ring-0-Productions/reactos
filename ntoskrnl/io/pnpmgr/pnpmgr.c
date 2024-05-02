@@ -1775,7 +1775,7 @@ IoInvalidateDeviceRelations(
 {
     if (!IopIsValidPhysicalDeviceObject(DeviceObject))
     {
-        KeBugCheckEx(PNP_DETECTED_FATAL_ERROR, 0x2, (ULONG_PTR)DeviceObject, 0, 0);
+       // KeBugCheckEx(PNP_DETECTED_FATAL_ERROR, 0x2, (ULONG_PTR)DeviceObject, 0, 0);
     }
 
     switch (Type)
@@ -1803,7 +1803,7 @@ IoSynchronousInvalidateDeviceRelations(
 
     if (!IopIsValidPhysicalDeviceObject(DeviceObject))
     {
-        KeBugCheckEx(PNP_DETECTED_FATAL_ERROR, 0x2, (ULONG_PTR)DeviceObject, 0, 0);
+       // KeBugCheckEx(PNP_DETECTED_FATAL_ERROR, 0x2, (ULONG_PTR)DeviceObject, 0, 0);
     }
 
     switch (Type)
@@ -1850,7 +1850,7 @@ IoInvalidateDeviceState(
 {
     if (!IopIsValidPhysicalDeviceObject(DeviceObject))
     {
-        KeBugCheckEx(PNP_DETECTED_FATAL_ERROR, 0x2, (ULONG_PTR)DeviceObject, 0, 0);
+       // KeBugCheckEx(PNP_DETECTED_FATAL_ERROR, 0x2, (ULONG_PTR)DeviceObject, 0, 0);
     }
 
     PiQueueDeviceAction(DeviceObject, PiActionQueryState, NULL, NULL);

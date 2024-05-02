@@ -1151,12 +1151,7 @@ IoAssignResources(
         DeviceNode = IopGetDeviceNode(DeviceObject);
         if (DeviceNode && !(DeviceNode->Flags & DNF_LEGACY_RESOURCE_DEVICENODE))
         {
-            /* New drivers should not call this API */
-            KeBugCheckEx(PNP_DETECTED_FATAL_ERROR,
-                         0x2,
-                         (ULONG_PTR)DeviceObject,
-                         (ULONG_PTR)DriverObject,
-                         0);
+  
         }
     }
 
