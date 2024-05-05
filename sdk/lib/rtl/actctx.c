@@ -6423,6 +6423,9 @@ RtlpInitializeActCtx(PVOID* pOldShimData)
     WCHAR buffer[1024];
     NTSTATUS Status;
 
+    /* Initialize trace flags to WARN and ERR */
+    __wine_dbch_actctx.flags = 0x03;
+
     actctx_init();
 
     /* ReactOS specific:
