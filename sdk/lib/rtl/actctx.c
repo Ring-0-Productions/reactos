@@ -19,17 +19,16 @@
 #include <ntstrsafe.h>
 #include <compat_undoc.h>
 
-#define NDEBUG
-#include <debug.h>
-
 #include <wine/unicode.h>
 #include "wine/exception.h"
+#include "wine/debug.h"
+
+WINE_DEFAULT_DEBUG_CHANNEL(actctx);
 
 #define GetProcessHeap() RtlGetProcessHeap()
 #define GetCurrentProcess() NtCurrentProcess()
-#define FIXME DPRINT1
-#define WARN DPRINT1
-#define TRACE DPRINT
+#define DPRINT1 FIXME
+#define DPRINT TRACE
 #define FILE_END_OF_FILE_INFORMATION FILE_STANDARD_INFORMATION
 #define FileEndOfFileInformation FileStandardInformation
 #define RELATIVE_PATH RtlPathTypeRelative
@@ -37,6 +36,7 @@
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof((a)[0]))
 #define wcsnicmp _wcsnicmp
 #define swprintf _snwprintf
+extern LPCSTR debugstr_us( const UNICODE_STRING *str ) DECLSPEC_HIDDEN;
 
 #undef RT_MANIFEST
 #undef CREATEPROCESS_MANIFEST_RESOURCE_ID

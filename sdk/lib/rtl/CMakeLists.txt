@@ -23,6 +23,7 @@ include_directories(${REACTOS_SOURCE_DIR}/sdk/include/reactos/wine)
 
 list(APPEND SOURCE
     ${RTL_WINE_SOURCE}
+    wine_debug.c
     access.c
     acl.c
     appverifier.c
