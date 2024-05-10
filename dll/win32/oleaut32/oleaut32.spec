@@ -291,6 +291,22 @@
 292 stdcall LPSAFEARRAY_UserMarshal(ptr ptr ptr)
 293 stdcall LPSAFEARRAY_UserUnmarshal(ptr ptr ptr)
 294 stdcall LPSAFEARRAY_UserFree(ptr ptr)
+
+@ stdcall BSTR_UserSize64() BSTR_UserSize         
+@ stdcall BSTR_UserMarshal64() BSTR_UserMarshal         
+@ stdcall BSTR_UserUnmarshal64() BSTR_UserUnmarshal         
+@ stdcall BSTR_UserFree64() BSTR_UserFree         
+@ stdcall VARIANT_UserSize64() VARIANT_UserSize         
+@ stdcall VARIANT_UserMarshal64() VARIANT_UserMarshal         
+@ stdcall VARIANT_UserUnmarshal64() VARIANT_UserUnmarshal         
+@ stdcall VARIANT_UserFree64() VARIANT_UserFree         
+@ stdcall LPSAFEARRAY_UserSize64() LPSAFEARRAY_UserSize         
+@ stdcall LPSAFEARRAY_UserMarshal64() LPSAFEARRAY_UserMarshal         
+@ stdcall LPSAFEARRAY_UserUnmarshal64() LPSAFEARRAY_UserUnmarshal         
+@ stdcall LPSAFEARRAY_UserFree64() LPSAFEARRAY_UserFree         
+@ stub LPSAFEARRAY_Size64
+@ stub LPSAFEARRAY_Marshal64
+@ stub LPSAFEARRAY_Unmarshal64
 295 stub LPSAFEARRAY_Size
 296 stub LPSAFEARRAY_Marshal
 297 stub LPSAFEARRAY_Unmarshal
