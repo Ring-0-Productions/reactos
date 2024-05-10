@@ -6,3 +6,4 @@
 105 stub D3D12CoreRegisterLayers
 106 stub D3D12CreateRootSignatureDeserializer
 107 stub D3D12SerializeRootSignature
+@ stub D3D12SerializeVersionedRootSignature
