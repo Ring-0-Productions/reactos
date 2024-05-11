@@ -50,13 +50,11 @@ LpcpCreatePort(OUT PHANDLE PortHandle,
     NTSTATUS Status;
     KPROCESSOR_MODE PreviousMode = KeGetPreviousMode();
     UNICODE_STRING CapturedObjectName, *ObjectName;
-#if DBG
-    UNICODE_STRING CapturedPortName;
-#endif
     PLPCP_PORT_OBJECT Port;
     HANDLE Handle;
 
     PAGED_CODE();
+    LPCTRACE(LPC_CREATE_DEBUG, "Name: %wZ\n", ObjectAttributes->ObjectName);
 
     RtlInitEmptyUnicodeString(&CapturedObjectName, NULL, 0);
 
@@ -72,7 +70,10 @@ LpcpCreatePort(OUT PHANDLE PortHandle,
             ProbeForRead(ObjectAttributes, sizeof(*ObjectAttributes), sizeof(ULONG));
             ObjectName = ((volatile OBJECT_ATTRIBUTES*)ObjectAttributes)->ObjectName;
             if (ObjectName)
-                CapturedObjectName = ProbeForReadUnicodeString(ObjectName);
+            {
+                ProbeForRead(ObjectName, sizeof(*ObjectName), 1);
+                CapturedObjectName = *(volatile UNICODE_STRING*)ObjectName;
+            }
         }
         _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
         {
@@ -83,39 +84,28 @@ LpcpCreatePort(OUT PHANDLE PortHandle,
     }
     else
     {
-        ObjectName = ObjectAttributes->ObjectName;
-        if (ObjectName)
-            CapturedObjectName = *ObjectName;
+        if (ObjectAttributes->ObjectName)
+            CapturedObjectName = *(ObjectAttributes->ObjectName);
     }
 
-    /* Normalize the buffer pointer in case we don't have
-     * a name, for initializing an unconnected port. */
+    /* Normalize the buffer pointer in case we don't have a name */
     if (CapturedObjectName.Length == 0)
         CapturedObjectName.Buffer = NULL;
 
-#if DBG
-    /* Capture the port name for DPRINT only - ObCreateObject does its
-     * own capture. As it is used only for debugging, ignore any failure;
-     * the string is zeroed out in such case. */
-    ProbeAndCaptureUnicodeString(&CapturedPortName, PreviousMode, ObjectName);
-    LPCTRACE(LPC_CREATE_DEBUG, "Name: %wZ\n", &CapturedPortName);
-    ReleaseCapturedUnicodeString(&CapturedPortName, PreviousMode);
-#endif
-
     /* Create the Object */
     Status = ObCreateObject(PreviousMode,
-                            LpcPortObjectType,
+                            Waitable ? LpcWaitablePortObjectType : LpcPortObjectType,
                             ObjectAttributes,
                             PreviousMode,
                             NULL,
-                            sizeof(LPCP_PORT_OBJECT),
+                            Waitable ? sizeof(LPCP_PORT_OBJECT) : FIELD_OFFSET(LPCP_PORT_OBJECT, WaitEvent),
                             0,
                             0,
                             (PVOID*)&Port);
     if (!NT_SUCCESS(Status)) return Status;
 
     /* Set up the Object */
-    RtlZeroMemory(Port, sizeof(LPCP_PORT_OBJECT));
+    RtlZeroMemory(Port, (Waitable ? sizeof(LPCP_PORT_OBJECT) : FIELD_OFFSET(LPCP_PORT_OBJECT, WaitEvent)));
     Port->ConnectionPort = Port;
     Port->Creator = PsGetCurrentThread()->Cid;
     InitializeListHead(&Port->LpcDataInfoChainHead);
@@ -183,6 +173,7 @@ LpcpCreatePort(OUT PHANDLE PortHandle,
 
     /* Now set the custom setting */
     Port->MaxMessageLength = MaxMessageLength;
+    Port->MaxConnectionInfoLength = MaxConnectionInfoLength;
 
     /* Insert it now */
     Status = ObInsertObject(Port,

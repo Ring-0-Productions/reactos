@@ -22,6 +22,7 @@
 22 stdcall IUnknown_Release_Proxy(ptr)
 23 stdcall I_RpcAbortAsyncCall(ptr long) I_RpcAsyncAbortCall
 24 stdcall I_RpcAllocate(long)
+@ stdcall -stub NdrMesTypeDecode3()
 25 stdcall I_RpcAsyncAbortCall(ptr long)
 26 stdcall I_RpcAsyncSetHandle(ptr ptr)
 27 stub I_RpcBCacheAllocate

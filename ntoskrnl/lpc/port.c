@@ -1,3 +1,4 @@
+
 /*
  * PROJECT:         ReactOS Kernel
  * LICENSE:         GPL - See COPYING in the top level directory
@@ -120,7 +121,6 @@ LpcpValidateClientPort(
 
 
 /* PUBLIC FUNCTIONS **********************************************************/
-
 NTSTATUS
 NTAPI
 NtImpersonateClientOfPort(IN HANDLE PortHandle,
@@ -277,7 +277,7 @@ NTAPI
 NtQueryPortInformationProcess(VOID)
 {
     /* This is all this function does */
-    return STATUS_UNSUCCESSFUL;
+    return TRUE;
 }
 
 NTSTATUS
@@ -288,8 +288,60 @@ NtQueryInformationPort(IN HANDLE PortHandle,
                        IN ULONG PortInformationLength,
                        OUT PULONG ReturnLength)
 {
-    UNIMPLEMENTED;
-    return STATUS_NOT_IMPLEMENTED;
+    KPROCESSOR_MODE PreviousMode;
+    NTSTATUS Status;
+    PLPCP_PORT_OBJECT PortObject;
+
+    PAGED_CODE();
+
+    UNREFERENCED_PARAMETER(PortInformationClass);
+
+    PreviousMode = KeGetPreviousMode();
+    if (PreviousMode != KernelMode)
+    {
+        _SEH2_TRY
+        {
+            ProbeForWrite(PortInformation, PortInformationLength, sizeof(ULONG));
+            if (ReturnLength)
+            {
+                ProbeForWriteUlong(ReturnLength);
+            }
+        }
+        _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+        {
+            _SEH2_YIELD(return _SEH2_GetExceptionCode());
+        }
+        _SEH2_END;
+    }
+
+    if (PortHandle)
+    {
+        Status = ObReferenceObjectByHandle(PortHandle,
+                                           GENERIC_READ,
+                                           LpcPortObjectType,
+                                           PreviousMode,
+                                           (PVOID*)&PortObject,
+                                           NULL);
+        if (!NT_SUCCESS(Status))
+        {
+            Status = ObReferenceObjectByHandle(PortHandle,
+                                               GENERIC_READ,
+                                               LpcWaitablePortObjectType,
+                                               PreviousMode,
+                                               (PVOID*)&PortObject,
+                                               NULL);
+            if (!NT_SUCCESS(Status))
+            {
+                return Status;
+            }
+        }
+        ObDereferenceObject(PortObject);
+        return STATUS_SUCCESS;
+    }
+    else
+    {
+        return STATUS_INVALID_INFO_CLASS;
+    }
 }
 
 /* EOF */

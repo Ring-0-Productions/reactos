@@ -31,7 +31,7 @@ Author:
 // Kernel Exported Object Types
 //
 extern POBJECT_TYPE NTSYSAPI LpcPortObjectType;
-
+extern POBJECT_TYPE NTSYSAPI LpcWaitablePortObjectType;
 #endif // !NTOS_MODE_USER
 
 //

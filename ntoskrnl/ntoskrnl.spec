@@ -799,9 +799,10 @@
 @ stdcall -stub -version=0x600+ LdrResFindResource()
 @ stdcall -stub -version=0x600+ LdrResFindResourceDirectory()
 @ extern LpcPortObjectType
+@ extern LpcWaitablePortObjectType
 @ stdcall LpcRequestPort(ptr ptr)
 @ stdcall LpcRequestWaitReplyPort(ptr ptr ptr)
-@ stdcall -version=0x600+ LpcRequestWaitReplyPortEx(ptr ptr ptr)
+@ stdcall -stub -version=0x600+ LpcRequestWaitReplyPortEx(ptr ptr ptr)
 @ stdcall LsaCallAuthenticationPackage(long long ptr long ptr ptr ptr)
 @ stdcall LsaDeregisterLogonProcess(long)
 @ stdcall LsaFreeReturnBuffer(ptr)
