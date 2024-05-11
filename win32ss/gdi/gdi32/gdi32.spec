@@ -615,9 +615,6 @@
 ; Vista+
 611 stdcall -stub -version=0x600+ D3DKMTEscape(ptr)
 612 stdcall -stub -version=0x600+ D3DKMTOpenAdapterFromHdc(ptr)
-613 stdcall -stub -version=0x600+ GetFontFileData(long long int64 ptr long)
-614 stdcall -stub -version=0x600+ GetFontFileInfo(long long ptr long ptr)
-615 stdcall -stub -version=0x600+ GetFontRealizationInfo(long ptr)
 616 stdcall -stub -version=0x600+ D3DKMTCloseAdapter(ptr)
 617 stdcall -stub -version=0x600+ D3DKMTCreateDevice(ptr)
 618 stdcall -stub -version=0x600+ D3DKMTDestroyDevice(ptr)

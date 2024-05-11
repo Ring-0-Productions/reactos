@@ -861,7 +861,7 @@ WINAPI
 IsThreadDesktopComposited(VOID)
 {
     UNIMPLEMENTED;
-    return TRUE;
+    return FALSE;
 } 
 
 BOOL
@@ -869,7 +869,7 @@ WINAPI
 IsTopLevelWindow(IN HWND hWnd)
 {
     UNIMPLEMENTED;
-    return TRUE;
+    return FALSE;
 }
 
 BOOL
@@ -877,7 +877,7 @@ WINAPI
 IsWindowRedirectedForPrint(IN HWND hWnd)
 {
     UNIMPLEMENTED;
-    return TRUE;
+    return FALSE;
 }
 
 BOOL
@@ -886,7 +886,7 @@ GetWindowCompositionAttribute(HWND hwnd,
                               PVOID pAttrData) // WINCOMPATTRDATA
 {
     UNIMPLEMENTED;
-    return TRUE;
+    return FALSE;
 }
 
 BOOL
@@ -895,7 +895,7 @@ RegisterTouchWindow(HWND  hwnd,
                     ULONG ulFlags)
 {
     UNIMPLEMENTED;
-    return TRUE;
+    return FALSE;
 }
 
 BOOL
@@ -904,7 +904,7 @@ SetWindowCompositionAttribute(HWND hwnd,
                               PVOID pAttrData) // WINCOMPATTRDATA
 {
     UNIMPLEMENTED;
-    return TRUE;
+    return FALSE;
 }
 
 LONG 
@@ -959,10 +959,10 @@ DwmGetDxRgn(PVOID x1, PVOID x2, PVOID x3)
 
 NTSTATUS
 WINAPI
-RegisterSessionPort(UINT32 x1)
+RegisterSessionPort(HANDLE x1)
 {
     NTSTATUS Status;
-    Status = NtUserRegisterSessionPort((HANDLE)x1);
+    Status = NtUserRegisterSessionPort((HANDLE)(PVOID)x1);
     DbgPrint("status %X\n", GetLastError());
     SetLastError(0);
     __debugbreak();
