@@ -387,6 +387,7 @@
 383 stdcall -stub RpcIfInqId(ptr ptr)
 384 stdcall RpcImpersonateClient(ptr)
 @ stdcall -stub NdrStubCall3()
+@ stdcall -stub Ndr64DcomAsyncClientCall()
 385 stdcall RpcInitializeAsyncHandle(ptr long) RpcAsyncInitializeHandle
 386 stdcall RpcMgmtEnableIdleCleanup()
 387 stdcall RpcMgmtEpEltInqBegin(ptr long ptr long ptr ptr)

@@ -15,6 +15,12 @@ HGLOBAL FASTCALL DdeGetPair(HGLOBAL ServerMem);
 typedef  PVOID           HPOWERNOTIFY;
 typedef  HPOWERNOTIFY   *PHPOWERNOTIFY;
 
+BOOL WINAPI PaintMonitor(HMONITOR monnitor, HDC hdc, RECT rcDst)
+{
+	return PaintDesktop(hdc);	
+}
+
+
  HPOWERNOTIFY WINAPI RegisterSuspendResumeNotification(
 	IN	HANDLE	hRecipient,
 	IN	DWORD	Flags)

@@ -824,7 +824,7 @@ WINAPI
 GetThreadUILanguage(VOID)
 {
     UNIMPLEMENTED;
-    SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+    SetLastError(0);
     return 0;
 }
 

@@ -43,7 +43,7 @@ BasepNotifyCsrOfThread(IN HANDLE ThreadHandle,
     if (!NT_SUCCESS(ApiMessage.Status))
     {
         DPRINT1("Failed to tell CSRSS about new thread: %lx\n", ApiMessage.Status);
-        return ApiMessage.Status;
+        __debugbreak();
     }
 
     /* Return Success */

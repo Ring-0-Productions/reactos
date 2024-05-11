@@ -21,6 +21,13 @@ WINSTAAPI WinStationOpenServerW(PVOID A)
 }
 
 VOID
+WINSTAAPI
+WinStationFreePropertyValue()
+{
+    __debugbreak();
+}
+
+VOID
 WINSTAAPI WinStationCloseServer(PVOID A,
                                 PVOID B,
                                 PVOID C,

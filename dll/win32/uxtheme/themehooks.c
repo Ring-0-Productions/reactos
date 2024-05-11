@@ -722,8 +722,16 @@ ThemeHooksInstall()
     }
     else
     {
-        UNIMPLEMENTED;
-        ret = FALSE;
+        PREGISTER_UUAH_WIN2003 lpfunc2003 = (PREGISTER_UUAH_WIN2003)lpFunc;
+        USERAPIHOOKINFO uah;
+
+        uah.m_size = sizeof(uah);
+        uah.m_dllname1 = L"uxtheme.dll";
+        uah.m_funname1 = L"ThemeInitApiHook";
+        uah.m_dllname2 = NULL;
+        uah.m_funname2 = NULL;
+
+        ret = lpfunc2003(&uah);
     }
 
     UXTHEME_broadcast_theme_changed (NULL, TRUE);

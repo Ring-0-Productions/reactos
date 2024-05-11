@@ -336,6 +336,8 @@
 @ stdcall IsTokenRestricted(long)
 @ stub IsTokenUntrusted
 @ stdcall IsValidAcl(ptr)
+@ stdcall -stub CredIsProtectedW()
+@ stdcall -stub CredProtectW()
 @ stdcall IsValidSecurityDescriptor(ptr)
 @ stdcall IsValidSid(ptr)
 @ stdcall IsWellKnownSid(ptr long)

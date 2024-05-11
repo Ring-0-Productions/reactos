@@ -25,7 +25,7 @@
 
 #include "wine/heap.h"
 #include "wine/debug.h"
-
+#include <debug.h>
 WINE_DEFAULT_DEBUG_CHANNEL(sxs);
 
 /***********************************************************************
@@ -109,7 +109,7 @@ BOOL WINAPI SxsLookupClrGuid(DWORD flags, GUID *clsid, HANDLE actctx, void *buff
     SXS_GUID_INFORMATION_CLR *ret = buffer;
     char *ret_strings;
 
-    TRACE("(%x, %s, %p, %p, %08lx, %p): stub\n", flags, wine_dbgstr_guid(clsid), actctx,
+    DPRINT1("(%x, %s, %p, %p, %08lx, %p): stub\n", flags, wine_dbgstr_guid(clsid), actctx,
           buffer, buffer_len, buffer_len_required);
 
     if (flags & ~SXS_LOOKUP_CLR_GUID_FIND_CLR_CLASS)

@@ -977,9 +977,9 @@
 @ stub -version=0x600+ _snwprintf_s
 @ stub -version=0x600+ _snwprintf_s_l
 @ varargs _snwscanf(wstr long wstr)
-@ stub -version=0x600+ _snwscanf_l
-@ stub -version=0x600+ _snwscanf_s
-@ stub -version=0x600+ _snwscanf_s_l
+@ stdcall -stub -version=0x600+ _snwscanf_l()
+@ stdcall -stub -version=0x600+ _snwscanf_s()
+@ stdcall -stub -version=0x600+ _snwscanf_s_l()
 @ varargs _sopen(str long long)
 @ cdecl -version=0x600+ _sopen_s(ptr str long long long)
 @ varargs _spawnl(long str str)

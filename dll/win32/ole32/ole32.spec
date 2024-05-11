@@ -152,6 +152,26 @@
 @ stdcall GetHGlobalFromStream(ptr ptr)
 @ stub GetHookInterface
 @ stdcall GetRunningObjectTable(long ptr)
+
+@ stdcall HACCEL_UserFree64() HACCEL_UserFree
+@ stdcall HACCEL_UserMarshal64() HACCEL_UserMarshal
+@ stdcall HACCEL_UserSize64() HACCEL_UserSize
+@ stdcall HACCEL_UserUnmarshal64() HACCEL_UserUnmarshal
+@ stdcall HBITMAP_UserFree64() HBITMAP_UserFree
+@ stdcall HBITMAP_UserMarshal64() HBITMAP_UserMarshal
+@ stdcall HBITMAP_UserSize64() HBITMAP_UserSize
+@ stdcall HBITMAP_UserUnmarshal64() HBITMAP_UserUnmarshal
+@ stdcall HBRUSH_UserFree64() HBRUSH_UserFree
+@ stdcall HBRUSH_UserMarshal64() HBRUSH_UserMarshal
+@ stdcall HBRUSH_UserSize64() HBRUSH_UserSize
+@ stdcall HBRUSH_UserUnmarshal64() HBRUSH_UserUnmarshal
+@ stdcall HDC_UserFree64() HDC_UserFree
+@ stdcall HDC_UserMarshal64() HDC_UserMarshal
+@ stdcall HDC_UserSize64() HDC_UserSize 
+@ stdcall HDC_UserUnmarshal64() HDC_UserUnmarshal
+
+
+
 @ stdcall HACCEL_UserFree(ptr ptr)
 @ stdcall HACCEL_UserMarshal(ptr ptr ptr)
 @ stdcall HACCEL_UserSize(ptr long ptr)
@@ -168,6 +188,9 @@
 @ stdcall HDC_UserMarshal(ptr ptr ptr)
 @ stdcall HDC_UserSize(ptr long ptr)
 @ stdcall HDC_UserUnmarshal(ptr ptr ptr)
+
+
+
 @ stdcall HENHMETAFILE_UserFree(ptr ptr)
 @ stdcall HENHMETAFILE_UserMarshal(ptr ptr ptr)
 @ stdcall HENHMETAFILE_UserSize(ptr long ptr)
@@ -200,6 +223,43 @@
 @ stdcall HWND_UserMarshal(ptr ptr ptr)
 @ stdcall HWND_UserSize(ptr long ptr)
 @ stdcall HWND_UserUnmarshal(ptr ptr ptr)
+
+
+
+
+@ stdcall HENHMETAFILE_UserFree64() HENHMETAFILE_UserFree
+@ stdcall HENHMETAFILE_UserMarshal64() HENHMETAFILE_UserMarshal
+@ stdcall HENHMETAFILE_UserSize64() HENHMETAFILE_UserSize
+@ stdcall HENHMETAFILE_UserUnmarshal64() HENHMETAFILE_UserUnmarshal
+@ stdcall HGLOBAL_UserFree64() HGLOBAL_UserFree
+@ stdcall HGLOBAL_UserMarshal64() HGLOBAL_UserMarshal
+@ stdcall HGLOBAL_UserSize64() HGLOBAL_UserSize
+@ stdcall HGLOBAL_UserUnmarshal64() HGLOBAL_UserUnmarshal
+@ stdcall HICON_UserFree64() HICON_UserFree
+@ stdcall HICON_UserMarshal64() HICON_UserMarshal
+@ stdcall HICON_UserSize64() HICON_UserSize
+@ stdcall HICON_UserUnmarshal64() HICON_UserUnmarshal
+@ stdcall HMENU_UserFree64() HMENU_UserFree
+@ stdcall HMENU_UserMarshal64() HMENU_UserMarshal
+@ stdcall HMENU_UserSize64() HMENU_UserSize
+@ stdcall HMENU_UserUnmarshal64() HMENU_UserUnmarshal
+@ stdcall HMETAFILEPICT_UserFree64() HMETAFILEPICT_UserFree
+@ stdcall HMETAFILEPICT_UserMarshal64() HMETAFILEPICT_UserMarshal
+@ stdcall HMETAFILEPICT_UserSize64() HMETAFILEPICT_UserSize
+@ stdcall HMETAFILEPICT_UserUnmarshal64() HMETAFILEPICT_UserUnmarshal
+@ stdcall HMETAFILE_UserFree64() HMETAFILE_UserFree
+@ stdcall HMETAFILE_UserMarshal64() HMETAFILE_UserMarshal
+@ stdcall HMETAFILE_UserSize64() HMETAFILE_UserSize
+@ stdcall HMETAFILE_UserUnmarshal64() HMETAFILE_UserUnmarshal
+@ stdcall HPALETTE_UserFree64() HPALETTE_UserFree
+@ stdcall HPALETTE_UserMarshal64() HPALETTE_UserMarshal
+@ stdcall HPALETTE_UserSize64() HPALETTE_UserSize
+@ stdcall HPALETTE_UserUnmarshal64() HPALETTE_UserUnmarshal
+@ stdcall HWND_UserFree64() HWND_UserFree
+@ stdcall HWND_UserMarshal64() HWND_UserMarshal
+@ stdcall HWND_UserSize64() HWND_UserSize
+@ stdcall HWND_UserUnmarshal64() HWND_UserUnmarshal
+
 # HkOleRegisterObject
 @ stdcall IIDFromString(wstr ptr)
 @ stdcall IsAccelerator(long long ptr ptr)
