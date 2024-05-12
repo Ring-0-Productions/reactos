@@ -18,6 +18,7 @@ list(APPEND SOURCE
     fontdlg.c
     itemdlg.c
     printdlg.c
+    comdlg32_classes.idl
     precomp.h
     ${CMAKE_CURRENT_BINARY_DIR}/comdlg32_stubs.c)
 

@@ -47,6 +47,19 @@ CRITICAL_SECTION COMDLG32_OpenFileLock DECLSPEC_HIDDEN;
 
 static DWORD COMDLG32_TlsIndex = TLS_OUT_OF_INDEXES;
 
+HRESULT WINAPI DllRegisterServer(void)
+{
+    return __wine_register_resources( COMDLG32_hInstance );
+}
+
+/***********************************************************************
+ *		DllUnregisterServer (AVIFIL32.@)
+ */
+HRESULT WINAPI DllUnregisterServer(void)
+{
+    return __wine_unregister_resources( COMDLG32_hInstance );
+}
+
 /***********************************************************************
  *	DllMain  (COMDLG32.init)
  *

@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-#ifndef __REACTOS__ /* Win 7 */
+#if 1
 
 #include <stdarg.h>
 
@@ -617,7 +617,7 @@ static HRESULT on_default_action(FileDialogImpl *This)
         else
             open_action = ONOPEN_BROWSE;
 
-        open_action = FILEDLG95_ValidatePathAction(canon_filename, &psf_parent, This->dlg_hwnd,
+        open_action = FILEDLG95_ValidatePathAction(NULL, canon_filename, &psf_parent, This->dlg_hwnd,
                                                    This->options & ~FOS_FILEMUSTEXIST,
                                                    (This->dlg_type == ITEMDLG_TYPE_SAVE),
                                                    open_action);
@@ -2333,7 +2333,7 @@ static INT_PTR CALLBACK itemdlg_dlgproc(HWND hwnd, UINT umessage, WPARAM wparam,
 
     return FALSE;
 }
-
+#define NEWFILEOPENV3ORD        1553
 static HRESULT create_dialog(FileDialogImpl *This, HWND parent)
 {
     ULONG_PTR ctx_cookie = 0;
@@ -2611,7 +2611,7 @@ static HRESULT WINAPI IFileDialog2_fnSetOptions(IFileDialog2 *iface, FILEOPENDIA
             | FOS_ALLNONSTORAGEITEMS | FOS_NOVALIDATE | FOS_ALLOWMULTISELECT | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST
             | FOS_CREATEPROMPT | FOS_SHAREAWARE | FOS_NOREADONLYRETURN | FOS_NOTESTFILECREATE | FOS_HIDEMRUPLACES
             | FOS_HIDEPINNEDPLACES | FOS_NODEREFERENCELINKS | FOS_DONTADDTORECENT | FOS_FORCESHOWHIDDEN
-            | FOS_DEFAULTNOMINIMODE | FOS_FORCEPREVIEWPANEON | FOS_SUPPORTSTREAMABLEITEMS))
+            | FOS_DEFAULTNOMINIMODE | FOS_FORCEPREVIEWPANEON | 0x80000000))
     {
         WARN("Invalid option %#lx\n", fos);
         return E_INVALIDARG;
