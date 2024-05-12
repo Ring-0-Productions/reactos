@@ -32,3 +32,6 @@ add_delay_importlibs(comdlg32 ole32)
 add_importlibs(comdlg32 shell32 shlwapi comctl32 winspool user32 gdi32 advapi32 msvcrt kernel32 ntdll)
 add_pch(comdlg32 precomp.h SOURCE)
 add_cd_file(TARGET comdlg32 DESTINATION reactos/system32 FOR all)
+
+add_cd_file(TARGET comdlg32 DESTINATION reactos/winsxs/${WINARCH}_microsoft-windows-comdlg32_31bf3856ad364e35_6.0.2600.2982_none_deadbeef FOR all)
+add_cd_file(FILE ${CMAKE_CURRENT_SOURCE_DIR}/${WINARCH}_microsoft-windows-comdlg32_31bf3856ad364e35_6.0.2600.2982_none_deadbeef.manifest DESTINATION reactos/winsxs/manifests FOR all)
