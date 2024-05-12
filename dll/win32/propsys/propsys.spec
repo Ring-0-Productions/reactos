@@ -67,17 +67,17 @@
 @ stub PSCreateAdapterFromPropertyStore
 @ stub PSCreateDelayedMultiplexPropertyStore
 @ stdcall PSCreateMemoryPropertyStore(ptr ptr)
-@ stub PSCreateMultiplexPropertyStore
-@ stub PSCreatePropertyChangeArray
-@ stub PSCreatePropertyStoreFromObject
-@ stub PSCreatePropertyStoreFromPropertySetStorage
-@ stub PSCreateSimplePropertyChange
-@ stub PSEnumeratePropertyDescriptions
-@ stub PSFormatForDisplay
-@ stub PSFormatForDisplayAlloc
-@ stub PSFormatPropertyValue
-@ stub PSGetItemPropertyHandler
-@ stub PSGetItemPropertyHandlerWithCreateObject
+@ stdcall -stub PSCreateMultiplexPropertyStore()
+@ stdcall -stub PSCreatePropertyChangeArray()
+@ stdcall -stub PSCreatePropertyStoreFromObject()
+@ stdcall -stub PSCreatePropertyStoreFromPropertySetStorage()
+@ stdcall -stub PSCreateSimplePropertyChange()
+@ stdcall -stub PSEnumeratePropertyDescriptions()
+@ stdcall -stub PSFormatForDisplay()
+@ stdcall -stub PSFormatForDisplayAlloc()
+@ stdcall -stub PSFormatPropertyValue()
+@ stdcall -stub PSGetItemPropertyHandler()
+@ stdcall -stub PSGetItemPropertyHandlerWithCreateObject()
 @ stdcall -stub PSGetNameFromPropertyKey(ptr ptr)
 @ stub PSGetNamedPropertyFromPropertyStorage
 @ stdcall PSGetPropertyDescription(ptr ptr ptr)

@@ -1377,13 +1377,38 @@
 @ stdcall -stub -version=0x601+ Wow64GetThreadSelectorEntry(ptr long ptr)
 @ stdcall -stub -version=0x601+ -arch=x86_64 UmsThreadYield(ptr)
 @ stdcall -stub -version=0x601+ -arch=i386,x86_64 InitializeContext(ptr long ptr ptr)
-@ stub  -version=0x600+ GetProductName
-@ stub  -version=0x601+ GetXStateFeaturesMask
-@ stub  -version=0x601+ LoadStringByReference
-@ stub  -version=0x601+ LocateXStateFeature
-@ stub  -version=0x601+ GetEraNameCountedString
+@ stdcall -stub  -version=0x600+ GetProductName()
+@ stdcall -stub  -version=0x601+ GetXStateFeaturesMask()
+@ stdcall -stub  -version=0x601+ LoadStringByReference()
+@ stdcall -stub  -version=0x601+ LocateXStateFeature()
+@ stdcall -stub  -version=0x601+ GetEraNameCountedString()
 @ stdcall GetLogicalProcessorInformationEx(long ptr ptr)
 @ stdcall GetProcessGroupAffinity(ptr ptr ptr)
 @ stdcall SetThreadGroupAffinity(ptr ptr ptr)
 @ stdcall GetThreadGroupAffinity(ptr ptr)
 @ stdcall GetThreadIdealProcessorEx(ptr ptr)
+@ stdcall -stub RegQueryInfoKeyW(long ptr ptr ptr ptr ptr ptr ptr ptr ptr ptr ptr)
+
+
+@ stdcall -stub RegOpenKeyExW()
+@ stdcall -stub RegCreateKeyExW()
+@ stdcall -stub RegQueryValueExW()
+@ stdcall -stub RegSetValueExW()
+@ stdcall -stub RegCloseKey()
+@ stdcall -stub RegGetValueW()
+@ stdcall -stub RegDeleteValueW()
+
+@ stdcall -stub RegDeleteKeyExA(long str long long)
+@ stdcall -stub RegDeleteKeyExW(long wstr long long)
+@ stdcall -stub RegSetValueExA(long str long long ptr long)
+@ stdcall -stub RegQueryInfoKeyA(long ptr ptr ptr ptr ptr ptr ptr ptr ptr ptr ptr)
+@ stdcall -stub RegQueryValueExA(long str ptr ptr ptr ptr)
+@ stdcall -stub RegEnumValueW(long long ptr ptr ptr ptr ptr ptr)
+@ stdcall -stub RegOpenKeyExA(long str long long ptr)
+@ stdcall -stub RegDeleteValueA(long str)
+@ stdcall -stub RegOpenCurrentUser()
+@ stdcall -stub RegDeleteKeyW()
+
+@ stdcall -stub RegDeleteTreeW()
+@ stdcall -stub RegNotifyChangeKeyValue()
+@ stdcall -stub RegEnumKeyExW()

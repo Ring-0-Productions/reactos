@@ -1,0 +1,41 @@
+[HKEY_CLASSES_ROOT\CLSID\{ECD4FC4D-521C-11D0-B792-00A0C90312E1}]
+@="Shell Rebar BandSite"
+
+[HKEY_CLASSES_ROOT\CLSID\{ECD4FC4D-521C-11D0-B792-00A0C90312E1}\InProcServer32]
+@="C:\\Windows\\system32\\ExplorerFrame.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{ECD4FC4D-521C-11D0-B792-00A0C90312E1}]
+@="Shell Rebar BandSite"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{ECD4FC4D-521C-11D0-B792-00A0C90312E1}\InProcServer32]
+@="C:\\Windows\\system32\\ExplorerFrame.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{AE054212-3535-4430-83ED-D501AA6680E6}]
+@="Shell Name Space ListView"
+
+[HKEY_CLASSES_ROOT\CLSID\{AE054212-3535-4430-83ED-D501AA6680E6}\InProcServer32]
+@="C:\\Windows\\system32\\ExplorerFrame.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{AE054212-3535-4430-83ED-D501AA6680E6}]
+@="Shell Name Space ListView"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{AE054212-3535-4430-83ED-D501AA6680E6}\InProcServer32]
+@="C:\\Windows\\system32\\ExplorerFrame.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{64BC32B5-4EEC-4de7-972D-BD8BD0324537}]
+@="Search Control"
+
+[HKEY_CLASSES_ROOT\CLSID\{64BC32B5-4EEC-4de7-972D-BD8BD0324537}\InProcServer32]
+@="C:\\Windows\\system32\\ExplorerFrame.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{64BC32B5-4EEC-4de7-972D-BD8BD0324537}]
+@="Search Control"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{64BC32B5-4EEC-4de7-972D-BD8BD0324537}\InProcServer32]
+@="C:\\Windows\\system32\\ExplorerFrame.dll"
+"ThreadingModel"="Apartment"

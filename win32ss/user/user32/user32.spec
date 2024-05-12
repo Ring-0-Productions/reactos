@@ -822,3 +822,13 @@
 @ stdcall DwmGetSurfaceData(ptr long)
 @ stdcall DwmStartup(ptr)
 @ stdcall DwmShutdown()
+1554 stdcall -stub ExmapleFunc()
+2000 stdcall -stub ExmapleTwo()
+
+@ stdcall -stub GetGestureInfo()
+@ stdcall -stub CloseGestureInfoHandle()
+@ stdcall -stub SetGestureConfig()
+@ stdcall -stub SfxDxBindSwapChain()
+@ stdcall -stub SfmDxBindSwapChain()
+@ stdcall GetWindowCompositionAttribute(ptr ptr)
+@ stdcall -stub SfmDxReleaseSwapChain()

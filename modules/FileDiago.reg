@@ -1,0 +1,29 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{DC1C5A9C-E88A-4dde-A5A1-60F82A20AEF7}]
+@="File Open Dialog"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{DC1C5A9C-E88A-4dde-A5A1-60F82A20AEF7}\InProcServer32]
+@="c:\\Windows\\system32\\comdlg32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{DC1C5A9C-E88A-4dde-A5A1-60F82A20AEF7}]
+@="File Open Dialog"
+
+[HKEY_CLASSES_ROOT\CLSID\{DC1C5A9C-E88A-4dde-A5A1-60F82A20AEF7}\InProcServer32]
+@="c:\\Windows\\system32\\comdlg32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{C0B4E2F3-BA21-4773-8DBA-335EC946EB8B}]
+@="File Save Dialog"
+
+[HKEY_CLASSES_ROOT\CLSID\{C0B4E2F3-BA21-4773-8DBA-335EC946EB8B}\InProcServer32]
+@="c:\\Windows\\system32\\comdlg32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{C0B4E2F3-BA21-4773-8DBA-335EC946EB8B}]
+@="File Save Dialog"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{C0B4E2F3-BA21-4773-8DBA-335EC946EB8B}\InProcServer32]
+@="c:\\Windows\\system32\\comdlg32.dll"
+"ThreadingModel"="Apartment"

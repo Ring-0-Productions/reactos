@@ -61,6 +61,16 @@ typedef struct
     DWORD resloader;
 } NE_TYPEINFO;
 
+BOOL GetFileVersionInfoByHandle(
+LPCSTR lptstrFilename,
+DWORD  dwHandle,
+DWORD  dwLen,
+LPVOID lpData
+)
+{
+    return 0;
+}
+
 /**********************************************************************
  *  find_entry_by_id
  *

@@ -28,7 +28,7 @@ IntFreeDesktopHeap(IN PDESKTOP pdesk);
 /* GLOBALS *******************************************************************/
 
 /* These can be changed via CSRSS startup, these are defaults */
-DWORD gdwDesktopSectionSize = 512;
+DWORD gdwDesktopSectionSize = 2048;
 DWORD gdwNOIOSectionSize    = 128; // A guess, for one or more of the first three system desktops.
 
 /* Currently active desktop */

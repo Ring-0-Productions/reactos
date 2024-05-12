@@ -1,0 +1,414 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\CLSID\{4f6bcd94-c2a5-42ce-8dbc-31e794be4630}]
+@="Shell Computer Accounts"
+"AppID"="{4f6bcd94-c2a5-42ce-8dbc-31e794be4630}"
+
+[HKEY_CLASSES_ROOT\CLSID\{4f6bcd94-c2a5-42ce-8dbc-31e794be4630}\InProcServer32]
+@="Windows\\system32\\shacct.dll"
+"ThreadingModel"="Both"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{4f6bcd94-c2a5-42ce-8dbc-31e794be4630}]
+@="Shell Computer Accounts"
+"AppID"="{4f6bcd94-c2a5-42ce-8dbc-31e794be4630}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{4f6bcd94-c2a5-42ce-8dbc-31e794be4630}\InProcServer32]
+@="Windows\\system32\\shacct.dll"
+"ThreadingModel"="Both"
+
+[HKEY_CLASSES_ROOT\CLSID\{603D3801-BD81-11d0-A3A5-00C04FD706EC}]
+@="Shared Task Scheduler"
+
+[HKEY_CLASSES_ROOT\CLSID\{603D3801-BD81-11d0-A3A5-00C04FD706EC}\InProcServer32]
+@="Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{603D3801-BD81-11d0-A3A5-00C04FD706EC}]
+@="Shared Task Scheduler"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{603D3801-BD81-11d0-A3A5-00C04FD706EC}\InProcServer32]
+@="Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{21B22460-3AEA-1069-A2DC-08002B30309D}]
+@="File Property Page Extension"
+
+[HKEY_CLASSES_ROOT\CLSID\{21B22460-3AEA-1069-A2DC-08002B30309D}\InProcServer32]
+@="Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{21B22460-3AEA-1069-A2DC-08002B30309D}]
+@="File Property Page Extension"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{21B22460-3AEA-1069-A2DC-08002B30309D}\InProcServer32]
+@="Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{1649d1cf-deaf-4a68-abe8-5c9f68572fd1}]
+@="ExecuteAssociation"
+
+[HKEY_CLASSES_ROOT\CLSID\{ECD4FC4E-521C-11D0-B792-00A0C90312E1}]
+@="Shell Band Site Menu"
+
+[HKEY_CLASSES_ROOT\CLSID\{ECD4FC4E-521C-11D0-B792-00A0C90312E1}\InProcServer32]
+@="Windows\\system32\\explorerframe.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{ECD4FC4E-521C-11D0-B792-00A0C90312E1}]
+@="Shell Band Site Menu"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{ECD4FC4E-521C-11D0-B792-00A0C90312E1}\InProcServer32]
+@="Windows\\system32\\explorerframe.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{1649d1cf-deaf-4a68-abe8-5c9f68572fd1}\InProcServer32]
+@="Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{1649d1cf-deaf-4a68-abe8-5c9f68572fd1}]
+@="ExecuteAssociation"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{1649d1cf-deaf-4a68-abe8-5c9f68572fd1}\InProcServer32]
+@="Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{DD522ACC-F821-461A-A407-50B198B896DC}]
+@="HardwareDeviceNotif"
+"AppID"="{B1B9CBB2-B198-47E2-8260-9FD629A2B2EC}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{555F3418-D99E-4E51-800A-6E89CFD8B1D7}]
+@="HWDeviceCustomProperties"
+"AppID"="{B1B9CBB2-B198-47E2-8260-9FD629A2B2EC}"
+
+[HKEY_CLASSES_ROOT\CLSID\{555F3418-D99E-4E51-800A-6E89CFD8B1D7}]
+@="HWDeviceCustomProperties"
+"AppID"="{B1B9CBB2-B198-47E2-8260-9FD629A2B2EC}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{DD522ACC-F821-461A-A407-50B198B896DC}]
+@="HardwareDeviceNotif"
+"AppID"="{B1B9CBB2-B198-47E2-8260-9FD629A2B2EC}"
+
+[HKEY_CLASSES_ROOT\CLSID\{77F10CF0-3DB5-4966-B520-B7C54FD35ED6}]
+@="Custom Destination List"
+
+[HKEY_CLASSES_ROOT\CLSID\{77F10CF0-3DB5-4966-B520-B7C54FD35ED6}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{77F10CF0-3DB5-4966-B520-B7C54FD35ED6}]
+@="Custom Destination List"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{77F10CF0-3DB5-4966-B520-B7C54FD35ED6}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{a2a9545d-a0c2-42b4-9708-a0b2badd77c8}]
+@="Start Menu Pin"
+"ImplementsVerbs"="startpin;startunpin"
+
+[HKEY_CLASSES_ROOT\CLSID\{a2a9545d-a0c2-42b4-9708-a0b2badd77c8}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{a2a9545d-a0c2-42b4-9708-a0b2badd77c8}]
+@="Start Menu Pin"
+"ImplementsVerbs"="startpin;startunpin"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{a2a9545d-a0c2-42b4-9708-a0b2badd77c8}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{75847177-f077-4171-bd2c-a6bb2164fbd0}]
+@="Private Profile Object"
+
+[HKEY_CLASSES_ROOT\CLSID\{75847177-f077-4171-bd2c-a6bb2164fbd0}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{75847177-f077-4171-bd2c-a6bb2164fbd0}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{660b90c8-73a9-4b58-8cae-355b7f55341b}]
+@="Start Menu Cache"
+
+[HKEY_CLASSES_ROOT\CLSID\{660b90c8-73a9-4b58-8cae-355b7f55341b}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Both"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{660b90c8-73a9-4b58-8cae-355b7f55341b}]
+@="Start Menu Cache"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{660b90c8-73a9-4b58-8cae-355b7f55341b}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Both"
+
+[HKEY_CLASSES_ROOT\CLSID\{90AA3A4E-1CBA-4233-B8BB-535773D48449}]
+@="Taskband Pin"
+"ImplementsVerbs"="taskbarpin;taskbarunpin"
+
+[HKEY_CLASSES_ROOT\CLSID\{90AA3A4E-1CBA-4233-B8BB-535773D48449}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{90AA3A4E-1CBA-4233-B8BB-535773D48449}]
+@="Taskband Pin"
+"ImplementsVerbs"="taskbarpin;taskbarunpin"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{90AA3A4E-1CBA-4233-B8BB-535773D48449}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{75847177-f077-4171-bd2c-a6bb2164fbd0}]
+@="Private Profile Object"
+
+[HKEY_CLASSES_ROOT\CLSID\{75847177-f077-4171-bd2c-a6bb2164fbd0}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{75847177-f077-4171-bd2c-a6bb2164fbd0}]
+@=Private Profile Object
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{75847177-f077-4171-bd2c-a6bb2164fbd0}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{BCDE0395-E52F-467C-8E3D-C4579291692E}]
+@="MMDeviceEnumerator class"
+
+[HKEY_CLASSES_ROOT\CLSID\{a323554a-0fe1-4e49-aee1-6722465d799f}]
+@="DateTimeCPL Flyout Class"
+
+[HKEY_CLASSES_ROOT\CLSID\{a323554a-0fe1-4e49-aee1-6722465d799f}\InProcServer32]
+@="c:\\Windows\\system32\\timedate.cpl"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{a323554a-0fe1-4e49-aee1-6722465d799f}]
+@="DateTimeCPL Flyout Class"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{a323554a-0fe1-4e49-aee1-6722465d799f}\InProcServer32]
+@="c:\\Windows\\system32\\timedate.cpl"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{1f486a52-3cb1-48fd-8f50-b8dc300d9f9d}]
+@="Memory Mapped Cache Mgr"
+
+[HKEY_CLASSES_ROOT\CLSID\{1f486a52-3cb1-48fd-8f50-b8dc300d9f9d}\InProcServer32]
+@="c:\\Windows\\system32\\propsys.dll"
+"ThreadingModel"="Both"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{1f486a52-3cb1-48fd-8f50-b8dc300d9f9d}]
+@="Memory Mapped Cache Mgr"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{1f486a52-3cb1-48fd-8f50-b8dc300d9f9d}\InProcServer32]
+@="c:\\Windows\\system32\\propsys.dll"
+"ThreadingModel"="Both"
+
+[HKEY_CLASSES_ROOT\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}]
+@="IFileDialog"
+
+[HKEY_CLASSES_ROOT\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}\NumMethods]
+@="27"
+
+[HKEY_CLASSES_ROOT\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}\ProxyStubClsid32]
+@="{C90250F3-4D7D-4991-9B69-A5C5BC1C2AE6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}]
+@="IFileDialog"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}\NumMethods]
+@="27"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}\ProxyStubClsid32]
+@="{C90250F3-4D7D-4991-9B69-A5C5BC1C2AE6}"
+
+[HKEY_CLASSES_ROOT\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}]
+@="IFileDialog"
+
+[HKEY_CLASSES_ROOT\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}\NumMethods]
+@="27"
+
+[HKEY_CLASSES_ROOT\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}\ProxyStubClsid32]
+@="{C90250F3-4D7D-4991-9B69-A5C5BC1C2AE6}"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}]
+@="IFileDialog"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}\NumMethods]
+@="27"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Interface\{42F85136-DB7E-439C-85F1-E4075D135FC8}\ProxyStubClsid32]
+@="{C90250F3-4D7D-4991-9B69-A5C5BC1C2AE6}"
+
+[HKEY_CLASSES_ROOT\CLSID\{AF02484C-A0A9-4669-9051-058AB12B9195}]
+@="File Save Dialog Legacy"
+
+[HKEY_CLASSES_ROOT\CLSID\{AF02484C-A0A9-4669-9051-058AB12B9195}\InProcServer32]
+@="c:\\Windows\\system32\\comdlg32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{AF02484C-A0A9-4669-9051-058AB12B9195}]
+@="File Save Dialog Legacy"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{AF02484C-A0A9-4669-9051-058AB12B9195}\InProcServer32]
+@="c:\\Windows\\system32\\comdlg32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{725F645B-EAED-4fc5-B1C5-D9AD0ACCBA5E}]
+@="File Open Dialog Legacy"
+
+[HKEY_CLASSES_ROOT\CLSID\{725F645B-EAED-4fc5-B1C5-D9AD0ACCBA5E}\InProcServer32]
+@="c:\\Windows\\system32\\comdlg32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{725BE8F7-668E-4C7B-8F90-46BDB0936430}\DefaultIcon]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,6d,00,61,00,\
+  69,00,6e,00,2e,00,63,00,70,00,6c,00,2c,00,2d,00,32,00,30,00,30,00,00,00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{725BE8F7-668E-4C7B-8F90-46BDB0936430}\Shell]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{725BE8F7-668E-4C7B-8F90-46BDB0936430}\Shell\Open]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{725BE8F7-668E-4C7B-8F90-46BDB0936430}\Shell\Open\Command]
+@=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,\
+  00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,72,00,75,00,\
+  6e,00,64,00,6c,00,6c,00,33,00,32,00,2e,00,65,00,78,00,65,00,20,00,25,00,53,\
+  00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,5c,00,53,00,\
+  79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,00,68,00,65,00,6c,00,6c,\
+  00,33,00,32,00,2e,00,64,00,6c,00,6c,00,2c,00,43,00,6f,00,6e,00,74,00,72,00,\
+  6f,00,6c,00,5f,00,52,00,75,00,6e,00,44,00,4c,00,4c,00,20,00,25,00,53,00,79,\
+  00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,5c,00,53,00,79,00,\
+  73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,6d,00,61,00,69,00,6e,00,2e,00,63,\
+  00,70,00,6c,00,2c,00,40,00,31,00,00,00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{725F645B-EAED-4fc5-B1C5-D9AD0ACCBA5E}]
+@="File Open Dialog Legacy"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{725F645B-EAED-4fc5-B1C5-D9AD0ACCBA5E}\InProcServer32]
+@="c:\\Windows\\system32\\comdlg32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{71f96385-ddd6-48d3-a0c1-ae06e8b055fb}]
+@="Explorer Browser"
+
+[HKEY_CLASSES_ROOT\CLSID\{71f96385-ddd6-48d3-a0c1-ae06e8b055fb}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{71f96385-ddd6-48d3-a0c1-ae06e8b055fb}]
+@="Explorer Browser"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{71f96385-ddd6-48d3-a0c1-ae06e8b055fb}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{104846ab-42b1-4e38-a80d-136f78c3f258}]
+@="Browser Progress Aggregator"
+
+[HKEY_CLASSES_ROOT\CLSID\{104846ab-42b1-4e38-a80d-136f78c3f258}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{104846ab-42b1-4e38-a80d-136f78c3f258}]
+@="Browser Progress Aggregator"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{104846ab-42b1-4e38-a80d-136f78c3f258}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{B12AE898-D056-4378-A844-6D393FE37956}]
+@="Windows ThemeUI Pages"
+
+[HKEY_CLASSES_ROOT\CLSID\{B12AE898-D056-4378-A844-6D393FE37956}\DefaultIcon]
+@="C:\\Windows\\system32\\themeui.dll,7"
+
+[HKEY_CLASSES_ROOT\CLSID\{B12AE898-D056-4378-A844-6D393FE37956}\InProcServer32]
+@="C:\\Windows\\system32\\themeui.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{B12AE898-D056-4378-A844-6D393FE37956}]
+@="Windows ThemeUI Pages"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{B12AE898-D056-4378-A844-6D393FE37956}\DefaultIcon]
+@="C:\\Windows\\system32\\themeui.dll,7"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{B12AE898-D056-4378-A844-6D393FE37956}\InProcServer32]
+@="C:\\Windows\\system32\\themeui.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{53bd6b4e-3780-4693-afc3-7161c2f3ee9c}]
+@="MruLongList"
+
+[HKEY_CLASSES_ROOT\CLSID\{53bd6b4e-3780-4693-afc3-7161c2f3ee9c}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{53bd6b4e-3780-4693-afc3-7161c2f3ee9c}]
+@="MruLongList"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{53bd6b4e-3780-4693-afc3-7161c2f3ee9c}\InProcServer32]
+@="c:\\Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{ADB9F5A4-E73E-49b8-99B6-2FA317EF9DBC}]
+@="Windows ScreenSaver Properties"
+
+[HKEY_CLASSES_ROOT\CLSID\{ADB9F5A4-E73E-49b8-99B6-2FA317EF9DBC}\DefaultIcon]
+@="C:\\Windows\\system32\\themeui.dll,7"
+
+[HKEY_CLASSES_ROOT\CLSID\{ADB9F5A4-E73E-49b8-99B6-2FA317EF9DBC}\InProcServer32]
+@="C:\\Windows\\system32\\themeui.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{ADB9F5A4-E73E-49b8-99B6-2FA317EF9DBC}]
+@="Windows ScreenSaver Properties"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{ADB9F5A4-E73E-49b8-99B6-2FA317EF9DBC}\DefaultIcon]
+@="C:\\Windows\\system32\\themeui.dll,7"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{ADB9F5A4-E73E-49b8-99B6-2FA317EF9DBC}\InProcServer32]
+@="C:\\Windows\\system32\\themeui.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{26EE0668-A00A-44D7-9371-BEB064C98683}]
+@="Control Panel"
+"InfoTip"=
+"System.AppUserModel.ID"="Microsoft.Windows.ControlPanel"
+"System.AppUserModel.RelaunchCommand"="Windows\\system32\\control.exe"
+"System.AppUserModel.RelaunchIconResource"="C:\\Windows\\system32\\imageres.dll,27"
+"System.AppUserModel.RelaunchDisplayNameResource"="c:\\Windows\\system32\\shell32.dll,-4161"
+
+[HKEY_CLASSES_ROOT\CLSID\{26EE0668-A00A-44D7-9371-BEB064C98683}\DefaultIcon]
+@="C:\\Windows\\system32\\themeui.dll,7"
+
+[HKEY_CLASSES_ROOT\CLSID\{26EE0668-A00A-44D7-9371-BEB064C98683}\InProcServer32]
+@="Windows\\system32\\shell32.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_CLASSES_ROOT\CLSID\{26EE0668-A00A-44D7-9371-BEB064C98683}\ShellFolder]
+"NoFileFolderJunction"=dword:00000001
+"Attributes"=dword:a0000004
+"HideOnDesktopPerUser"=""
+"WantsFORDISPLAY"=""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{26EE0668-A00A-44D7-9371-BEB064C98683}]
+@="Control Panel"
+"InfoTip"=
+"System.AppUserModel.ID"="Microsoft.Windows.ControlPanel"
+"System.AppUserModel.RelaunchCommand"="Windows\\system32\\control.exe"
+"System.AppUserModel.RelaunchIconResource"="C:\\Windows\\system32\\imageres.dll,27"
+"System.AppUserModel.RelaunchDisplayNameResource"="c:\\Windows\\system32\\shell32.dll,-4161"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{26EE0668-A00A-44D7-9371-BEB064C98683}\DefaultIcon]
+@="C:\\Windows\\system32\\themeui.dll,7"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{26EE0668-A00A-44D7-9371-BEB064C98683}\InProcServer32]
+@="C:\\Windows\\system32\\themeui.dll"
+"ThreadingModel"="Apartment"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{26EE0668-A00A-44D7-9371-BEB064C98683}\ShellFolder]
+"NoFileFolderJunction"=dword:00000001
+"Attributes"=dword:a0000004
+"HideOnDesktopPerUser"=""
+"WantsFORDISPLAY"=""

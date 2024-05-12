@@ -724,6 +724,7 @@
 @ stub WmiSetSingleInstanceW
 @ stub WmiSetSingleItemA
 @ stub WmiSetSingleItemW
+@ stdcall -stub EnableTraceEx()
 @ stub Wow64Win32ApiEntry
 @ stdcall WriteEncryptedFileRaw(ptr ptr ptr)
 @ stdcall -version=0x600+ RegLoadMUIStringW(ptr wstr wstr long ptr long wstr)
@@ -743,3 +744,5 @@
 @ stdcall RegDeleteKeyValueW(ptr wstr wstr)
 @ stdcall RegDeleteKeyValueA(ptr str str)
 @ stdcall -version=0x600+ InitiateShutdownW(wstr wstr long long long)
+@ stdcall -stub CredUnprotectW()
+

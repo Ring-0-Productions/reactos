@@ -904,7 +904,7 @@ SetWindowCompositionAttribute(HWND hwnd,
                               PVOID pAttrData) // WINCOMPATTRDATA
 {
     UNIMPLEMENTED;
-    return FALSE;
+    return TRUE;
 }
 
 LONG 
