@@ -526,3 +526,6 @@
 520 stub tree_into_ndr
 521 stub tree_peek_ndr
 522 stub tree_size_ndr
+@ stdcall -stub Ndr64ASyncServerCallAll()
+@ stdcall -stub NdrMesTypeEncode3()
+@ stdcall -stub NdrMesTypeDecode3()

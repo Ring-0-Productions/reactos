@@ -16,6 +16,91 @@
 #include <debug.h>
 
 /* FUNCTIONS ******************************************************************/
+static LPCWSTR ENV_FindVariable(PCWSTR var, PCWSTR name, unsigned namelen)
+{
+    while (*var)
+    {
+        /* match var names, but avoid setting a var with a name including a '='
+         * (a starting '=' is valid though)
+         */
+        unsigned int len = wcslen( var );
+        if (len > namelen &&
+            var[namelen] == '=' &&
+            !RtlCompareUnicodeStrings( var, namelen, name, namelen, TRUE ) &&
+            wcschr(var + 1, '=') == var + namelen)
+        {
+            return var + namelen + 1;
+        }
+        var += len + 1;
+    }
+    return NULL;
+}
+NTSTATUS WINAPI RtlExpandEnvironmentStrings( const WCHAR *renv, WCHAR *src, SIZE_T src_len,
+                                             WCHAR *dst, SIZE_T count, SIZE_T *plen )
+{
+    SIZE_T len, total_size = 1;  /* 1 for terminating '\0' */
+    LPCWSTR env, var;
+
+    if (!renv)
+    {
+        RtlAcquirePebLock();
+        env = NtCurrentTeb()->ProcessEnvironmentBlock->ProcessParameters->Environment;
+    }
+    else env = renv;
+
+    while (src_len)
+    {
+        if (*src != '%')
+        {
+            for (len = 0; len < src_len; len++) if (src[len] == '%') break;
+            var = src;
+            src += len;
+            src_len -= len;
+        }
+        else  /* we are at the start of a variable */
+        {
+            for (len = 1; len < src_len; len++) if (src[len] == '%') break;
+            if (len < src_len)
+            {
+                if ((var = ENV_FindVariable( env, src + 1, len - 1 )))
+                {
+                    src += len + 1;  /* Skip the variable name */
+                    src_len -= len + 1;
+                    len = wcslen(var);
+                }
+                else
+                {
+                    var = src;  /* Copy original name instead */
+                    len++;
+                    src += len;
+                    src_len -= len;
+                }
+            }
+            else  /* unfinished variable name, ignore it */
+            {
+                var = src;
+                src += len;
+                src_len = 0;
+            }
+        }
+        total_size += len;
+        if (dst)
+        {
+            if (count < len) len = count;
+            memcpy(dst, var, len * sizeof(WCHAR));
+            count -= len;
+            dst += len;
+        }
+    }
+
+    if (!renv) RtlReleasePebLock();
+
+    if (dst && count) *dst = '\0';
+    if (plen) *plen = total_size;
+
+    return (count) ? STATUS_SUCCESS : STATUS_BUFFER_TOO_SMALL;
+}
+
 
 /* HACK: ReactOS specific changes, see bug-reports CORE-6611 and CORE-4620 (aka. #5003) */
 static VOID NTAPI

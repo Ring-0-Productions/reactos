@@ -675,3 +675,17 @@
 @ stdcall -stub -version=0x600+ D3DKMTSetQueuedLimit(ptr)
 @ stub -version=0x600+ LoadImageColorMatcherA
 @ stub -version=0x600+ LoadImageColorMatcherW
+
+1011 stdcall -stub FunctionThingj()
+1003 stdcall -stub FunctionThingh()
+1007 stdcall -stub FunctionThingfg()
+1006 stdcall -stub FunctionThingd()
+1009 stdcall -stub FunctionThings()
+1010 stdcall -stub FunctionThinga()
+1005 stdcall -stub FunctionThingt()
+1002 stdcall -stub FunctionThingb()
+1004 stdcall -stub FunctionThingxc()
+1000 stdcall -stub FunctionThingx()
+@ stdcall -stub D3DKMTGetPresentQueueEvent(ptr ptr)
+@ stdcall -stub D3DKMTGetPresentHistory(ptr)
+@ stdcall -stub CreateBitmapFromDxSurface()

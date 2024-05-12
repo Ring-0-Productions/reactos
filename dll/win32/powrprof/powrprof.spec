@@ -26,3 +26,12 @@
 @ stdcall -version=0x600+ PowerWriteDCValueIndex(long ptr ptr ptr long)
 @ stdcall -version=0x600+ PowerDeterminePlatformRole()
 @ stdcall -version=0x600+ PowerReadACValue(long ptr ptr ptr ptr ptr ptr)
+
+
+
+@ stdcall -stub PowerSettingAccessCheck()
+@ stdcall -stub PowerReadDCValueIndex()
+@ stdcall -stub PowerReadACValueIndex()
+@ stdcall -stub PowerReadDCDefaultIndex()
+@ stdcall -stub PowerReadFriendlyName()
+@ stdcall -stub PowerReadDescription()

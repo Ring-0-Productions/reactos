@@ -200,3 +200,16 @@
 @ stub CM_Remove_Unmarked_Children_Ex # setupapi.CM_Remove_Unmarked_Children_Ex
 @ stub CM_Reset_Children_Marks # setupapi.CM_Reset_Children_Marks
 @ stub CM_Reset_Children_Marks_Ex # setupapi.CM_Reset_Children_Marks_Ex
+@ stdcall -stub CM_Get_DevNode_Property_ExW()
+
+@ stdcall -stub CM_Open_Device_Interface_Key_ExW()
+@ stdcall -stub CM_Delete_Device_Interface_Key_ExW()
+@ stdcall -stub CM_Set_DevNode_Property_ExW()
+@ stdcall -stub CM_Get_Class_Property_ExW()
+@ stdcall -stub CM_Set_Class_Property_ExW()
+@ stdcall -stub CM_Get_DevNode_Property_Keys_Ex()
+@ stdcall -stub CM_Get_Device_Interface_Property_Keys_ExW()
+@ stdcall -stub CM_Set_Device_Interface_Property_Keys_ExW()
+@ stdcall -stub CM_Get_Class_Property_Keys_Ex()
+@ stdcall -stub CM_Get_Device_Interface_Property_ExW()
+@ stdcall -stub CM_Set_Device_Interface_Property_ExW()

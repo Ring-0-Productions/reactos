@@ -858,3 +858,4 @@
 858 stdcall wvnsprintfW(ptr long wstr ptr)
 @ stdcall PathCreateFromUrlAlloc(ptr ptr long)
 @ stdcall -version=0x600+ PathMatchSpecExW(wstr wstr long)
+@ stdcall -stub StrFormatByteSizeEx()

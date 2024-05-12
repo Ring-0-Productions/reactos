@@ -134,8 +134,14 @@ GreCreateBitmapEx(
                                  pvBits);
     if (!psurf)
     {
-        DPRINT1("SURFACE_AllocSurface failed.\n");
-        return NULL;
+            psurf = SURFACE_AllocSurface(STYPE_BITMAP,
+                                 1,
+                                 1,
+                                 iFormat,
+                                 fjBitmap,
+                                 1,
+                                 pvCompressedBits ? 0 : cjSizeImage,
+                                 pvBits);
     }
 
     /* The infamous RLE hack */
