@@ -1909,8 +1909,9 @@ SamRidToSid(IN SAM_HANDLE ObjectHandle,
             IN ULONG Rid,
             OUT PSID *Sid)
 {
+    *Sid = MIDL_user_allocate(sizeof(SID));
     UNIMPLEMENTED;
-    return STATUS_NOT_IMPLEMENTED;
+    return 0;
 }
 
 

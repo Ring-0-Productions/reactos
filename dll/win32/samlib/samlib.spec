@@ -29,6 +29,7 @@
 @ stdcall SamLookupIdsInDomain(ptr long ptr ptr ptr)
 @ stdcall SamLookupNamesInDomain(ptr long ptr ptr ptr)
 @ stdcall SamOpenAlias(ptr long long ptr)
+@ stdcall -stub SamValidatePassword()
 @ stdcall SamOpenDomain(ptr long ptr ptr)
 @ stdcall SamOpenGroup(ptr long long ptr)
 @ stdcall SamOpenUser(ptr long long ptr)
