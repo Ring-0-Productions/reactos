@@ -2,33 +2,33 @@
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
   <assemblyIdentity type="win32" name="Microsoft.Windows.Common-Controls" version="6.0.2600.2982" processorArchitecture="x86" publicKeyToken="6595b64144ccf1df"/>
   <file name="comctl32.dll">
-    <windowClass>Button</windowClass>
-    <windowClass>ButtonListBox</windowClass>
-    <windowClass>ComboBoxEx32</windowClass>
-    <windowClass>ComboLBox</windowClass>
-    <windowClass>Combobox</windowClass>
-    <windowClass>Edit</windowClass>
-    <windowClass>Listbox</windowClass>
-    <windowClass>NativeFontCtl</windowClass>
-    <windowClass>ReBarWindow32</windowClass>
-    <windowClass>ScrollBar</windowClass>
-    <windowClass>Static</windowClass>
-    <windowClass>SysAnimate32</windowClass>
-    <windowClass>SysDateTimePick32</windowClass>
-    <windowClass>SysHeader32</windowClass>
-    <windowClass>SysIPAddress32</windowClass>
-    <windowClass>SysLink</windowClass>
-    <windowClass>SysListView32</windowClass>
-    <windowClass>SysMonthCal32</windowClass>
-    <windowClass>SysPager</windowClass>
-    <windowClass>SysTabControl32</windowClass>
-    <windowClass>SysTreeView32</windowClass>
-    <windowClass>ToolbarWindow32</windowClass>
-    <windowClass>msctls_hotkey32</windowClass>
-    <windowClass>msctls_progress32</windowClass>
-    <windowClass>msctls_statusbar32</windowClass>
-    <windowClass>msctls_trackbar32</windowClass>
-    <windowClass>msctls_updown32</windowClass>
-    <windowClass>tooltips_class32</windowClass>
+    <windowClass versioned="yes">Button</windowClass>
+    <windowClass versioned="yes">ButtonListBox</windowClass>
+    <windowClass versioned="yes">ComboBoxEx32</windowClass>
+    <windowClass versioned="yes">ComboLBox</windowClass>
+    <windowClass versioned="yes">Combobox</windowClass>
+    <windowClass versioned="yes">Edit</windowClass>
+    <windowClass versioned="yes">Listbox</windowClass>
+    <windowClass versioned="yes">NativeFontCtl</windowClass>
+    <windowClass versioned="yes">ReBarWindow32</windowClass>
+    <windowClass versioned="yes">ScrollBar</windowClass>
+    <windowClass versioned="yes">Static</windowClass>
+    <windowClass versioned="yes">SysAnimate32</windowClass>
+    <windowClass versioned="yes">SysDateTimePick32</windowClass>
+    <windowClass versioned="yes">SysHeader32</windowClass>
+    <windowClass versioned="yes">SysIPAddress32</windowClass>
+    <windowClass versioned="yes">SysLink</windowClass>
+    <windowClass versioned="yes">SysListView32</windowClass>
+    <windowClass versioned="yes">SysMonthCal32</windowClass>
+    <windowClass versioned="yes">SysPager</windowClass>
+    <windowClass versioned="yes">SysTabControl32</windowClass>
+    <windowClass versioned="yes">SysTreeView32</windowClass>
+    <windowClass versioned="yes">ToolbarWindow32</windowClass>
+    <windowClass versioned="yes">msctls_hotkey32</windowClass>
+    <windowClass versioned="yes">msctls_progress32</windowClass>
+    <windowClass versioned="yes">msctls_statusbar32</windowClass>
+    <windowClass versioned="yes">msctls_trackbar32</windowClass>
+    <windowClass versioned="yes">msctls_updown32</windowClass>
+    <windowClass versioned="yes">tooltips_class32</windowClass>
   </file>
 </assembly>
