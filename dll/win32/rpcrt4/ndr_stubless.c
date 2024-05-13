@@ -872,7 +872,8 @@ LONG_PTR CDECL DECLSPEC_HIDDEN ndr_client_call( PMIDL_STUB_DESC pStubDesc, PFORM
     TRACE("pStubDesc %p, pFormat %p, ...\n", pStubDesc, pFormat);
 
     TRACE("NDR Version: 0x%x\n", pStubDesc->Version);
-
+    if ((ULONG_PTR)pProcHeader <= (ULONG_PTR)0xf)
+        return 0;
     if (pProcHeader->Oi_flags & Oi_HAS_RPCFLAGS)
     {
         const NDR_PROC_HEADER_RPC *header_rpc = (const NDR_PROC_HEADER_RPC *)&pFormat[0];

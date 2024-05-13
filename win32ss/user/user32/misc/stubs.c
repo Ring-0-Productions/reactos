@@ -869,7 +869,8 @@ WINAPI
 IsTopLevelWindow(IN HWND hWnd)
 {
     UNIMPLEMENTED;
-    return FALSE;
+    return TRUE;
+ //   return !GetParent(hWnd);
 }
 
 BOOL
