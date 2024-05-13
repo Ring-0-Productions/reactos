@@ -148,34 +148,34 @@
 @ stub PropVariantToUInt32VectorAlloc
 @ stub PropVariantToUInt32WithDefault
 @ stdcall PropVariantToUInt64(ptr ptr)
-@ stub PropVariantToUInt64Vector
-@ stub PropVariantToUInt64VectorAlloc
-@ stub PropVariantToUInt64WithDefault
-@ stub PropVariantToVariant
-@ stub StgDeserializePropVariant
-@ stub StgSerializePropVariant
-@ stub VariantCompare
-@ stub VariantGetBooleanElem
-@ stub VariantGetDoubleElem
-@ stub VariantGetElementCount
-@ stub VariantGetInt16Elem
-@ stub VariantGetInt32Elem
-@ stub VariantGetInt64Elem
-@ stub VariantGetStringElem
-@ stub VariantGetUInt16Elem
-@ stub VariantGetUInt32Elem
-@ stub VariantGetUInt64Elem
-@ stub VariantToBoolean
-@ stub VariantToBooleanArray
-@ stub VariantToBooleanArrayAlloc
-@ stub VariantToBooleanWithDefault
-@ stub VariantToBuffer
-@ stub VariantToDosDateTime
-@ stub VariantToDouble
-@ stub VariantToDoubleArray
-@ stub VariantToDoubleArrayAlloc
-@ stub VariantToDoubleWithDefault
-@ stub VariantToFileTime
+@ stdcall -stub PropVariantToUInt64Vector()
+@ stdcall -stub PropVariantToUInt64VectorAlloc()
+@ stdcall -stub PropVariantToUInt64WithDefault()
+@ stdcall -stub PropVariantToVariant()
+@ stdcall -stub StgDeserializePropVariant()
+@ stdcall -stub StgSerializePropVariant()
+@ stdcall -stub VariantCompare()
+@ stdcall -stub VariantGetBooleanElem()
+@ stdcall -stub VariantGetDoubleElem()
+@ stdcall -stub VariantGetElementCount()
+@ stdcall -stub VariantGetInt16Elem()
+@ stdcall -stub VariantGetInt32Elem()
+@ stdcall -stub VariantGetInt64Elem()
+@ stdcall -stub VariantGetStringElem()
+@ stdcall -stub VariantGetUInt16Elem()
+@ stdcall -stub VariantGetUInt32Elem()
+@ stdcall -stub VariantGetUInt64Elem()
+@ stdcall -stub VariantToBoolean()
+@ stdcall -stub VariantToBooleanArray()
+@ stdcall -stub VariantToBooleanArrayAlloc()
+@ stdcall -stub VariantToBooleanWithDefault()
+@ stdcall -stub VariantToBuffer()
+@ stdcall -stub VariantToDosDateTime()
+@ stdcall -stub VariantToDouble()
+@ stdcall -stub VariantToDoubleArray()
+@ stdcall -stub VariantToDoubleArrayAlloc()
+@ stdcall -stub VariantToDoubleWithDefault()
+@ stdcall -stub VariantToFileTime()
 @ stdcall VariantToGUID(ptr ptr)
 @ stub VariantToInt16
 @ stub VariantToInt16Array

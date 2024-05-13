@@ -126,4 +126,4 @@ add_delay_importlibs(shell32 powrprof shdocvw devmgr winspool.drv winmm mpr uxth
 add_importlibs(shell32 advapi32 gdi32 user32 comctl32 comdlg32 shlwapi msvcrt kernel32 ntdll)
 add_dependencies(shell32 stdole2) # shell32_shldisp.tlb needs stdole2.tlb
 add_pch(shell32 precomp.h "${PCH_SKIP_SOURCE}")
-add_cd_file(TARGET shell32 DESTINATION reactos/system32 FOR all)
+#add_cd_file(TARGET shell32 DESTINATION reactos/system32 FOR all)

@@ -12,7 +12,7 @@
         <assemblyIdentity
             type="win32"
             name="Microsoft.Windows.Common-Controls"
-            version="6.0.0.0"
+            version="6.0.2600.2982"
             processorArchitecture="*"
             publicKeyToken="6595b64144ccf1df"
             language="*"

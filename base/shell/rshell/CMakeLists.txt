@@ -33,6 +33,7 @@ add_importlibs(rshell
     msvcrt
     kernel32
     ntdll)
+    add_cd_file(TARGET rshell DESTINATION reactos FOR all)
 
 add_custom_command(TARGET rshell POST_BUILD
   COMMAND "${CMAKE_COMMAND}" -E copy
