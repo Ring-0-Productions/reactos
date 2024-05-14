@@ -39,6 +39,10 @@
 @ stdcall CoGetCallContext(ptr ptr)
 @ stdcall CoGetCallerTID(ptr)
 @ stdcall -stub CoGetCancelObject(long ptr ptr)
+@ stdcall -stub StgSerializePropVariant()
+@ stdcall -stub VariantToPropVariant()
+@ stdcall -stub PropVariantToVariant()
+@ stdcall -stub StgDeserializePropVariant()
 @ stdcall CoGetClassObject(ptr long ptr ptr ptr)
 # CoGetClassVersion
 # CoGetComCatalog
