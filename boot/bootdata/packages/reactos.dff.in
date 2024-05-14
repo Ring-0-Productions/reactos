@@ -101,8 +101,11 @@ Signature = "$Windows NT$"
 81 = winsxs\arm64_microsoft.windows.gdiplus_6595b64144ccf1df_1.0.14393.0_none_deadbeef
 82 = Resources\Themes\Reactive
 83 = winsxs\amd64_microsoft-windows-comdlg32_31bf3856ad364e35_6.0.2600.2982_none_deadbeef
+<<<<<<< HEAD
 84 = winsxs\x86_microsoft-windows-comdlg32_31bf3856ad364e35_6.0.2600.2982_none_deadbeef
 6002 = Resources\Themes\Aero
+=======
+>>>>>>> 4cd7fdde48ffb612ff6714cd46a2cdab90bc9043
 
 .InfEnd
 

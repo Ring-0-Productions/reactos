@@ -959,10 +959,13 @@ static void free_entity_array(struct entity_array *array)
         case ACTIVATION_CONTEXT_SECTION_APPLICATION_SETTINGS:
             RtlFreeHeap(GetProcessHeap(), 0, entity->u.settings.name);
             RtlFreeHeap(GetProcessHeap(), 0, entity->u.settings.value);
+<<<<<<< HEAD
             RtlFreeHeap(GetProcessHeap(), 0, entity->u.settings.ns);
             break;
         case ACTIVATION_CONTEXT_SECTION_WINRT_ACTIVATABLE_CLASSES:
             RtlFreeHeap(GetProcessHeap(), 0, entity->u.activatable_class.name);
+=======
+>>>>>>> 4cd7fdde48ffb612ff6714cd46a2cdab90bc9043
             break;
         default:
             FIXME("Unknown entity kind %ld\n", entity->kind);
@@ -5419,7 +5422,11 @@ static NTSTATUS find_guid(ACTIVATION_CONTEXT* actctx, ULONG section_kind,
     return STATUS_SUCCESS;
 }
 
+<<<<<<< HEAD
 static const WCHAR *find_app_settings( ACTIVATION_CONTEXT *actctx, const WCHAR *settings, const WCHAR *ns )
+=======
+static const WCHAR *find_app_settings( ACTIVATION_CONTEXT *actctx, const WCHAR *settings )
+>>>>>>> 4cd7fdde48ffb612ff6714cd46a2cdab90bc9043
 {
     unsigned int i, j;
 
@@ -5430,8 +5437,12 @@ static const WCHAR *find_app_settings( ACTIVATION_CONTEXT *actctx, const WCHAR *
         {
             struct entity *entity = &assembly->entities.base[j];
             if (entity->kind == ACTIVATION_CONTEXT_SECTION_APPLICATION_SETTINGS &&
+<<<<<<< HEAD
                 !wcscmp( entity->u.settings.name, settings ) &&
                 !wcscmp( entity->u.settings.ns, ns ))
+=======
+                !strcmpW( entity->u.settings.name, settings ))
+>>>>>>> 4cd7fdde48ffb612ff6714cd46a2cdab90bc9043
                 return entity->u.settings.value;
         }
     }
@@ -6219,11 +6230,17 @@ NTSTATUS WINAPI RtlQueryActivationContextApplicationSettings( DWORD flags, HANDL
                                                               const WCHAR *settings, WCHAR *buffer,
                                                               SIZE_T size, SIZE_T *written )
 {
+<<<<<<< HEAD
     ACTIVATION_CONTEXT *actctx;
+=======
+    static const WCHAR namespaceW[] = {'h','t','t','p',':','/','/','s','c','h','e','m','a','s','.','m','i','c','r','o','s','o','f','t','.','c','o','m','/','S','M','I','/','2','0',0};
+    ACTIVATION_CONTEXT *actctx = check_actctx( handle );
+>>>>>>> 4cd7fdde48ffb612ff6714cd46a2cdab90bc9043
     const WCHAR *res;
 
     if (flags)
     {
+<<<<<<< HEAD
         WARN( "unknown flags %08lx\n", flags );
         return STATUS_INVALID_PARAMETER;
     }
@@ -6239,15 +6256,34 @@ NTSTATUS WINAPI RtlQueryActivationContextApplicationSettings( DWORD flags, HANDL
             return STATUS_INVALID_PARAMETER;
     }
     else ns = windowsSettings2005NSW;
+=======
+        WARN( "unknown flags %08x\n", flags );
+        return STATUS_INVALID_PARAMETER;
+    }
+
+    if (ns && strncmpW( ns, namespaceW, strlenW(namespaceW) ))
+    {
+        WARN( "unknown namespace %S\n", ns );
+        return STATUS_INVALID_PARAMETER;
+    }
+>>>>>>> 4cd7fdde48ffb612ff6714cd46a2cdab90bc9043
 
     if (!handle) handle = process_actctx;
     if (!(actctx = check_actctx( handle ))) return STATUS_INVALID_PARAMETER;
 
+<<<<<<< HEAD
     if (!(res = find_app_settings( actctx, settings, ns ))) return STATUS_SXS_KEY_NOT_FOUND;
 
     if (written) *written = wcslen(res) + 1;
     if (size < wcslen(res)) return STATUS_BUFFER_TOO_SMALL;
     wcscpy( buffer, res );
+=======
+    if (!(res = find_app_settings( actctx, settings ))) return STATUS_SXS_KEY_NOT_FOUND;
+
+    if (written) *written = strlenW(res) + 1;
+    if (size < strlenW(res)) return STATUS_BUFFER_TOO_SMALL;
+    strcpyW( buffer, res );
+>>>>>>> 4cd7fdde48ffb612ff6714cd46a2cdab90bc9043
     return STATUS_SUCCESS;
 }
 
