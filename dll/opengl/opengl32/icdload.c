@@ -321,17 +321,6 @@ custom_end:
     DRV_LOAD(DrvSwapLayerBuffers);
 #undef DRV_LOAD
 
-    /* Let's see if GDI should handle this instead of the ICD DLL */
-    // FIXME: maybe there is a better way
-    if (GdiDescribePixelFormat(hdc, 0, 0, NULL) != 0)
-    {
-        /* GDI knows what to do with that. Override */
-        TRACE("Forwarding WGL calls to win32k!\n");
-        data->DrvDescribePixelFormat = GdiDescribePixelFormat;
-        data->DrvSetPixelFormat = GdiSetPixelFormat;
-        data->DrvSwapBuffers = GdiSwapBuffers;
-    }
-
     /* Copy the DriverName */
     wcscpy(data->DriverName, pDrvInfo->DriverName);
 

@@ -29,8 +29,6 @@ NTAPI
 DriverEntry(IN PDRIVER_OBJECT DriverObject,
             IN PUNICODE_STRING RegistryPath)
 {
-    __debugbreak();
-
     return 0;
 }
 
@@ -43,7 +41,6 @@ DxDdStartupDxGraphics (ULONG SizeEngDrv,
                        PULONG DirectDrawContext,
                        PEPROCESS Proc )
 {
-    __debugbreak();
 
     PDRVFN drv_func;
     PFN *peng_funcs;
@@ -64,7 +61,7 @@ DxDdStartupDxGraphics (ULONG SizeEngDrv,
     /*
      * Setup internal driver functions list we got from dxg driver functions list
      */
-    pDxgDrv->iDriverVersion = 0x80000; /* Note 12/1-2004 : DirectX 8 ? */
+    pDxgDrv->iDriverVersion = 0x90000; /* Note 12/1-2004 : DirectX 8 ? */
     pDxgDrv->c = gcDxgFuncs;
     pDxgDrv->pdrvfn = gaDxgFuncs;
 

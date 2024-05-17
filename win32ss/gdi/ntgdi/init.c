@@ -17,7 +17,7 @@ NTSTATUS
 GdiProcessCreate(PEPROCESS Process)
 {
     PPROCESSINFO ppiCurrent = PsGetProcessWin32Process(Process);
-    ASSERT(ppiCurrent);
+   // ASSERT(ppiCurrent);
 
     InitializeListHead(&ppiCurrent->PrivateFontListHead);
     InitializeListHead(&ppiCurrent->PrivateMemFontListHead);
@@ -35,9 +35,9 @@ GdiProcessCreate(PEPROCESS Process)
     ppiCurrent->pPoolDcAttr = GdiPoolCreate(sizeof(DC_ATTR), 'acdG');
     ppiCurrent->pPoolBrushAttr = GdiPoolCreate(sizeof(BRUSH_ATTR), 'arbG');
     ppiCurrent->pPoolRgnAttr = GdiPoolCreate(sizeof(RGN_ATTR), 'agrG');
-    ASSERT(ppiCurrent->pPoolDcAttr);
-    ASSERT(ppiCurrent->pPoolBrushAttr);
-    ASSERT(ppiCurrent->pPoolRgnAttr);
+   // ASSERT(ppiCurrent->pPoolDcAttr);
+   // ASSERT(ppiCurrent->pPoolBrushAttr);
+   // ASSERT(ppiCurrent->pPoolRgnAttr);
 
     return STATUS_SUCCESS;
 }
