@@ -57,11 +57,178 @@ typedef struct _KDNET_EXTENSIBILITY_EXPORTS
 
 #define KDNET_EXT_IMPORTS 30
 
+/* Imports */
+typedef ULONG
+(NTAPI *GET_PCI_DATA_BY_OFFSET)(
+        _In_ ULONG BusNumber,
+        _In_ ULONG SlotNumber,
+        _Out_writes_bytes_(Length) PVOID Buffer,
+        _In_ ULONG Offset,
+        _In_ ULONG Length);
+
+typedef ULONG
+(NTAPI *SET_PCI_DATA_BY_OFFSET)(
+        _In_ ULONG BusNumber,
+        _In_ ULONG SlotNumber,
+        _In_reads_bytes_(Length) PVOID Buffer,
+        _In_ ULONG Offset,
+        _In_ ULONG Length);
+
+typedef PHYSICAL_ADDRESS
+(NTAPI *GET_PHYSICAL_ADDRESS)(
+        _In_ PVOID Address);
+
+typedef VOID
+(NTAPI *STALL_EXECUTION_PROCESSOR)(
+        _In_ ULONG Microseconds);
+
+typedef VOID
+(NTAPI *STALL_EXECUTION_PROCESSOR)(
+        _In_ ULONG Microseconds);
+
+typedef UCHAR
+(NTAPI *INT_READ_REGISTER_UCHAR)(
+        _In_ UCHAR *Register);
+
+typedef USHORT
+(NTAPI *INT_READ_REGISTER_USHORT)(
+        _In_ USHORT *Register);
+
+typedef ULONG
+(NTAPI *INT_READ_REGISTER_ULONG)(
+        _In_ ULONG *Register);
+
+typedef ULONG64
+(NTAPI *INT_READ_REGISTER_ULONG64)(
+        _In_ ULONG64 *Register);
+
+typedef VOID
+(NTAPI *INT_WRITE_REGISTER_UCHAR)(
+        _In_ UCHAR *Register,
+        _In_ UCHAR Value);
+
+typedef VOID
+(NTAPI *INT_WRITE_REGISTER_USHORT)(
+        _In_ USHORT *Register,
+        _In_ USHORT Value);
+
+typedef VOID
+(NTAPI *INT_WRITE_REGISTER_ULONG)(
+        _In_ ULONG *Register,
+        _In_ ULONG Value);
+
+typedef VOID
+(NTAPI *INT_WRITE_REGISTER_ULONG64)(
+        _In_ ULONG64 *Register,
+        _In_ ULONG64 Value);
+
+typedef UCHAR
+(NTAPI *INT_READ_PORT_UCHAR)(
+        _In_ UCHAR *Port);
+
+typedef USHORT
+(NTAPI *INT_READ_PORT_USHORT)(
+        _In_ USHORT *Port);
+
+typedef ULONG
+(NTAPI *INT_READ_PORT_ULONG)(
+        _In_ ULONG *Port);
+
+typedef ULONG64
+(NTAPI *INT_READ_PORT_ULONG64)(
+        _In_ ULONG64 *Port);
+
+typedef VOID
+(NTAPI *INT_WRITE_PORT_UCHAR)(
+        _In_ UCHAR *Port,
+        _In_ UCHAR Value);
+
+typedef VOID
+(NTAPI *INT_WRITE_PORT_USHORT)(
+        _In_ USHORT *Port,
+        _In_ USHORT Value);
+
+typedef VOID
+(NTAPI *INT_WRITE_PORT_ULONG)(
+        _In_ ULONG *Port,
+        _In_ ULONG Value);
+
+typedef VOID
+(NTAPI *INT_WRITE_PORT_ULONG64)(
+        _In_ ULONG64 *Register,
+        _In_ ULONG64 Value);
+
+typedef VOID
+(NTAPI *INT_SET_HIBER_RANGE)(
+            IN PVOID HiberContext,
+            IN ULONG Flags,
+            IN OUT PVOID StartPage,
+            IN ULONG Length,
+            IN ULONG PageTag);
+
+typedef VOID
+(NTAPI *KD_DEBUG_PRINT_F)(
+        _In_ PCSTR Format,
+        ...);
+
+typedef VOID
+(NTAPI *INT_UNMAP_VIRTUAL_ADDRESS)(
+        _In_ PVOID VirtualAddress,
+        _In_ PFN_COUNT PageCount);
+    
+typedef PVOID
+(NTAPI *INT_MAP_PHYSICAL_MEMORY64)(
+            _In_ PHYSICAL_ADDRESS PhysicalAddress,
+            _In_ PFN_COUNT PageCount,
+            _In_ BOOLEAN FlushCurrentTL);
+
+typedef ULONG64
+(NTAPI *INT_READ_CYCLE_COUNTER)(
+        VOID);
+
+typedef VOID
+(NTAPI *INT_BUGCHECK_EX)(
+        _In_ ULONG BugCheckCode,
+        _In_ ULONG_PTR BugCheckParameter1,
+        _In_ ULONG_PTR BugCheckParameter2,
+        _In_ ULONG_PTR BugCheckParameter3,
+        _In_ ULONG_PTR BugCheckParameter4);
+
 typedef struct _KDNET_EXTENSIBILITY_IMPORTS
 {
     ULONG FunctionCount;
     PKDNET_EXTENSIBILITY_EXPORTS Exports;
-    PVOID Reserved[28];
+
+    /* Function imports - Windows 10 */
+    GET_PCI_DATA_BY_OFFSET         GetPciDataByOffset;
+    SET_PCI_DATA_BY_OFFSET         SetPciDataByOffset;
+    GET_PHYSICAL_ADDRESS           GetPhysicalAddress;
+    STALL_EXECUTION_PROCESSOR      StallExecutionProcessor;
+    INT_READ_REGISTER_UCHAR        ReadRegisterUChar;
+    INT_READ_REGISTER_USHORT       ReadRegisterUShort;
+    INT_READ_REGISTER_ULONG        ReadRegisterULong;
+    INT_READ_REGISTER_ULONG64      ReadRegisterULong64;
+    INT_WRITE_REGISTER_UCHAR       WriteRegisterUChar;
+    INT_WRITE_REGISTER_USHORT      WriteRegisterUShort;
+    INT_WRITE_REGISTER_ULONG       WriteRegisterULong;
+    INT_WRITE_REGISTER_ULONG64     WriteRegisterULong64;
+    INT_READ_PORT_UCHAR            ReadPortUChar;
+    INT_READ_PORT_USHORT           ReadPortUShort;
+    INT_READ_PORT_ULONG            ReadPortULong;
+    INT_READ_PORT_ULONG64          ReadPortULong64;
+    INT_WRITE_PORT_UCHAR           WritePortUChar;
+    INT_WRITE_PORT_USHORT          WritePortUShort;
+    INT_WRITE_PORT_ULONG           WritePortULong;
+    INT_WRITE_PORT_ULONG64         WritePortULong64;
+    INT_SET_HIBER_RANGE            SetHiberRange;
+    INT_BUGCHECK_EX                BugCheckEx;
+    INT_MAP_PHYSICAL_MEMORY64      MapPhysicalMemory64;
+    INT_UNMAP_VIRTUAL_ADDRESS      UnmapVirtualAddress; 
+    INT_READ_CYCLE_COUNTER         ReadCycleCounter;
+    KD_DEBUG_PRINT_F               KdNetDbgPrintf;
+    NTSTATUS*                      KdNetErrorStatus;
+    PWSTR*                         KdNetErrorString;
+    PULONG                         KdNetHardwareID;
 } KDNET_EXTENSIBILITY_IMPORTS, *PKDNET_EXTENSIBILITY_IMPORTS;
 
 extern PKDNET_EXTENSIBILITY_EXPORTS KdNetExtensibilityExports;

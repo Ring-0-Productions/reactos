@@ -196,6 +196,14 @@ KdDebuggerInitialize0(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
     return STATUS_SUCCESS;
 }
 
+#include <halfuncs.h>
+
+PoSetHiberRange(IN PVOID HiberContext,
+                IN ULONG Flags,
+                IN OUT PVOID StartPage,
+                IN ULONG Length,
+                IN ULONG PageTag);
+
 NTSTATUS
 NTAPI
 KdDebuggerInitialize1(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
@@ -203,6 +211,32 @@ KdDebuggerInitialize1(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
     KDNET_EXTENSIBILITY_IMPORTS ImportTable = {0};
     NTSTATUS Status;
 
+    ImportTable.GetPciDataByOffset = KdGetPciDataByOffset;
+    ImportTable.SetPciDataByOffset = KdSetPciDataByOffset;
+    ImportTable.GetPhysicalAddress = MmGetPhysicalAddress;
+    ImportTable.StallExecutionProcessor = KeStallExecutionProcessor;
+    ImportTable.ReadRegisterUChar = READ_REGISTER_UCHAR;
+    ImportTable.ReadRegisterUShort = READ_REGISTER_USHORT;
+    ImportTable.ReadRegisterULong = READ_REGISTER_ULONG;
+    //ImportTable.ReadRegisterULong64 = READ_REGISTER_ULONG64;
+    ImportTable.WriteRegisterUChar = WRITE_REGISTER_UCHAR;
+    ImportTable.WriteRegisterUShort = WRITE_REGISTER_USHORT;
+    ImportTable.WriteRegisterULong = WRITE_REGISTER_ULONG;
+ //   ImportTable.WriteRegisterULong64 = WRITE_REGISTER_ULONG64;
+    ImportTable.ReadPortUChar = READ_PORT_UCHAR;
+    ImportTable.ReadPortUShort = READ_PORT_USHORT;
+    ImportTable.ReadPortULong = READ_PORT_ULONG;
+    //ImportTable.ReadPortULong64 = READ_PORT_ULONG64;
+    ImportTable.WritePortUChar = WRITE_PORT_UCHAR;
+    ImportTable.WritePortUShort = WRITE_PORT_USHORT;
+    ImportTable.WritePortULong = WRITE_PORT_ULONG;
+    //ImportTable.WritePortULong64 = WRITE_PORT_ULONG64;
+    ImportTable.SetHiberRange = (INT_SET_HIBER_RANGE)PoSetHiberRange;
+    ImportTable.BugCheckEx = KeBugCheckEx;
+    ImportTable.MapPhysicalMemory64 = (INT_MAP_PHYSICAL_MEMORY64)KdMapPhysicalMemory64;
+    ImportTable.UnmapVirtualAddress = KdUnmapVirtualAddress; 
+  //  ImportTable.KdNetDbgPrintf = KdPrint;
+ 
     Status = KdInitializeLibrary(&ImportTable, LoaderBlock ? LoaderBlock->LoadOptions : NULL, NULL);
     if (NT_SUCCESS(Status))
         KdNetExtensibilityExports = ImportTable.Exports;

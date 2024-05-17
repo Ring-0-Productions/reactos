@@ -51,6 +51,8 @@ Author:
 #define HalVectorToIDTEntry             HALPRIVATEDISPATCH->HalVectorToIDTEntry
 #define KdMapPhysicalMemory64           HALPRIVATEDISPATCH->KdMapPhysicalMemory64
 #define KdUnmapVirtualAddress           HALPRIVATEDISPATCH->KdUnmapVirtualAddress
+#define KdGetPciDataByOffset           HALPRIVATEDISPATCH->KdGetPciDataByOffset
+#define KdSetPciDataByOffset           HALPRIVATEDISPATCH->KdSetPciDataByOffset
 
 //
 // Display Functions
