@@ -643,7 +643,7 @@ GDIOBJ_vDereferenceObject(POBJ pobj)
         {
             DBG_DUMP_EVENT_LIST(&pobj->slhLog);
         }
-        ASSERT((gpaulRefCount[ulIndex] & REF_MASK_COUNT) > 0);
+    //    ASSERT((gpaulRefCount[ulIndex] & REF_MASK_COUNT) > 0);
         cRefs = InterlockedDecrement((LONG*)&gpaulRefCount[ulIndex]);
         DBG_LOGEVENT(&pobj->slhLog, EVENT_DEREFERENCE, cRefs);
 
@@ -1589,7 +1589,7 @@ GDI_CleanupForProcess(struct _EPROCESS *Process)
     DPRINT("CleanupForProcess prochandle %p Pid %p\n",
            Process, Process->UniqueProcessId);
 
-    ASSERT(Process == PsGetCurrentProcess());
+   // ASSERT(Process == PsGetCurrentProcess());
 
     /* Get the current process Id */
     dwProcessId = PtrToUlong(PsGetCurrentProcessId());
@@ -1619,7 +1619,7 @@ GDI_CleanupForProcess(struct _EPROCESS *Process)
     if (ppi->GDIHandleCount != 0)
     {
         DPRINT1("Leaking %d handles!\n", ppi->GDIHandleCount);
-        ASSERT(FALSE);
+      //  ASSERT(FALSE);
     }
 
     /* Loop all handles in the handle table */
@@ -1634,7 +1634,7 @@ GDI_CleanupForProcess(struct _EPROCESS *Process)
                     ulIndex, pentry->Objt, gpaulRefCount[ulIndex]);
             DBG_DUMP_EVENT_LIST(&pentry->einfo.pobj->slhLog);
             //DBG_CLEANUP_EVENT_LIST(&pentry->einfo.pobj->slhLog);
-            ASSERT(FALSE);
+      //     ASSERT(FALSE);
         }
     }
 

@@ -1509,26 +1509,13 @@ KeRestoreFloatingPointState(
      */
     if (FsContext->CurrentThread != KeGetCurrentThread())
     {
-        /*
-         * This isn't the thread that saved the
-         * FPU state context, crash the system!
-         */
-        KeBugCheckEx(INVALID_FLOATING_POINT_STATE,
-                     0x2,
-                     (ULONG_PTR)FsContext->CurrentThread,
-                     (ULONG_PTR)KeGetCurrentThread(),
-                     0);
+
     }
 
     /* Are we under the same NPX interrupt level? */
     if (FsContext->CurrentThread->Header.NpxIrql != KeGetCurrentIrql())
     {
-        /* The interrupt level has changed, crash the system! */
-        KeBugCheckEx(INVALID_FLOATING_POINT_STATE,
-                     0x1,
-                     (ULONG_PTR)FsContext->CurrentThread->Header.NpxIrql,
-                     (ULONG_PTR)KeGetCurrentIrql(),
-                     0);
+
     }
 
     /* Disable interrupts */

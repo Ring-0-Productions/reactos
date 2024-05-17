@@ -74,7 +74,7 @@ KeInitializeMutex(IN PKMUTEX Mutex,
     InitializeListHead(&(Mutex->Header.WaitListHead));
 
     /* Initialize the default data */
-    Mutex->OwnerThread = NULL;
+    Mutex->OwnerThread = KeGetCurrentThread();
     Mutex->Abandoned = FALSE;
     Mutex->ApcDisable = 1;
 }
@@ -192,7 +192,7 @@ KeReleaseMutex(IN PKMUTEX Mutex,
     ASSERT_MUTANT(Mutex);
 
     /* There's no difference at this level between the two */
-    return KeReleaseMutant(Mutex, MUTANT_INCREMENT, FALSE, Wait);
+    return KeReleaseMutant(Mutex, MUTANT_INCREMENT, FALSE, FALSE);
 }
 
 /* EOF */
