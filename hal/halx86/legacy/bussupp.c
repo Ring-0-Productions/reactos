@@ -1266,6 +1266,32 @@ HalpInitBusHandlers(VOID)
     HalpRegisterInternalBusHandlers();
 }
 
+ULONG
+NTAPI HalGetPciDataByOffset(
+  _In_ ULONG BusNumber,
+  _In_ ULONG SlotNumber,
+  _Out_writes_bytes_(Length) PVOID Buffer,
+  _In_ ULONG Offset,
+  _In_ ULONG Length)
+{
+    PCI_SLOT_NUMBER Slot;
+    Slot.u.AsULONG = SlotNumber;
+    return HalpPhase0GetPciDataByOffset(BusNumber, Slot, Buffer, Offset, Length);
+}
+
+ ULONG
+NTAPI HalSetPciDataByOffset(
+  _In_ ULONG BusNumber,
+  _In_ ULONG SlotNumber,
+  _In_reads_bytes_(Length) PVOID Buffer,
+  _In_ ULONG Offset,
+  _In_ ULONG Length)
+{
+    PCI_SLOT_NUMBER Slot;
+    Slot.u.AsULONG = SlotNumber;
+    return HalpPhase0SetPciDataByOffset(BusNumber, Slot, Buffer, Offset, Length);
+}
+
 CODE_SEG("INIT")
 VOID
 NTAPI
@@ -1285,6 +1311,9 @@ HalpRegisterKdSupportFunctions(VOID)
     KdUnmapVirtualAddress = HalpUnmapVirtualAddress;
 #endif
 #endif
+
+    KdGetPciDataByOffset = HalGetPciDataByOffset;
+    KdSetPciDataByOffset = HalSetPciDataByOffset;
 
     /* Register ACPI stub */
     KdCheckPowerButton = HalpCheckPowerButton;

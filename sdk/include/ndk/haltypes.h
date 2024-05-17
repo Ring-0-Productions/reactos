@@ -189,9 +189,9 @@ typedef struct _HAL_PRIVATE_DISPATCH
     pHalVectorToIDTEntry HalVectorToIDTEntry;
     pKdMapPhysicalMemory64 KdMapPhysicalMemory64;
     pKdUnmapVirtualAddress KdUnmapVirtualAddress;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
     pKdGetPciDataByOffset KdGetPciDataByOffset;
     pKdSetPciDataByOffset KdSetPciDataByOffset;
+#if (NTDDI_VERSION >= NTDDI_LONGHORN)
     PVOID HalGetInterruptVectorOverride;
     PVOID HalGetVectorInputOverride;
 #endif
