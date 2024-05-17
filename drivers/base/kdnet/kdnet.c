@@ -231,7 +231,7 @@ KdDebuggerInitialize1(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
     ImportTable.WritePortUShort = WRITE_PORT_USHORT;
     ImportTable.WritePortULong = WRITE_PORT_ULONG;
     //ImportTable.WritePortULong64 = WRITE_PORT_ULONG64;
-    ImportTable.SetHiberRange = (INT_SET_HIBER_RANGE)PoSetHiberRange;
+  //  ImportTable.SetHiberRange = (INT_SET_HIBER_RANGE)PoSetHiberRange;
     ImportTable.BugCheckEx = KeBugCheckEx;
     ImportTable.MapPhysicalMemory64 = (INT_MAP_PHYSICAL_MEMORY64)KdMapPhysicalMemory64;
     ImportTable.UnmapVirtualAddress = KdUnmapVirtualAddress; 
