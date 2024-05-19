@@ -16,6 +16,10 @@ KdInitializeLibrary(
     _In_opt_ PCHAR LoaderOptions,
     _Inout_ PDEBUG_DEVICE_DESCRIPTOR Device)
 {
+    for(;;)
+    {
+        
+    }
     return STATUS_NOT_IMPLEMENTED;
 }
 

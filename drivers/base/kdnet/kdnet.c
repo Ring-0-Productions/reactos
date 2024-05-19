@@ -12,6 +12,7 @@
 #include <arc/arc.h>
 #include <kddll.h>
 #include <kdnetextensibility.h>
+#include "dbgkd.h"
 
 /* GLOBALS ********************************************************************/
 
@@ -188,14 +189,6 @@ KdD3Transition(VOID)
 {
     return STATUS_SUCCESS;
 }
-
-NTSTATUS
-NTAPI
-KdDebuggerInitialize0(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
-{
-    return STATUS_SUCCESS;
-}
-
 #include <halfuncs.h>
 
 PoSetHiberRange(IN PVOID HiberContext,
@@ -203,14 +196,23 @@ PoSetHiberRange(IN PVOID HiberContext,
                 IN OUT PVOID StartPage,
                 IN ULONG Length,
                 IN ULONG PageTag);
-
 NTSTATUS
 NTAPI
-KdDebuggerInitialize1(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
+KdDebuggerInitialize0(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
 {
+    KdpDebgOutput();
     KDNET_EXTENSIBILITY_IMPORTS ImportTable = {0};
+    DEBUG_DEVICE_DESCRIPTOR DeviceDescriptor = {0};
     NTSTATUS Status;
 
+    DeviceDescriptor.NameSpace = KdNameSpaceAny;
+    DeviceDescriptor.Bus = -1;
+    DeviceDescriptor.Slot = -1;
+    DeviceDescriptor.DeviceID = -1;
+    DeviceDescriptor.Segment = -1;
+    DeviceDescriptor.ProgIf = -1;
+    DeviceDescriptor.PortType = -1;
+    DeviceDescriptor.NameSpacePathLength = -1;
     ImportTable.GetPciDataByOffset = KdGetPciDataByOffset;
     ImportTable.SetPciDataByOffset = KdSetPciDataByOffset;
     ImportTable.GetPhysicalAddress = MmGetPhysicalAddress;
@@ -218,29 +220,41 @@ KdDebuggerInitialize1(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
     ImportTable.ReadRegisterUChar = READ_REGISTER_UCHAR;
     ImportTable.ReadRegisterUShort = READ_REGISTER_USHORT;
     ImportTable.ReadRegisterULong = READ_REGISTER_ULONG;
-    //ImportTable.ReadRegisterULong64 = READ_REGISTER_ULONG64;
+    ImportTable.ReadRegisterULong64 = (INT_READ_REGISTER_ULONG64)READ_REGISTER_ULONG;
     ImportTable.WriteRegisterUChar = WRITE_REGISTER_UCHAR;
     ImportTable.WriteRegisterUShort = WRITE_REGISTER_USHORT;
     ImportTable.WriteRegisterULong = WRITE_REGISTER_ULONG;
- //   ImportTable.WriteRegisterULong64 = WRITE_REGISTER_ULONG64;
+    ImportTable.WriteRegisterULong64 = (INT_WRITE_REGISTER_ULONG64)WRITE_REGISTER_ULONG;
     ImportTable.ReadPortUChar = READ_PORT_UCHAR;
     ImportTable.ReadPortUShort = READ_PORT_USHORT;
     ImportTable.ReadPortULong = READ_PORT_ULONG;
-    //ImportTable.ReadPortULong64 = READ_PORT_ULONG64;
+    ImportTable.ReadPortULong64 = (INT_READ_PORT_ULONG64)READ_PORT_ULONG;
     ImportTable.WritePortUChar = WRITE_PORT_UCHAR;
     ImportTable.WritePortUShort = WRITE_PORT_USHORT;
     ImportTable.WritePortULong = WRITE_PORT_ULONG;
-    //ImportTable.WritePortULong64 = WRITE_PORT_ULONG64;
+    ImportTable.WritePortULong64 = (INT_WRITE_PORT_ULONG64)WRITE_PORT_ULONG;
   //  ImportTable.SetHiberRange = (INT_SET_HIBER_RANGE)PoSetHiberRange;
     ImportTable.BugCheckEx = KeBugCheckEx;
     ImportTable.MapPhysicalMemory64 = (INT_MAP_PHYSICAL_MEMORY64)KdMapPhysicalMemory64;
-    ImportTable.UnmapVirtualAddress = KdUnmapVirtualAddress; 
-  //  ImportTable.KdNetDbgPrintf = KdPrint;
- 
-    Status = KdInitializeLibrary(&ImportTable, LoaderBlock ? LoaderBlock->LoadOptions : NULL, NULL);
+    ImportTable.UnmapVirtualAddress = KdUnmapVirtualAddress;
+    ImportTable.FunctionCount = 30;
+    ImportTable.Exports->FunctionCount = 13;
+   ImportTable.KdNetDbgPrintf = KdNetDebugPrint;
+    KdNetDebugPrint(   "KdDebuggerInitialize0 - SetupPtrs\n");
+    Status = KdInitializeLibrary(&ImportTable, LoaderBlock->LoadOptions, &DeviceDescriptor);
+    KdNetDebugPrint("Library initialized Status hmm %X\n", Status);
     if (NT_SUCCESS(Status))
         KdNetExtensibilityExports = ImportTable.Exports;
-    return Status;
+    return 0;
+}
+
+
+NTSTATUS
+NTAPI
+KdDebuggerInitialize1(IN PLOADER_PARAMETER_BLOCK LoaderBlock OPTIONAL)
+{
+    KdNetDebugPrint("KdDebuggerInitialize1\n");
+    return 0;
 }
 
 
@@ -273,6 +287,11 @@ KdReceivePacket(
     _Out_ PULONG DataLength,
     _Inout_ PKD_CONTEXT Context)
 {
+    KdNetDebugPrint("Entry KdReceivePacket\n");
+    for(;;)
+    {
+
+    }
     UCHAR Byte = 0;
     KDSTATUS KdStatus;
     KD_PACKET Packet;
@@ -487,6 +506,11 @@ KdSendPacket(
     _In_ PSTRING MessageData,
     _Inout_ PKD_CONTEXT Context)
 {
+    KdNetDebugPrint("Entry KdSendPacket\n");
+    for(;;)
+    {
+
+    }
     PKD_PACKET Packet;
     KDSTATUS KdStatus;
     ULONG Retries;

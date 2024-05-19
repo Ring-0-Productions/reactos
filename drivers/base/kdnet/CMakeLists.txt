@@ -2,6 +2,7 @@ spec2def(kdnet.dll kdnet.spec ADD_IMPORTLIB)
 
 list(APPEND SOURCE
     kdnet.c
+    debugkd.c
     )
 
 add_library(kdnet MODULE
@@ -12,5 +13,6 @@ add_library(kdnet MODULE
 set_module_type(kdnet kerneldll ENTRYPOINT 0)
 set_subsystem(kdnet native)
 add_importlibs(kdnet ntoskrnl hal kdstub)
+target_link_libraries(kdnet cportlib)
 add_dependencies(kdnet psdk bugcodes)
 #add_cd_file(TARGET kdnet DESTINATION reactos/system32 NO_CAB FOR all)

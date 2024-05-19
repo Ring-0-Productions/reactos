@@ -29,7 +29,6 @@ typedef struct _DEBUG_MEMORY_REQUIREMENTS {
   BOOLEAN Aligned;
 } DEBUG_MEMORY_REQUIREMENTS, *PDEBUG_MEMORY_REQUIREMENTS;
 
-#if (NTDDI_VERSION >= NTDDI_WIN8)
 typedef enum {
   KdNameSpacePCI,
   KdNameSpaceACPI,
@@ -37,9 +36,7 @@ typedef enum {
   KdNameSpaceNone,
   KdNameSpaceMax, /* Maximum namespace enumerator */
 } KD_NAMESPACE_ENUM, *PKD_NAMESPACE_ENUM;
-#endif
 
-#if (NTDDI_VERSION >= NTDDI_WIN10)
 typedef struct _DEBUG_TRANSPORT_DATA {
   ULONG HwContextSize;
   BOOLEAN UseSerialFraming;
@@ -48,7 +45,6 @@ typedef struct _DEBUG_TRANSPORT_DATA {
   UCHAR USBCoreId;
 #endif
 } DEBUG_TRANSPORT_DATA, *PDEBUG_TRANSPORT_DATA;
-#endif
 
 #define MAXIMUM_DEBUG_BARS 6
 
@@ -66,42 +62,26 @@ typedef struct _DEBUG_TRANSPORT_DATA {
 
 typedef struct _DEBUG_DEVICE_DESCRIPTOR {
   ULONG Bus;
-#if (NTDDI_VERSION >= NTDDI_VISTA) && (NTDDI_VERSION < NTDDI_WIN8)
-  USHORT Segment;
-#endif
   ULONG Slot;
-#if (NTDDI_VERSION >= NTDDI_WIN8)
   USHORT Segment;
-#endif
   USHORT VendorID;
   USHORT DeviceID;
   UCHAR BaseClass;
   UCHAR SubClass;
   UCHAR ProgIf;
-#if (NTDDI_VERSION >= NTDDI_WIN8)
-#if (NTDDI_VERSION >= NTDDI_WIN10)
   union {
-#endif
     UCHAR Flags;
-#if (NTDDI_VERSION >= NTDDI_WIN10)
     struct {
       UCHAR DbgHalScratchAllocated : 1;
       UCHAR DbgBarsMapped : 1;
       UCHAR DbgScratchAllocated : 1;
     };
   };
-#endif
-#endif
+
   BOOLEAN Initialized;
-#if (NTDDI_VERSION >= NTDDI_VISTA)
   BOOLEAN Configured;
-#endif
   DEBUG_DEVICE_ADDRESS BaseAddress[MAXIMUM_DEBUG_BARS];
   DEBUG_MEMORY_REQUIREMENTS Memory;
-#if (NTDDI_VERSION >= NTDDI_WIN10_19H1)
-  ULONG Dbg2TableIndex;
-#endif
-#if (NTDDI_VERSION >= NTDDI_WIN8)
   USHORT PortType;
   USHORT PortSubtype;
   PVOID OemData;
@@ -109,11 +89,8 @@ typedef struct _DEBUG_DEVICE_DESCRIPTOR {
   KD_NAMESPACE_ENUM NameSpace;
   PWCHAR NameSpacePath;
   ULONG NameSpacePathLength;
-#endif
-#if (NTDDI_VERSION >= NTDDI_WIN10)
   ULONG TransportType;
   DEBUG_TRANSPORT_DATA TransportData;
-#endif
 } DEBUG_DEVICE_DESCRIPTOR, *PDEBUG_DEVICE_DESCRIPTOR;
 
 typedef NTSTATUS
