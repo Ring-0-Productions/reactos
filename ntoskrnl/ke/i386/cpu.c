@@ -1267,8 +1267,8 @@ KiFlushNPXState(IN PFLOATING_SAVE_AREA SaveArea)
         if ((NpxThread) && (NpxThread->NpxState == NPX_STATE_LOADED))
         {
             /* Get the FX frame and store the state there */
-          //  FxSaveArea = KiGetThreadNpxArea(NpxThread);
-           // Ke386FxSave(FxSaveArea);
+            FxSaveArea = KiGetThreadNpxArea(NpxThread);
+            Ke386FxSave(FxSaveArea);
 
             /* NPX thread has lost its state */
             NpxThread->NpxState = NPX_STATE_NOT_LOADED;
