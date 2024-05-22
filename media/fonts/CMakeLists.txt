@@ -24,7 +24,7 @@ list(APPEND FONT_FILES
     georgiai.ttf
     georgiaz.ttf
     lucon.ttf
-    Marlett.ttf
+   # Marlett.ttf
     pala.ttf
     palab.ttf
     palabi.ttf

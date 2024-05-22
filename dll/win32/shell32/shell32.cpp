@@ -255,6 +255,33 @@ public:
     };
 };
 
+class CPersonalStartMenuDummy :
+    public CComCoClass<CPersonalStartMenuDummy, &CLSID_PersonalStartMenu>,
+    public CComObjectRootEx<CComMultiThreadModelNoCS>
+{
+private:
+    CPersonalStartMenuDummy();
+    virtual ~CPersonalStartMenuDummy();
+
+public:
+    DECLARE_REGISTRY_RESOURCEID(IDR_STARTMENU)
+
+    class _CreatorClass
+    {
+    public:
+        static STDMETHODIMP CreateInstance(void *pv, REFIID riid, LPVOID *ppv)
+        {
+            if (ppv == NULL)
+                return E_POINTER;
+            *ppv = NULL;
+            if (pv != NULL)
+                return CLASS_E_NOAGGREGATION;
+            __debugbreak();
+            return RSHELL_CStartMenu_CreateInstance(riid, ppv);
+        }
+    };
+};
+
 /**************************************************************************
  *  CShell32Module
  */
@@ -295,6 +322,7 @@ BEGIN_OBJECT_MAP(ObjectMap)
     OBJECT_ENTRY(CLSID_CopyToMenu, CCopyToMenu)
     OBJECT_ENTRY(CLSID_MoveToMenu, CMoveToMenu)
     OBJECT_ENTRY(CLSID_StartMenu, CStartMenuDummy)
+    OBJECT_ENTRY(CLSID_PersonalStartMenu, CPersonalStartMenuDummy)
     OBJECT_ENTRY(CLSID_MenuBandSite, CMenuSite)
     OBJECT_ENTRY(CLSID_MenuBand, CMenuBand)
     OBJECT_ENTRY(CLSID_MenuDeskBar, CMenuDeskBar)
