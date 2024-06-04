@@ -22,8 +22,30 @@
 @ stdcall CcMdlWriteComplete(ptr ptr ptr)
 @ stdcall CcPinMappedData(ptr ptr long long ptr)
 @ stdcall CcPinRead(ptr ptr long long ptr ptr)
+stdcall KeRegisterProcessorChangeCallback(ptr ptr long)
 @ stdcall CcPrepareMdlWrite(ptr ptr long ptr ptr)
 @ stdcall CcPreparePinWrite(ptr ptr long long long ptr ptr)
+@ stdcall KeRevertToUserGroupAffinityThread(ptr)
+@ stdcall KeSetSystemGroupAffinityThread(ptr ptr)
+@ stdcall KeGetProcessorNumberFromIndex(long ptr)
+@ stdcall KeQueryMaximumGroupCount()
+@ stdcall -stub NtQuerySystemInformationEx(long ptr long ptr long long)
+@ stub PcwAddInstance
+@ stub PcwRegister
+@ stdcall KeFreeCalloutStack(ptr)
+@ stdcall -stub RtlLookupEntryHashTable(ptr long)
+@ stdcall -stub RtlCreateHashTable(ptr long long)
+@ stdcall -stub RtlDeleteHashTable(ptr)
+@ stdcall -stub RtlGetNextEntryHashTable(ptr)
+@ stub RtlInsertEntryHashTable
+@ stub RtlRemoveEntryHashTable
+@ stub RtlContractHashTable
+@ stub RtlEndEnumerationHashTable
+@ stub RtlEnumerateEntryHashTable
+@ stub RtlExpandHashTable
+@ stub RtlInitEnumerationHashTable
+@ stdcall KeAllocateCalloutStack(ptr)
+@ stdcall IoGetDeviceNumaNode(ptr ptr)
 @ stdcall CcPurgeCacheSection(ptr ptr long long)
 @ stdcall CcRemapBcb(ptr)
 @ stdcall CcRepinBcb(ptr)
