@@ -42,3 +42,13 @@ GetDpiForWindow(
     UNREFERENCED_PARAMETER(hWnd);
     return GetDpiForSystem();
 }
+
+BOOL SetProcessDPIAware()
+{
+    return TRUE;
+}
+
+BOOL IsProcessDPIAware()
+{
+    return FALSE;
+}

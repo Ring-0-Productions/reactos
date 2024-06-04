@@ -434,6 +434,7 @@
 427 stdcall IsIconic(long)
 428 stdcall IsMenu(long)
 429 stdcall -stub IsProcess16Bit()
+@ stdcall -version=0x600+ IsProcessDPIAware()
 430 stdcall IsRectEmpty(ptr)
 431 stdcall IsSETEnabled()
 432 stdcall IsServerSideWindow(long)
@@ -630,6 +631,7 @@
 621 stdcall SetMessageQueue(long)
 622 stdcall SetParent(long long) NtUserSetParent
 623 stdcall SetProcessDefaultLayout(long)
+@ stdcall -version=0x600+ SetProcessDPIAware()
 624 stdcall SetProcessWindowStation(long) NtUserSetProcessWindowStation
 625 stdcall SetProgmanWindow (long)
 626 stdcall SetPropA(long str long)
