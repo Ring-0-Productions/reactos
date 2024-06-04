@@ -307,13 +307,8 @@ IoSynchronousCallDriver(_In_ PDEVICE_OBJECT DeviceObject,
 
     IrpStack = Irp->Tail.Overlay.CurrentStackLocation;
     IrpStack->Context = &Event;
-<<<<<<< HEAD
-    IrpStack->CompletionRoutine = IopSynchronousCompletion;
-    IrpStack->Control = -1;
-=======
     IrpStack->CompletionRoutine = IopSynchronousCompletionLoc;
     IrpStack->Control = -32; // Why hell are we getting this with manual probing?
->>>>>>> faad344e6df ([SDK] Make IoSynchronousCallDriver more accurate to test results)
 
     Status = IofCallDriver(DeviceObject, Irp);
     if (Status == STATUS_PENDING)
