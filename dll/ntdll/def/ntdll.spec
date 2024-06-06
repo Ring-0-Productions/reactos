@@ -568,7 +568,7 @@
 @ stdcall NtTestAlert()
 ;@ stdcall -stub -version=0x600+ NtThawRegistry ; CHECKME
 ;@ stdcall -stub -version=0x600+ NtThawTransactions ; CHECKME
-@ stdcall -version=0x600+ NtTraceControl(long ptr long ptr long long)
+@ stdcall -stub -version=0x600+ NtTraceControl(long ptr long ptr long long)
 @ stdcall NtTraceEvent(long long long ptr)
 @ stdcall NtTranslateFilePath(ptr long ptr long)
 @ stdcall NtUnloadDriver(ptr)
