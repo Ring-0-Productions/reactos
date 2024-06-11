@@ -7,6 +7,7 @@
 
 #include <math.h>
 
+#uf 9
 _Check_return_
 float
 __cdecl
