@@ -688,5 +688,4 @@
 1004 stdcall -stub FunctionThingxc()
 1000 stdcall -stub FunctionThingx()
 @ stdcall -stub D3DKMTGetPresentQueueEvent(ptr ptr)
-@ stdcall -stub D3DKMTGetPresentHistory(ptr)
 @ stdcall -stub CreateBitmapFromDxSurface()

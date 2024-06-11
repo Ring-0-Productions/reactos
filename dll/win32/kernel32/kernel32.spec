@@ -1395,7 +1395,6 @@
 @ stdcall -stub RegQueryValueExW()
 @ stdcall -stub RegSetValueExW()
 @ stdcall -stub RegCloseKey()
-@ stdcall -stub RegGetValueW()
 @ stdcall -stub RegDeleteValueW()
 
 @ stdcall -stub RegDeleteKeyExA(long str long long)
