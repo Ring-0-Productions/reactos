@@ -91,12 +91,24 @@ BaseGetNamedObjectDirectory(VOID)
     {
         Token = NULL;
     }
-
+    WCHAR BnoBuffer[100];
+    ULONG SessionId;
+    SessionId = NtCurrentPeb()->SessionId;
+        UNICODE_STRING NamedObjectDirectoryLoc;
+    if (SessionId != 0)
+    {
+        swprintf(BnoBuffer, L"\\Sessions\\%ld\\BaseNamedObjects", SessionId);
+    }
+    else
+    {
+        wcscpy(BnoBuffer, L"\\BaseNamedObjects");
+    }
+    RtlInitUnicodeString(&NamedObjectDirectoryLoc, BnoBuffer);
     RtlAcquirePebLock();
-    if (BaseNamedObjectDirectory) goto Quickie;
+
 
     InitializeObjectAttributes(&ObjectAttributes,
-                               &BaseStaticServerData->NamedObjectDirectory,
+                               &NamedObjectDirectoryLoc,
                                OBJ_CASE_INSENSITIVE,
                                NULL,
                                NULL);
@@ -363,13 +375,16 @@ BaseCreateStack(
     BOOLEAN UseGuard;
     ULONG PageSize, AllocationGranularity, Dummy;
     SIZE_T MinimumStackCommit, GuardPageSize;
-
+    SYSTEM_BASIC_INFORMATION SystemInformation;
     DPRINT("BaseCreateStack(hProcess: 0x%p, Max: 0x%lx, Current: 0x%lx)\n",
             hProcess, StackReserve, StackCommit);
-
+            Status = NtQuerySystemInformation(SystemBasicInformation,
+                &SystemInformation,
+                sizeof(SystemInformation),
+                NULL);
     /* Read page size */
-    PageSize = BaseStaticServerData->SysInfo.PageSize;
-    AllocationGranularity = BaseStaticServerData->SysInfo.AllocationGranularity;
+    PageSize = 512;
+    AllocationGranularity = SystemInformation.AllocationGranularity;
 
     /* Get the Image Headers */
     Headers = RtlImageNtHeader(NtCurrentPeb()->ImageBaseAddress);

@@ -26,7 +26,7 @@ WINAPI
 IsTimeZoneRedirectionEnabled(VOID)
 {
     /* Return if a TS Timezone ID is active */
-    return (BaseStaticServerData->TermsrvClientTimeZoneId != TIME_ZONE_ID_INVALID);
+    return 0;
 }
 
 /*

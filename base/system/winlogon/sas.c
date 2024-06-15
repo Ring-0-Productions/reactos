@@ -1523,14 +1523,14 @@ InitializeSAS(
         ERR("WL: Failed to create SAS window\n");
         goto cleanup;
     }
-
+#if 0
     /* Register SAS window to receive SAS notifications */
     if (!SetLogonNotifyWindow(Session->SASWindow))
     {
         ERR("WL: Failed to register SAS window\n");
         goto cleanup;
     }
-
+#endif
     if (!SetDefaultLanguage(NULL))
         return FALSE;
 

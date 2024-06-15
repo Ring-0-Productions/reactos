@@ -74,3 +74,6 @@
 @ stdcall TranslateNameW(wstr long long ptr ptr)
 @ stdcall UnsealMessage(ptr ptr long ptr) DecryptMessage
 @ stdcall VerifySignature(ptr ptr long ptr)
+
+@ stdcall -stub SecpSetIPAddress()
+@ stdcall -stub ChangeAccountPasswordW()

@@ -257,6 +257,14 @@ static void xor( unsigned char *dst, const unsigned char *a, const unsigned char
         dst[i] = a[i] ^ b[i];
 }
 
+
+DWORD
+WINAPI
+NotifyServiceStatusChange( SC_HANDLE service)
+{
+    return ERROR_SUCCESS;
+}
+
 DWORD
 WINAPI
 NotifyServiceStatusChangeW( SC_HANDLE service, DWORD mask,

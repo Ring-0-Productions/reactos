@@ -252,7 +252,7 @@ DefineDosDeviceW(
     WPARAM wParam;
 
     /* Get status about local device mapping */
-    LUIDDeviceMapsEnabled = BaseStaticServerData->LUIDDeviceMapsEnabled;
+    LUIDDeviceMapsEnabled = TRUE;
 
     /* Validate input & flags */
     if ((dwFlags & 0xFFFFFFE0) ||

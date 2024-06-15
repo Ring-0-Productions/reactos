@@ -2850,3 +2850,20 @@ RtlSendMsgToSm(
 
     return Status;
 }
+
+
+NTSTATUS
+NTAPI
+NtInitializeNlsFiles(
+       _Out_ PVOID *BaseAddress,
+       _Out_ PLCID DefaultLocaleId,
+       _Out_ PLARGE_INTEGER DefaultCasingTableSize
+    )
+{
+
+    *BaseAddress =  RtlAllocateHeap(RtlGetProcessHeap(),
+    0,
+    0x1000);
+    DefaultLocaleId = 0;
+    return 0;
+}

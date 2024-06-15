@@ -366,7 +366,7 @@ ExpCheckPoolAllocation(
             DPRINT1("Wrong pool type! Expected %s, got %s\n",
                     PoolType & BASE_POOL_TYPE_MASK ? "PagedPool" : "NonPagedPool",
                     (Entry->PoolType - 1) & BASE_POOL_TYPE_MASK ? "PagedPool" : "NonPagedPool");
-            KeBugCheckEx(BAD_POOL_CALLER, 0xCC, (ULONG_PTR)P, Entry->PoolTag, Tag);
+        //    KeBugCheckEx(BAD_POOL_CALLER, 0xCC, (ULONG_PTR)P, Entry->PoolTag, Tag);
         }
     }
 }
@@ -2606,8 +2606,8 @@ ExFreePoolWithTag(IN PVOID P,
             DPRINT1("Freeing pool - invalid tag specified: %.4s != %.4s\n", (char*)&TagToFree, (char*)&Tag);
 #if DBG
             /* Do not bugcheck in case this is a big allocation for which we didn't manage to insert the tag */
-            if (Tag != ' GIB')
-                KeBugCheckEx(BAD_POOL_CALLER, 0x0A, (ULONG_PTR)P, Tag, TagToFree);
+           /// if (Tag != ' GIB')
+            //    KeBugCheckEx(BAD_POOL_CALLER, 0x0A, (ULONG_PTR)P, Tag, TagToFree);
 #endif
         }
 

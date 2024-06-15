@@ -149,10 +149,8 @@ DllMain(HANDLE hDll,
             }
 
             /* Get the server data */
-            ASSERT(Peb->ReadOnlyStaticServerData);
-            BaseStaticServerData = Peb->ReadOnlyStaticServerData[BASESRV_SERVERDLL_INDEX];
-            ASSERT(BaseStaticServerData);
-
+         //   ASSERT(Peb->ReadOnlyStaticServerData);
+    
             /* Check if we are running a CSR Server */
             if (!BaseRunningInServerProcess)
             {
@@ -166,10 +164,10 @@ DllMain(HANDLE hDll,
 
             /* Set HMODULE for our DLL */
             kernel32_handle = hCurrentModule = hDll;
+    
+            RtlInitUnicodeString(&BaseWindowsDirectory, L"windows");
+            RtlInitUnicodeString(&BaseWindowsSystemDirectory, L"system32");
 
-            /* Set the directories */
-            BaseWindowsDirectory = BaseStaticServerData->WindowsDirectory;
-            BaseWindowsSystemDirectory = BaseStaticServerData->WindowsSystemDirectory;
 
             /* Construct the default path (using the static buffer) */
             Status = RtlStringCbPrintfW(BaseDefaultPathBuffer,

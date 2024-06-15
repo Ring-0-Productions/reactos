@@ -31,6 +31,7 @@ if(ARCH STREQUAL "i386")
     add_subdirectory(crtdll) # only built on x86
 endif()
 add_subdirectory(crypt32)
+add_subdirectory(WLCLNTFY)
 add_subdirectory(cryptdlg)
 add_subdirectory(cryptdll)
 add_subdirectory(cryptnet)

@@ -440,6 +440,7 @@
 @ stdcall NotifyBootConfigStatus(long)
 @ stdcall NotifyChangeEventLog(long long)
 @ stdcall -version=0x600+ NotifyServiceStatusChangeW(long long ptr)
+@ stdcall -version=0x600+ NotifyServiceStatusChange(long )
 @ stdcall ObjectCloseAuditAlarmA(str ptr long)
 @ stdcall ObjectCloseAuditAlarmW(wstr ptr long)
 @ stdcall ObjectDeleteAuditAlarmA(str ptr long)
@@ -746,3 +747,5 @@
 @ stdcall -version=0x600+ InitiateShutdownW(wstr wstr long long long)
 @ stdcall -stub CredUnprotectW()
 
+@ stdcall -stub EventWriteEndScenario()
+@ stdcall -stub EventWriteStartScenario()

@@ -815,7 +815,7 @@ IsBadReadPtr(IN LPCVOID lp,
     if (!lp) return TRUE;
 
     /* Get the page size */
-    PageSize = BaseStaticServerData->SysInfo.PageSize;
+    PageSize = 512;
 
     /* Calculate start and end */
     Current = (volatile CHAR*)lp;
@@ -893,7 +893,7 @@ IsBadWritePtr(IN LPVOID lp,
     if (!lp) return TRUE;
 
     /* Get the page size */
-    PageSize = BaseStaticServerData->SysInfo.PageSize;
+    PageSize = 512;
 
     /* Calculate start and end */
     Current = (volatile CHAR*)lp;

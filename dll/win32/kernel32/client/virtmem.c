@@ -26,11 +26,15 @@ VirtualAllocEx(IN HANDLE hProcess,
                IN DWORD flAllocationType,
                IN DWORD flProtect)
 {
+    SYSTEM_BASIC_INFORMATION SystemInformation;
     NTSTATUS Status;
-
+    Status = NtQuerySystemInformation(SystemBasicInformation,
+        &SystemInformation,
+        sizeof(SystemInformation),
+        NULL);
     /* Make sure the address is within the granularity of the system (64K) */
     if ((lpAddress != NULL) &&
-        (lpAddress < UlongToPtr(BaseStaticServerData->SysInfo.AllocationGranularity)))
+        (lpAddress < UlongToPtr(SystemInformation.AllocationGranularity)))
     {
         /* Fail the call */
         SetLastError(ERROR_INVALID_PARAMETER);
