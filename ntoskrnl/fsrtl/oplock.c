@@ -27,19 +27,6 @@
 #define BROKEN_TO_CLOSE_PENDING     0x800
 #define BROKEN_ANY                  (BROKEN_TO_LEVEL_2 | BROKEN_TO_NONE  | BROKEN_TO_NONE_FROM_LEVEL_2 | BROKEN_TO_CLOSE_PENDING)
 
-typedef struct _INTERNAL_OPLOCK
-{
-    /* Level I IRP */
-    PIRP ExclusiveIrp;
-    /* Level I FILE_OBJECT */
-    PFILE_OBJECT FileObject;
-    /* Level II IRPs */
-    LIST_ENTRY SharedListHead;
-    /* IRPs waiting on level I */
-    LIST_ENTRY WaitListHead;
-    ULONG Flags;
-    PFAST_MUTEX IntLock;
-} INTERNAL_OPLOCK, *PINTERNAL_OPLOCK;
 
 typedef struct _WAIT_CONTEXT
 {

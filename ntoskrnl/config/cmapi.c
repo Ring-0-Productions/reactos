@@ -1492,6 +1492,7 @@ CmpQueryKeyDataFromCache(
     return STATUS_SUCCESS;
 }
 
+#if (NTDDI_VERSION < NTDDI_VISTA)
 static
 NTSTATUS
 CmpQueryFlagsInformation(
@@ -1512,6 +1513,7 @@ CmpQueryFlagsInformation(
 
     return STATUS_SUCCESS;
 }
+#endif
 
 static
 NTSTATUS
@@ -1683,11 +1685,16 @@ CmQueryKey(_In_ PCM_KEY_CONTROL_BLOCK Kcb,
 
             case KeyFlagsInformation:
             {
+#if (NTDDI_VERSION < NTDDI_VISTA)
                 /* Call the internal API */
                 Status = CmpQueryFlagsInformation(Kcb,
                                                   KeyInformation,
                                                   Length,
                                                   ResultLength);
+#else
+                __debugbreak();
+                Status = STATUS_NOT_IMPLEMENTED;
+#endif
                 break;
             }
 

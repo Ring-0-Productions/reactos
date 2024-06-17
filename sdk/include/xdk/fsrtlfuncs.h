@@ -1094,7 +1094,7 @@ NTKERNELAPI
 NTSTATUS
 NTAPI
 FsRtlOplockBreakToNone(
-  _Inout_ POPLOCK Oplock,
+  _Inout_ PINTERNAL_OPLOCK Oplock,
   _In_opt_ PIO_STACK_LOCATION IrpSp,
   _In_ PIRP Irp,
   _In_opt_ PVOID Context,

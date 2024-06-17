@@ -8,6 +8,7 @@
 
 /* GLOBALS *******************************************************************/
 
+POBJECT_TYPE LpcPortObjectType, LpcWaitablePortObjectType;
 
 /* PRIVATE FUNCTIONS *********************************************************/
 

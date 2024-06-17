@@ -846,7 +846,7 @@ typedef struct _SYNCH_COUNTERS
 //
 typedef struct _KDPC_DATA
 {
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     KDPC_LIST DpcList;
 #else
     LIST_ENTRY DpcListHead;
@@ -1551,7 +1551,7 @@ typedef struct _KTHREAD
     };
 #endif // ]
 #if defined(_M_IX86) // [
-#if (NTDDI_VERSION >= NTDDI_LONGHORN) // [
+#if 0// (NTDDI_VERSION >= NTDDI_LONGHORN) // [
     UCHAR OtherPlatformFill;
 #else // ][
     UCHAR Iopl;
@@ -1568,7 +1568,7 @@ typedef struct _KTHREAD
 #if (NTDDI_VERSION >= NTDDI_WIN7) // [
             UCHAR ResourceIndex;
 #elif (NTDDI_VERSION >= NTDDI_LONGHORN) // ][
-            CHAR Spare04;
+            SCHAR Quantum;//CHAR Spare04;
 #else // ][
             SCHAR Quantum;
 #endif // ]
@@ -2083,7 +2083,7 @@ typedef struct _KPROCESS
 {
     DISPATCHER_HEADER Header;
     LIST_ENTRY ProfileListHead;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     ULONG_PTR DirectoryTableBase;
     ULONG_PTR Unused0;
 #else

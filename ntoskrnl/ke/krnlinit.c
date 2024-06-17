@@ -32,7 +32,7 @@ PLOADER_PARAMETER_BLOCK KeLoaderBlock;
 PKPRCB KiProcessorBlock[MAXIMUM_PROCESSORS];
 
 /* Number of processors */
-CCHAR KeNumberProcessors = 0;
+volatile CCHAR KeNumberProcessors = 0;
 
 /* NUMA Node Support */
 KNODE KiNode0;

@@ -248,7 +248,19 @@ typedef struct _EOF_WAIT_BLOCK {
 } EOF_WAIT_BLOCK, *PEOF_WAIT_BLOCK;
 
 typedef PVOID OPLOCK, *POPLOCK;
-
+typedef struct _INTERNAL_OPLOCK
+{
+    /* Level I IRP */
+    PIRP ExclusiveIrp;
+    /* Level I FILE_OBJECT */
+    PFILE_OBJECT FileObject;
+    /* Level II IRPs */
+    LIST_ENTRY SharedListHead;
+    /* IRPs waiting on level I */
+    LIST_ENTRY WaitListHead;
+    ULONG Flags;
+    PFAST_MUTEX IntLock;
+} INTERNAL_OPLOCK, *PINTERNAL_OPLOCK;
 typedef VOID
 (NTAPI *POPLOCK_WAIT_COMPLETE_ROUTINE) (
   _In_ PVOID Context,

@@ -1145,7 +1145,7 @@ typedef struct _ETHREAD
     ULONG_PTR TopLevelIrp;
     PDEVICE_OBJECT DeviceToVerify;
 #if (NTDDI_VERSION >= NTDDI_LONGHORN)
-    PPSP_RATE_APC RateControlApc;
+    struct _EPROCESS *ThreadsProcess;//PPSP_RATE_APC RateControlApc;
 #else
     struct _EPROCESS *ThreadsProcess;
 #endif
@@ -1162,7 +1162,7 @@ typedef struct _ETHREAD
     ULONG LpcReplyMessageId;
 #endif
     ULONG ReadClusterSize;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     ULONG SpareUlong0;
 #else
     ACCESS_MASK GrantedAccess;
@@ -1172,7 +1172,7 @@ typedef struct _ETHREAD
         struct
         {
            ULONG Terminated:1;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
            ULONG ThreadInserted:1;
 #else
            ULONG DeadThread:1;
@@ -1213,7 +1213,7 @@ typedef struct _ETHREAD
         {
            ULONG LpcReceivedMsgIdValid:1;
            ULONG LpcExitThreadCalled:1;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
            ULONG Spare:1;
 #else
            ULONG AddressSpaceOwner:1;
@@ -1224,7 +1224,7 @@ typedef struct _ETHREAD
            ULONG OwnsSystemWorkingSetShared:1;
            ULONG OwnsSessionWorkingSetExclusive:1;
            ULONG OwnsSessionWorkingSetShared:1;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
            ULONG SuppressSymbolLoad:1;
            ULONG Spare1:3;
            ULONG PriorityRegionActive:4;
@@ -1234,7 +1234,7 @@ typedef struct _ETHREAD
         };
         ULONG SameThreadApcFlags;
     };
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     UCHAR CacheManagerActive;
 #else
     UCHAR ForwardClusterOnly;
@@ -1273,7 +1273,7 @@ typedef struct _EPROCESS
     SIZE_T VirtualSize;
     LIST_ENTRY SessionProcessLinks;
     PVOID DebugPort;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     union
     {
         PVOID ExceptionPortData;
@@ -1286,7 +1286,7 @@ typedef struct _EPROCESS
     PHANDLE_TABLE ObjectTable;
     EX_FAST_REF Token;
     PFN_NUMBER WorkingSetPage;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     EX_PUSH_LOCK AddressCreationLock;
     PETHREAD RotateInProgress;
 #else
@@ -1334,7 +1334,7 @@ typedef struct _EPROCESS
     PVOID PaeTop;
 #endif
     ULONG ActiveThreads;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     ULONG ImagePathHash;
 #else
     ACCESS_MASK GrantedAccess;
@@ -1360,7 +1360,7 @@ typedef struct _EPROCESS
     LIST_ENTRY MmProcessLinks;
 #endif
     ULONG ModifiedPageCount;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     union
     {
         struct
@@ -1522,7 +1522,7 @@ typedef struct _EJOB
 #elif (NTDDI_VERSION >= NTDDI_WS03) && (NTDDI_VERSION < NTDDI_LONGHORN)
     KGUARDED_MUTEX MemoryLimitsLock;
 #elif (NTDDI_VERSION >= NTDDI_LONGHORN)
-    EX_PUSH_LOCK MemoryLimitsLock;
+    KGUARDED_MUTEX MemoryLimitsLock;//EX_PUSH_LOCK MemoryLimitsLock;
 #endif
     LIST_ENTRY JobSetLinks;
     ULONG MemberLevel;

@@ -1706,10 +1706,10 @@ Phase1InitializationDiscard(IN PVOID Context)
 
     /* Update progress bar */
     InbvUpdateProgressBar(20);
-
+#if 0
     /* Initialize LPC */
     if (!LpcInitSystem()) KeBugCheck(LPC_INITIALIZATION_FAILED);
-
+#endif
     /* Make sure we have a command line */
     if (CommandLine)
     {

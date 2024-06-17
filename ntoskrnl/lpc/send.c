@@ -8,6 +8,15 @@
 
 /* PUBLIC FUNCTIONS **********************************************************/
 
+VOID
+NTAPI
+LpcExitThread(
+    _In_ PETHREAD Thread)
+{
+    UNIMPLEMENTED;
+    __debugbreak();
+}
+
 NTSTATUS
 NTAPI
 LpcRequestPort(

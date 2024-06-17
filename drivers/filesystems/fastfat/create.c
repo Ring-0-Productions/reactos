@@ -2367,7 +2367,7 @@ Return Value:
         if (!FlagOn(ShareAccess, FILE_SHARE_WRITE) &&
             !FlagOn(ShareAccess, FILE_SHARE_DELETE)) {
 
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if 0// (NTDDI_VERSION >= NTDDI_VISTA)
             //
             //  See if the user has requested write access.  If so, they cannot share
             //  read.  There is one exception to this.  We allow autochk to get an
@@ -6901,7 +6901,7 @@ Return Value:
 {
     PAGED_CODE();
 
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if 0//(NTDDI_VERSION >= NTDDI_VISTA)
     //
     //  Do an extra test for writeable user sections if the user did not allow
     //  write sharing - this is neccessary since a section may exist with no handles

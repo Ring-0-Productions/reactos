@@ -325,7 +325,7 @@ Return Value:
     //  running.
     //
 
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if 0//(NTDDI_VERSION >= NTDDI_VISTA)
     FatData.NumberProcessors = KeQueryActiveProcessorCount( NULL );
 #else
     FatData.NumberProcessors = KeNumberProcessors;

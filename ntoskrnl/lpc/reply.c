@@ -1,5 +1,12 @@
 
 
+
+/* INCLUDES ******************************************************************/
+
+#include <ntoskrnl.h>
+#define NDEBUG
+#include <debug.h>
+
 /* PUBLIC FUNCTIONS **********************************************************/
 
 NTSTATUS
@@ -7,6 +14,17 @@ NTAPI
 NtReplyPort(
     _In_ HANDLE PortHandle,
     _In_ PPORT_MESSAGE LpcReply)
+{
+    UNIMPLEMENTED;
+    __debugbreak();
+    return STATUS_NOT_IMPLEMENTED;
+}
+
+NTSTATUS
+NTAPI
+NtReplyWaitReplyPort(
+    _In_ HANDLE PortHandle,
+    _Out_ PPORT_MESSAGE ReplyMessage)
 {
     UNIMPLEMENTED;
     __debugbreak();

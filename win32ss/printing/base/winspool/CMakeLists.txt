@@ -3,28 +3,11 @@ include_directories(${REACTOS_SOURCE_DIR}/sdk/include/reactos/idl)
 add_rpc_files(client ${REACTOS_SOURCE_DIR}/sdk/include/reactos/idl/winspool.idl)
 spec2def(winspool.drv winspool.spec ADD_IMPORTLIB)
 
-list(APPEND SOURCE
-    ../marshalling.c
-    devmode.c
-    forms.c
-    jobs.c
-    main.c
-    monitors.c
-    ports.c
-    printerdata.c
-    printerdrivers.c
-    printers.c
-    printprocessors.c
-    printproviders.c
-    spoolfile.c
-    utils.c
-    ${CMAKE_CURRENT_BINARY_DIR}/winspool_c.c)
 
 list(APPEND PCH_SKIP_SOURCE
     ${CMAKE_CURRENT_BINARY_DIR}/winspool_stubs.c)
 
 add_library(winspool MODULE
-    ${SOURCE}
     ${PCH_SKIP_SOURCE}
     winspool.rc
     ${CMAKE_CURRENT_BINARY_DIR}/winspool.def)

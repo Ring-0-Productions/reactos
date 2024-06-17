@@ -119,7 +119,7 @@ typedef struct _USB_BUS_INTERFACE_USBDI_V2 {
 
 #endif /* (NTDDI_VERSION >= NTDDI_WINXP) */
 
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if 0//(NTDDI_VERSION >= NTDDI_VISTA)
 
 typedef
 _Must_inspect_result_

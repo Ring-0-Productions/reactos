@@ -158,7 +158,7 @@ CcPurgeCacheSection (
     IN PSECTION_OBJECT_POINTERS SectionObjectPointer,
     IN PLARGE_INTEGER FileOffset OPTIONAL,
     IN ULONG Length,
-    IN BOOLEAN UninitializeCacheMaps)
+    IN ULONG Flags)
 {
     PROS_SHARED_CACHE_MAP SharedCacheMap;
     PPRIVATE_CACHE_MAP PrivateCacheMap;
@@ -171,8 +171,8 @@ CcPurgeCacheSection (
     LONGLONG ViewEnd;
     BOOLEAN Success;
 
-    CCTRACE(CC_API_DEBUG, "SectionObjectPointer=%p\n FileOffset=%p Length=%lu UninitializeCacheMaps=%d",
-        SectionObjectPointer, FileOffset, Length, UninitializeCacheMaps);
+    CCTRACE(CC_API_DEBUG, "SectionObjectPointer=%p\n FileOffset=%p Length=%lu Flags=%d",
+        SectionObjectPointer, FileOffset, Length, Flags);
 
     /* Obtain the shared cache from the section */
     SharedCacheMap = SectionObjectPointer->SharedCacheMap;
@@ -182,7 +182,7 @@ CcPurgeCacheSection (
         goto purgeMm;
     }
 
-    if (UninitializeCacheMaps)
+    if (Flags)
     {
         /*
          * We have gotten the acknowledgement that

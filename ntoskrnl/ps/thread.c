@@ -287,7 +287,7 @@ PspCreateThread(OUT PHANDLE ThreadHandle,
     Thread->ReadClusterSize = MmReadClusterSize;
 
     /* Initialize the LPC Reply Semaphore */
-    KeInitializeSemaphore(&Thread->LpcReplySemaphore, 0, 1);
+   // KeInitializeSemaphore(&Thread->LpcReplySemaphore, 0, 1);
 
     /* Initialize the list heads and locks */
     InitializeListHead(&Thread->LpcReplyChain);

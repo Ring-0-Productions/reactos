@@ -605,18 +605,18 @@ typedef struct _KPRCB
     ULONG CcCopyReadNoWait;
     ULONG CcCopyReadWait;
     ULONG CcCopyReadNoWaitMiss;
-#if (NTDDI_VERSION < NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION < NTDDI_LONGHORN)
     ULONG KeAlignmentFixupCount;
 #endif
     ULONG SpareCounter0;
-#if (NTDDI_VERSION < NTDDI_LONGHORN)
+#if 1//(NTDDI_VERSION < NTDDI_LONGHORN)
     ULONG KeDcacheFlushCount;
-    ULONG KeExceptionDispatchCount;
+  //  ULONG KeExceptionDispatchCount;
     ULONG KeFirstLevelTbFills;
     ULONG KeFloatingEmulationCount;
     ULONG KeIcacheFlushCount;
     ULONG KeSecondLevelTbFills;
-    ULONG KeSystemCalls;
+    //ULONG KeSystemCalls;
 #endif
     volatile ULONG IoReadOperationCount;
     volatile ULONG IoWriteOperationCount;

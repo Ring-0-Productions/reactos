@@ -1175,8 +1175,12 @@ MmCreateProcessAddressSpace(IN ULONG MinWs,
     ASSERT(Process->Pcb.DirectoryTableBase[1] == 0);
     ASSERT(Process->WorkingSetPage == 0);
 
+#if (NTDDI_VERSION < NTDDI_VISTA)
     /* Choose a process color */
     Process->NextPageColor = (USHORT)RtlRandom(&MmProcessColorSeed);
+#else
+    Process->Vm.NextPageColor = (USHORT)RtlRandom(&MmProcessColorSeed);
+#endif
 
     /* Setup the hyperspace lock */
     KeInitializeSpinLock(&Process->HyperSpaceLock);

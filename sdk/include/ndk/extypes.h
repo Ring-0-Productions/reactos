@@ -633,7 +633,7 @@ typedef struct _HANDLE_TABLE
 #endif
     PHANDLE_TRACE_DEBUG_INFO DebugInfo;
     LONG ExtraInfoPages;
-#if (NTDDI_VERSION >= NTDDI_LONGHORN)
+#if 0//(NTDDI_VERSION >= NTDDI_LONGHORN)
     union
     {
         ULONG Flags;
