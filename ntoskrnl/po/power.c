@@ -510,16 +510,16 @@ NTAPI
 PoInitializePrcb(IN PKPRCB Prcb)
 {
     /* Initialize the Power State */
-    RtlZeroMemory(&Prcb->PowerState, sizeof(Prcb->PowerState));
-    Prcb->PowerState.Idle0KernelTimeLimit = 0xFFFFFFFF;
-    Prcb->PowerState.CurrentThrottle = 100;
-    Prcb->PowerState.CurrentThrottleIndex = 0;
-    Prcb->PowerState.IdleFunction = PopIdle0;
+  // RtlZeroMemory(&Prcb->PowerState, sizeof(Prcb->PowerState));
+  // Prcb->PowerState.Idle0KernelTimeLimit = 0xFFFFFFFF;
+  // Prcb->PowerState.CurrentThrottle = 100;
+  // Prcb->PowerState.CurrentThrottleIndex = 0;
+    //Prcb->PowerState.IdleFunction = PopIdle0;
 
     /* Initialize the Perf DPC and Timer */
-    KeInitializeDpc(&Prcb->PowerState.PerfDpc, PopPerfIdleDpc, Prcb);
-    KeSetTargetProcessorDpc(&Prcb->PowerState.PerfDpc, Prcb->Number);
-    KeInitializeTimerEx(&Prcb->PowerState.PerfTimer, SynchronizationTimer);
+   // KeInitializeDpc(&Prcb->PowerState.PerfDpc, PopPerfIdleDpc, Prcb);
+   // KeSetTargetProcessorDpc(&Prcb->PowerState.PerfDpc, Prcb->Number);
+   // KeInitializeTimerEx(&Prcb->PowerState.PerfTimer, SynchronizationTimer);
 }
 
 /* PUBLIC FUNCTIONS **********************************************************/
