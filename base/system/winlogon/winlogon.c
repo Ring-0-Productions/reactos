@@ -5,7 +5,7 @@
  * PURPOSE:         Logon
  * PROGRAMMERS:     Thomas Weidenmueller (w3seek@users.sourceforge.net)
  *                  Filip Navara
- *                  Hervé Poussineau (hpoussin@reactos.org)
+ *                  Hervï¿½ Poussineau (hpoussin@reactos.org)
  */
 
 /* INCLUDES *****************************************************************/
@@ -140,7 +140,7 @@ WaitForLsass(VOID)
     }
 
     TRACE("WL: Wait for the LSA server!\n");
-    WaitForSingleObject(hEvent, INFINITE);
+  //  WaitForSingleObject(hEvent, INFINITE);
     TRACE("WL: LSA server running!\n");
 
     CloseHandle(hEvent);
@@ -492,29 +492,29 @@ WinMain(
     if (!InitKeyboardLayouts())
     {
         ERR("WL: Could not preload keyboard layouts\n");
-        NtRaiseHardError(STATUS_SYSTEM_PROCESS_TERMINATED, 0, 0, NULL, OptionOk, &HardErrorResponse);
-        ExitProcess(1);
+      //  NtRaiseHardError(STATUS_SYSTEM_PROCESS_TERMINATED, 0, 0, NULL, OptionOk, &HardErrorResponse);
+      //  ExitProcess(1);
     }
 
     if (!StartRpcServer())
     {
         ERR("WL: Could not start the RPC server\n");
-        NtRaiseHardError(STATUS_SYSTEM_PROCESS_TERMINATED, 0, 0, NULL, OptionOk, &HardErrorResponse);
-        ExitProcess(1);
+       // NtRaiseHardError(STATUS_SYSTEM_PROCESS_TERMINATED, 0, 0, NULL, OptionOk, &HardErrorResponse);
+      //  ExitProcess(1);
     }
 
     if (!StartServicesManager())
     {
         ERR("WL: Could not start services.exe\n");
-        NtRaiseHardError(STATUS_SYSTEM_PROCESS_TERMINATED, 0, 0, NULL, OptionOk, &HardErrorResponse);
-        ExitProcess(1);
+       // NtRaiseHardError(STATUS_SYSTEM_PROCESS_TERMINATED, 0, 0, NULL, OptionOk, &HardErrorResponse);
+       /// ExitProcess(1);
     }
 
     if (!StartLsass())
     {
         ERR("WL: Failed to start lsass.exe service (error %lu)\n", GetLastError());
-        NtRaiseHardError(STATUS_SYSTEM_PROCESS_TERMINATED, 0, 0, NULL, OptionOk, &HardErrorResponse);
-        ExitProcess(1);
+       //NtRaiseHardError(STATUS_SYSTEM_PROCESS_TERMINATED, 0, 0, NULL, OptionOk, &HardErrorResponse);
+       //ExitProcess(1);
     }
 
     /* Wait for the LSA server */

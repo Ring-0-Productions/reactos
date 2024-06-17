@@ -383,12 +383,6 @@ StartupWindowThread(LPVOID lpParam)
         return FALSE;
     }
 
-    DialogBoxParamW(
-        hDllInstance,
-        MAKEINTRESOURCEW(IDD_STATUS),
-        GetDesktopWindow(),
-        StatusDialogProc,
-        (LPARAM)lpParam);
 
     HeapFree(GetProcessHeap(), 0, lpParam);
     return TRUE;
