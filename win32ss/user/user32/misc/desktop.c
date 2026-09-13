@@ -549,6 +549,13 @@ GetThreadDesktop(
 {
     USER_API_MESSAGE ApiMessage;
     PUSER_GET_THREAD_CONSOLE_DESKTOP GetThreadConsoleDesktopRequest = &ApiMessage.Data.GetThreadConsoleDesktopRequest;
+    HDESK hDesk;
+    /* TEMP-DEBUG (proper desktop-polling fix): some caller polls this API
+     * thousands of times during process startup. user32 is per-process, so
+     * this counter is per-process: log the first calls with caller address
+     * to identify the polling module. Remove once the poller is fixed. */
+    static LONG DebugCallCount = 0;
+    LONG CallNo = InterlockedIncrement(&DebugCallCount);
 
     GetThreadConsoleDesktopRequest->ThreadId = dwThreadId;
 
@@ -558,12 +565,25 @@ GetThreadDesktop(
                         sizeof(*GetThreadConsoleDesktopRequest));
     if (!NT_SUCCESS(ApiMessage.Status))
     {
+        /* TEMP-DEBUG v2: also log server-side failures (the 6K polling
+         * storm dies here). Same per-process first-8 budget. */
+        if (CallNo <= 8)
+        {
+            ERR("GetThreadDesktop(%lu) #%ld caller=%p SERVERFAIL=%08lx\n",
+                dwThreadId, CallNo, __builtin_return_address(0), ApiMessage.Status);
+        }
         UserSetLastNTError(ApiMessage.Status);
         return NULL;
     }
 
-    return NtUserGetThreadDesktop(dwThreadId,
-                                  GetThreadConsoleDesktopRequest->ConsoleDesktop);
+    hDesk = NtUserGetThreadDesktop(dwThreadId,
+                                   GetThreadConsoleDesktopRequest->ConsoleDesktop);
+    if (CallNo <= 8)
+    {
+        ERR("GetThreadDesktop(%lu) #%ld caller=%p desk=%p\n",
+            dwThreadId, CallNo, __builtin_return_address(0), hDesk);
+    }
+    return hDesk;
 }
 
 

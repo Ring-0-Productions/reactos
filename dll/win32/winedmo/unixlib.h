@@ -24,8 +24,9 @@
 #include <stdint.h>
 
 #ifdef __REACTOS__
-#include <Windows.h>
-#include <ntstatus.h>
+#include "ntstatus.h"
+#define WIN32_NO_STATUS
+#include <windows.h>
 #else
 #include "ntstatus.h"
 #include "windef.h"

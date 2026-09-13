@@ -20,6 +20,9 @@
 # error You must include config.h to use this header
 #endif
 
+#include "ntstatus.h"
+#define WIN32_NO_STATUS
+
 #include <stdint.h>
 
 #ifdef HAVE_FFMPEG

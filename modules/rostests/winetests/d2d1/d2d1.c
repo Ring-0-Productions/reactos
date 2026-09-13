@@ -18,21 +18,21 @@
 
 #define COBJMACROS
 #ifdef __REACTOS__
-#ifndef __MINGW32__
 #define WIDL_C_INLINE_WRAPPERS
-#endif
 #endif
 #include <limits.h>
 #include <math.h>
 #include <float.h>
 #include <stdint.h>
+#include "initguid.h"
+#include "d2d1effects.h"
 #include "d3dcompiler.h"
 #include "d2d1_3.h"
 #include "d2d1effectauthor.h"
 #include "d3d11.h"
 #include "wincrypt.h"
 #include "wine/test.h"
-#include "initguid.h"
+#include "cguid.h"
 #include "dwrite.h"
 #include "wincodec.h"
 
@@ -1549,7 +1549,7 @@ static HRESULT STDMETHODCALLTYPE geometry_sink_Close(ID2D1SimplifiedGeometrySink
     return S_OK;
 }
 
-static const struct ID2D1SimplifiedGeometrySinkVtbl geometry_sink_vtbl =
+static struct ID2D1SimplifiedGeometrySinkVtbl geometry_sink_vtbl =
 {
     geometry_sink_QueryInterface,
     geometry_sink_AddRef,
@@ -11242,8 +11242,10 @@ static HRESULT STDMETHODCALLTYPE effect_impl_Initialize(ID2D1EffectImpl *iface,
         ID2D1EffectContext *context,ID2D1TransformGraph *graph)
 {
     struct effect_impl *effect_impl = impl_from_ID2D1EffectImpl(iface);
-    ID2D1EffectContext_AddRef(effect_impl->effect_context = context);
-    ID2D1TransformGraph_AddRef(effect_impl->transform_graph = graph);
+    effect_impl->effect_context = context;
+    ID2D1EffectContext_AddRef(effect_impl->effect_context);
+    effect_impl->transform_graph = graph;
+    ID2D1TransformGraph_AddRef(effect_impl->transform_graph);
     return S_OK;
 }
 
@@ -11257,12 +11259,13 @@ static HRESULT STDMETHODCALLTYPE effect_impl_SetGraph(ID2D1EffectImpl *iface, ID
     struct effect_impl *effect_impl = impl_from_ID2D1EffectImpl(iface);
 
     ID2D1TransformGraph_Release(effect_impl->transform_graph);
-    ID2D1TransformGraph_AddRef(effect_impl->transform_graph = graph);
+    effect_impl->transform_graph = graph;
+    ID2D1TransformGraph_AddRef(effect_impl->transform_graph);
 
     return S_OK;
 }
 
-static const ID2D1EffectImplVtbl effect_impl_vtbl =
+static ID2D1EffectImplVtbl effect_impl_vtbl =
 {
     effect_impl_QueryInterface,
     effect_impl_AddRef,
@@ -14587,7 +14590,7 @@ static HRESULT STDMETHODCALLTYPE ps_effect_impl_Initialize(ID2D1EffectImpl *ifac
             (ID2D1TransformNode *)&effect_impl->ID2D1DrawTransform_iface);
 }
 
-static const ID2D1EffectImplVtbl custom_effect_impl_vtbl =
+static ID2D1EffectImplVtbl custom_effect_impl_vtbl =
 {
     effect_impl_QueryInterface,
     effect_impl_AddRef,
@@ -14688,7 +14691,7 @@ static HRESULT STDMETHODCALLTYPE effect_impl_draw_transform_SetDrawInfo(ID2D1Dra
     return hr;
 }
 
-static const ID2D1DrawTransformVtbl custom_shader_effect_draw_transform_vtbl =
+static ID2D1DrawTransformVtbl custom_shader_effect_draw_transform_vtbl =
 {
     effect_impl_draw_transform_QueryInterface,
     effect_impl_draw_transform_AddRef,

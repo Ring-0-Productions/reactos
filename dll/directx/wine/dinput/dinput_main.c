@@ -140,6 +140,8 @@ HRESULT WINAPI DirectInputCreateEx(
     HRESULT hr;
 
     TRACE("(%p,%04x,%s,%p,%p)\n", hinst, dwVersion, debugstr_guid(riid), ppDI, punkOuter);
+    FIXME("GAMING-MOUSE DirectInputCreate ver %#x iid %s pid %lu.\n",
+            dwVersion, debugstr_guid(riid), GetCurrentProcessId());
 
     if (IsEqualGUID( &IID_IDirectInputA,  riid ) ||
         IsEqualGUID( &IID_IDirectInput2A, riid ) ||
@@ -177,6 +179,8 @@ HRESULT WINAPI DECLSPEC_HOTPATCH DirectInput8Create(HINSTANCE hinst,
 
     TRACE("hinst %p, version %#x, iid %s, out %p, outer %p.\n",
         hinst, version, debugstr_guid(iid), out, outer);
+
+    FIXME("GAMING-MOUSE dinput loaded by pid %lu.\n", GetCurrentProcessId());
 
     if (!out)
         return E_POINTER;
@@ -467,6 +471,10 @@ static HRESULT WINAPI IDirectInputAImpl_EnumDevices(
     unsigned int i;
     int j;
     HRESULT r;
+
+    FIXME("GAMING-MOUSE EnumDevices type %s ver %#lx pid %lu.\n",
+            _dump_DIDEVTYPE_value(dwDevType, This->dwVersion),
+            This->dwVersion, GetCurrentProcessId());
 
     TRACE("(this=%p,0x%04x '%s',%p,%p,0x%04x)\n",
 	  This, dwDevType, _dump_DIDEVTYPE_value(dwDevType, This->dwVersion),
@@ -1806,6 +1814,9 @@ static DWORD WINAPI hook_thread_proc(void *param)
                 UnhookWindowsHookEx( mouse_hook );
                 mouse_hook = NULL;
             }
+            /* GAMING-MOUSE: LL hook install result (NULL = dead mouse) */
+            if (mice_cnt && !mouse_hook)
+                FIXME("GAMING-MOUSE WH_MOUSE_LL install FAILED (%lu).\n", GetLastError());
         }
         TranslateMessage(&msg);
         DispatchMessageW(&msg);

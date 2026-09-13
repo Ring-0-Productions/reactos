@@ -11,6 +11,8 @@
 #define NDEBUG
 #include <debug.h>
 
+DBG_DEFAULT_CHANNEL(GdiDC);
+
 static
 INT
 FASTCALL
@@ -26,11 +28,14 @@ IntGetipfdDevMax(PDC pdc)
 
     if (ppdev->DriverFunctions.DescribePixelFormat)
     {
+        ERR("DDITRACE enter DrvDescribePixelFormat(max) ppdev=%p dhpdev=%p\n",
+            ppdev, ppdev->dhpdev);
         Ret = ppdev->DriverFunctions.DescribePixelFormat(
                                                 ppdev->dhpdev,
                                                 1,
                                                 0,
                                                 NULL);
+        ERR("DDITRACE exit DrvDescribePixelFormat(max) => %d\n", Ret);
     }
 
     if (Ret) pdc->ipfdDevMax = Ret;
@@ -93,11 +98,14 @@ NtGdiDescribePixelFormat(
 
     if (ppdev->DriverFunctions.DescribePixelFormat)
     {
+        ERR("DDITRACE enter DrvDescribePixelFormat hdc=%p ppdev=%p dhpdev=%p ipfd=%d\n",
+            hdc, ppdev, ppdev->dhpdev, ipfd);
         Ret = ppdev->DriverFunctions.DescribePixelFormat(
                                                     ppdev->dhpdev,
                                                     ipfd,
                                                     sizeof(pfdSafe),
                                                     &pfdSafe);
+        ERR("DDITRACE exit DrvDescribePixelFormat => %d\n", Ret);
     }
 
     if (Ret && cjpfd)
@@ -184,10 +192,13 @@ NtGdiSetPixelFormat(
 
     if (ppdev->DriverFunctions.SetPixelFormat)
     {
+        ERR("DDITRACE enter DrvSetPixelFormat hdc=%p ppdev=%p dhpdev=%p ipfd=%d\n",
+            hdc, ppdev, ppdev->dhpdev, ipfd);
         Ret = ppdev->DriverFunctions.SetPixelFormat(
                                                 pso,
                                                 ipfd,
                                                 hWnd);
+        ERR("DDITRACE exit DrvSetPixelFormat => %d\n", Ret);
     }
 
 Exit:
@@ -245,7 +256,9 @@ NtGdiSwapBuffers(
 
     if (ppdev->DriverFunctions.SwapBuffers)
     {
+        ERR("DDITRACE enter DrvSwapBuffers hdc=%p ppdev=%p\n", hdc, ppdev);
         Ret = ppdev->DriverFunctions.SwapBuffers(pso, pWndObj);
+        ERR("DDITRACE exit DrvSwapBuffers => %d\n", Ret);
     }
 
 Exit:

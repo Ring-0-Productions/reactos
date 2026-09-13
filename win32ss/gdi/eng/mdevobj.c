@@ -11,6 +11,13 @@
 #include <debug.h>
 DBG_DEFAULT_CHANNEL(EngMDev);
 
+/* display.c (ntuser): seed the fullscreen-restore desktop baseline from
+ * the driver-default mode. Declared here to avoid dragging ntuser
+ * headers into GDI (no precedent for that direction). */
+VOID
+NTAPI
+UserSeedDesktopMode(PDEVMODEW pdm);
+
 PMDEVOBJ gpmdev = NULL; /* FIXME: should be stored in gpDispInfo->pmdev */
 
 VOID
@@ -110,6 +117,12 @@ MDEVOBJ_Create(
         /* Get or create a PDEV for these settings */
         if (LDEVOBJ_bProbeAndCaptureDevmode(pGraphicsDevice, pdm ? pdm : &dmDefault, &localPdm, !pdm))
         {
+            /* Default (boot-desktop) probe: seed the fullscreen-restore
+             * baseline while no game can have touched the mode yet.
+             * Driver defaults never move at runtime, so late calls are
+             * harmless (first seed wins inside). */
+            if (!pdm)
+                UserSeedDesktopMode(localPdm);
             ppdev = PDEVOBJ_Create(pGraphicsDevice, localPdm, dwAccelerationLevel, LDEV_DEVICE_DISPLAY);
         }
         else

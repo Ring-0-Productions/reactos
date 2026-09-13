@@ -112,6 +112,7 @@ CreateStandardProfile(IN LPCWSTR pszProfilesPath,
     DWORD dwLength;
     WCHAR szProfilePath[MAX_PATH];
     WCHAR szBuffer[MAX_PATH];
+    LPWSTR p;
 
     /*
      * Create the standard profile main directory
@@ -199,6 +200,27 @@ CreateStandardProfile(IN LPCWSTR pszProfilesPath,
         {
             /* Use the default name instead */
             StringCbCatW(szBuffer, sizeof(szBuffer), lpFolderData->lpPath);
+        }
+
+        /*
+         * Create any missing intermediate directories first. The fallback
+         * English names may nest differently than the localized ones
+         * (e.g. "AppData\Roaming" vs. "Datos de programa"), so the parent
+         * components cannot be assumed to exist.
+         */
+        for (p = szBuffer + wcslen(szProfilePath) + 1; *p != UNICODE_NULL; p++)
+        {
+            if (*p == L'\\')
+            {
+                *p = UNICODE_NULL;
+                if (!CreateDirectoryW(szBuffer, NULL) &&
+                    GetLastError() != ERROR_ALREADY_EXISTS)
+                {
+                    DPRINT1("Error: %lu\n", GetLastError());
+                    return FALSE;
+                }
+                *p = L'\\';
+            }
         }
 
         // FIXME: Security!

@@ -350,8 +350,16 @@ MiUnmapLockedPagesInUserSpace(
 
         if (MiDecrementPageTableReferences(BaseAddress) == 0)
         {
-            ASSERT(MiIsPteOnPdeBoundary(PointerPte + 1) || (NumberOfPages == 1));
-            MiDeletePde(PointerPde, Process);
+            /* Only delete the page table if we have processed the range
+             * up to a PDE boundary (or the whole mapping was a single
+             * page). Otherwise the remaining pages of this range still
+             * live in this table and freeing it here would leave the
+             * loop below operating on freed memory (the table page is
+             * leaked instead, which is safe). */
+            if (MiIsPteOnPdeBoundary(PointerPte + 1) || (NumberOfPages == 1))
+            {
+                MiDeletePde(PointerPde, Process);
+            }
         }
 
         /* Next page */

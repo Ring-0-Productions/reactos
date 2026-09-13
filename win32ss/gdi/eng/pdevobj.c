@@ -121,7 +121,9 @@ PDEVOBJ_vRelease(
             /* Release the surface and let the driver free it */
             SURFACE_ShareUnlockSurface(ppdev->pSurface);
             TRACE("DrvDisableSurface(dhpdev %p)\n", ppdev->dhpdev);
+            DPRINT1("DDITRACE enter DrvDisableSurface dhpdev=%p ppdev=%p\n", ppdev->dhpdev, ppdev);
             ppdev->pfn.DisableSurface(ppdev->dhpdev);
+            DPRINT1("DDITRACE exit DrvDisableSurface\n");
         }
 
         /* Do we have a palette? */
@@ -318,7 +320,9 @@ PDEVOBJ_pSurface(
     {
         /* Call the drivers DrvEnableSurface */
         TRACE("DrvEnableSurface(dhpdev %p)\n", ppdev->dhpdev);
+        DPRINT1("DDITRACE enter DrvEnableSurface dhpdev=%p ppdev=%p\n", ppdev->dhpdev, ppdev);
         hsurf = ppdev->pfn.EnableSurface(ppdev->dhpdev);
+        DPRINT1("DDITRACE exit DrvEnableSurface => hsurf %p\n", hsurf);
         TRACE("DrvEnableSurface(dhpdev %p) => hsurf %p\n", ppdev->dhpdev, hsurf);
         if (hsurf== NULL)
         {
@@ -399,7 +403,9 @@ PDEVOBJ_vEnableDisplay(
     do
     {
         TRACE("DrvAssertMode(dhpdev %p, TRUE)\n", ppdev->dhpdev);
+        DPRINT1("DDITRACE enter DrvAssertMode(TRUE) dhpdev=%p ppdev=%p\n", ppdev->dhpdev, ppdev);
         assertVal = ppdev->pfn.AssertMode(ppdev->dhpdev, TRUE);
+        DPRINT1("DDITRACE exit DrvAssertMode(TRUE) => %d\n", assertVal);
         TRACE("DrvAssertMode(dhpdev %p, TRUE) => %d\n", ppdev->dhpdev, assertVal);
     } while (!assertVal);
 
@@ -418,7 +424,9 @@ PDEVOBJ_bDisableDisplay(
     PDEVOBJ_vSuspendDirectDraw(ppdev);
 
     TRACE("DrvAssertMode(dhpdev %p, FALSE)\n", ppdev->dhpdev);
+    DPRINT1("DDITRACE enter DrvAssertMode(FALSE) dhpdev=%p ppdev=%p\n", ppdev->dhpdev, ppdev);
     assertVal = ppdev->pfn.AssertMode(ppdev->dhpdev, FALSE);
+    DPRINT1("DDITRACE exit DrvAssertMode(FALSE) => %d\n", assertVal);
     TRACE("DrvAssertMode(dhpdev %p, FALSE) => %d\n", ppdev->dhpdev, assertVal);
 
     if (assertVal)
@@ -701,19 +709,13 @@ PDEVOBJ_bDynamicModeChange(
 
 BOOL
 NTAPI
-PDEVOBJ_bSwitchMode(
+PDEVOBJ_bSwitchModeUnsafe(
     PPDEVOBJ ppdev,
     PDEVMODEW pdm)
 {
     PPDEVOBJ ppdevTmp;
     PSURFACE pSurface;
     BOOL retval = FALSE;
-
-    /* Lock the PDEV */
-    EngAcquireSemaphore(ppdev->hsemDevLock);
-
-    /* And everything else */
-    EngAcquireSemaphore(ghsemPDEV);
 
     DPRINT1("PDEVOBJ_bSwitchMode, ppdev = %p, pSurface = %p\n", ppdev, ppdev->pSurface);
 
@@ -783,12 +785,68 @@ leave2:
     PDEVOBJ_vEnableDisplay(ppdev);
 
 leave:
+    DPRINT1("leave, ppdev = %p, pSurface = %p\n", ppdev, ppdev->pSurface);
+
+    return retval;
+}
+
+BOOL
+NTAPI
+PDEVOBJ_bSwitchMode(
+    PPDEVOBJ ppdev,
+    PDEVMODEW pdm)
+{
+    BOOL retval = FALSE;
+    BOOL bFault = FALSE;
+    ULONG SavedApcDisable;
+
+    /* Lock the PDEV */
+    EngAcquireSemaphore(ppdev->hsemDevLock);
+
+    /* And everything else */
+    EngAcquireSemaphore(ghsemPDEV);
+
+    /* Third-party drivers (nv4) keep dangling pointers across rapid mode
+     * switches and fault inside AssertMode/Enable/DisableSurface (0x50).
+     * A faulted switch must fail gracefully via the restore below, never
+     * take the session down. APC-disable count is saved/restored whole
+     * (ULONG overlay, see DRIVEROBJ_vCleanup). */
+    SavedApcDisable = PsGetCurrentThread()->Tcb.CombinedApcDisable;
+    _SEH2_TRY
+    {
+        retval = PDEVOBJ_bSwitchModeUnsafe(ppdev, pdm);
+    }
+    _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+    {
+        DPRINT1("PDEVOBJ_bSwitchMode: driver faulted, code %lx (contained, tid %lx)\n",
+                _SEH2_GetExceptionCode(),
+                (ULONG)HandleToUlong(PsGetCurrentThread()->Cid.UniqueThread));
+        PsGetCurrentThread()->Tcb.CombinedApcDisable = SavedApcDisable;
+        bFault = TRUE;
+        retval = FALSE;
+    }
+    _SEH2_END;
+
+    if (bFault)
+    {
+        /* Best-effort display restore; itself guarded, one shot. */
+        _SEH2_TRY
+        {
+            PDEVOBJ_vEnableDisplay(ppdev);
+        }
+        _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+        {
+            DPRINT1("PDEVOBJ_bSwitchMode: restore faulted, code %lx (tolerated)\n",
+                    _SEH2_GetExceptionCode());
+            PsGetCurrentThread()->Tcb.CombinedApcDisable = SavedApcDisable;
+        }
+        _SEH2_END;
+    }
+
     /* Unlock everything else */
     EngReleaseSemaphore(ghsemPDEV);
     /* Unlock the PDEV */
     EngReleaseSemaphore(ppdev->hsemDevLock);
-
-    DPRINT1("leave, ppdev = %p, pSurface = %p\n", ppdev, ppdev->pSurface);
 
     return retval;
 }

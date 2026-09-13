@@ -58,7 +58,7 @@ static struct winedmo_stream *get_stream( UINT64 handle )
 }
 
 #ifdef __REACTOS__
-NTSTATUS WINAPI _seek_callback( void *args, ULONG size )
+NTSTATUS _seek_callback( void *args, ULONG size )
 #else
 static NTSTATUS WINAPI seek_callback( void *args, ULONG size )
 #endif
@@ -85,7 +85,7 @@ static NTSTATUS WINAPI seek_callback( void *args, ULONG size )
 }
 
 #ifdef __REACTOS__
-NTSTATUS WINAPI _read_callback( void *args, ULONG size )
+NTSTATUS _read_callback( void *args, ULONG size )
 #else
 static NTSTATUS WINAPI read_callback( void *args, ULONG size )
 #endif

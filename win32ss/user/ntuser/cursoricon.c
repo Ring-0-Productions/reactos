@@ -243,6 +243,13 @@ BOOL UserSetCursorPos( INT x, INT y, DWORD flags, ULONG_PTR dwExtraInfo, BOOL Ho
     RECTL rcClip;
     POINT pt;
 
+    /* GAMING-MOUSE: throttled position trace (recenters run ~60/s) */
+    {
+        static ULONG s_SetPosCount = 0;
+        if (++s_SetPosCount <= 3 || (s_SetPosCount % 240) == 0)
+            ERR("GAMING-MOUSE SetCursorPos #%lu (%d,%d) hook %d\n", s_SetPosCount, x, y, (int)Hook);
+    }
+
     if (!(DesktopWindow = UserGetDesktopWindow()))
     {
         return FALSE;
@@ -722,6 +729,9 @@ UserClipCursor(
             return FALSE;
         }
 
+        ERR("GAMING-MOUSE ClipCursor (%ld,%ld)-(%ld,%ld)\n",
+                prcl->left, prcl->top, prcl->right, prcl->bottom);
+
         CurInfo->bClipped = TRUE;
 
         /* Set nw cliping region. Note: we can't use RECTL_bIntersectRect because
@@ -741,6 +751,7 @@ UserClipCursor(
     }
     else
     {
+        ERR("GAMING-MOUSE ClipCursor(NULL) unclip\n");
         CurInfo->bClipped = FALSE;
     }
 

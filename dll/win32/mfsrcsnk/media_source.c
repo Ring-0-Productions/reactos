@@ -16,8 +16,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-#include "ntstatus.h"
+#define WIN32_NO_STATUS
 #include "mfsrcsnk_private.h"
+#undef WIN32_NO_STATUS
+#include "ntstatus.h"
 
 #include "wine/list.h"
 #include "wine/debug.h"

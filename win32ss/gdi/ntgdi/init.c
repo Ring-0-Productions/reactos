@@ -54,6 +54,24 @@ GdiProcessDestroy(PEPROCESS Process)
     /* And GDI ones too */
     GDI_CleanupForProcess(Process);
 
+    /* TEMP-DEBUG (table-leak hunt): log the shared table address while the
+     * address space is still alive (in-context here; reading it later in
+     * MmDeleteProcessAddressSpace can fault). Correlate with PDETBL. */
+    if (Process->Peb)
+    {
+        ERR("GDIDESTROY GdiSharedHandleTable=%p\n",
+            Process->Peb->GdiSharedHandleTable);
+    }
+
+    /* Unmap the shared GDI handle table view (mapped in GdiProcessCreate).
+     * Otherwise its page table survives process teardown and trips the
+     * directory-refcount assert in MmCleanProcessAddressSpace. */
+    if (Process->Peb && Process->Peb->GdiSharedHandleTable)
+    {
+        MmUnmapViewOfSection(Process, Process->Peb->GdiSharedHandleTable);
+        Process->Peb->GdiSharedHandleTable = NULL;
+    }
+
     /* So we can now free the pools */
     GdiPoolDestroy(ppiCurrent->pPoolDcAttr);
     GdiPoolDestroy(ppiCurrent->pPoolBrushAttr);

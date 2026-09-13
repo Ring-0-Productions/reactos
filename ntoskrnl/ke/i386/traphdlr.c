@@ -725,6 +725,32 @@ KiTrap07Handler(IN PKTRAP_FRAME TrapFrame)
     PFX_SAVE_AREA SaveArea, NpxSaveArea;
     ULONG Cr0;
 
+    /* TEMP-DEBUG (remove after FPU-crash debug): trace every #NM trap.
+     * DEMOTED to DPRINT: with 3 FPU-thrashing threads each fault costs a
+     * synchronous ~10ms serial print, turning a millisecond stall into a
+     * minutes-long livelock ("is hung" + dead display). */
+    DPRINT("FPUTRAP: Eip=%08lx Irql=%lu CR0=%08lx Thread=%p NpxThread=%p NpxState=%lx\n",
+            (ULONG)TrapFrame->Eip,
+            (ULONG)KeGetCurrentIrql(),
+            (ULONG)__readcr0(),
+            KeGetCurrentThread(),
+            KeGetCurrentPrcb()->NpxThread,
+            (ULONG)KeGetCurrentThread()->NpxState);
+
+    /* TEMP-DEBUG v2 (remove after FPU-crash debug): a #NM above
+     * DISPATCH_LEVEL cannot be served by the lazy FPU switch (and the
+     * kd transport cannot even print there). Bugcheck deliberately
+     * carrying the trapped EIP so a photo of the BSOD identifies the
+     * culprit. Bugcheck code 0x46505554 == "FPUT". */
+    if (KeGetCurrentIrql() > DISPATCH_LEVEL)
+    {
+        KeBugCheckEx(0x46505554,
+                     (ULONG_PTR)TrapFrame->Eip,
+                     (ULONG_PTR)KeGetCurrentIrql(),
+                     (ULONG_PTR)__readcr0(),
+                     (ULONG_PTR)KeGetCurrentThread());
+    }
+
     /* Save trap frame */
     KiEnterTrap(TrapFrame);
 
@@ -782,18 +808,21 @@ KiTrap07Handler(IN PKTRAP_FRAME TrapFrame)
             /* Otherwise, we need to reload CR0, disable interrupts */
             _disable();
 
-            /* Reload CR0 */
+            /* Reload CR0, but NEVER resume with TS set: the FPU state has
+             * just been loaded above and NpxThread == Thread, so TS must
+             * be clear. Resuming with TS set re-faults immediately --
+             * a tight #NM loop when the faulting EIP is kernel mode
+             * (e.g. inside Ke386SaveFpuState), a guaranteed double fault
+             * for user mode. With 3 threads ping-ponging the FPU this
+             * livelock stalls the GUI ("is hung" + dead display). */
             Cr0 = __readcr0();
-            Cr0 |= SaveArea->Cr0NpxState;
+            Cr0 &= ~CR0_TS;
+            Cr0 |= (SaveArea->Cr0NpxState & ~CR0_TS);
             __writecr0(Cr0);
 
-            /* Now restore interrupts and check for TS */
+            /* State is loaded and TS is clear: restore interrupts and go */
             _enable();
-            if (Cr0 & CR0_TS) KiEoiHelper(TrapFrame);
-
-            /* We're still here -- clear TS and try again */
-            __writecr0(__readcr0() &~ CR0_TS);
-            _disable();
+            KiEoiHelper(TrapFrame);
         }
         else
         {

@@ -1600,13 +1600,37 @@ GDI_CleanupForProcess(struct _EPROCESS *Process)
     /* Get the current process Id */
     dwProcessId = PtrToUlong(PsGetCurrentProcessId());
 
-    /* Loop all handles in the handle table */
+    /* Pass 1: destroy DRIVEROBJs first. Their driver free callbacks run
+     * third-party code (e.g. nv4_disp) that dereferences sibling objects
+     * (surfaces, PDEV linkage in session space). If those died first, the
+     * callback reads freed session memory -> an uncatchable 0x50 kernel
+     * fault at teardown. Driver cleanup must run while everything it can
+     * touch is still alive. */
     for (ulIndex = RESERVE_ENTRIES_COUNT; ulIndex < gulFirstUnused; ulIndex++)
     {
         pentry = &gpentHmgr[ulIndex];
 
         /* Check if the object is owned by the process */
-        if (pentry->ObjectOwner.ulObj == dwProcessId)
+        if (pentry->ObjectOwner.ulObj == dwProcessId &&
+            pentry->Objt == GDIObjType_DRVOBJ_TYPE)
+        {
+            ASSERT(pentry->einfo.pobj->cExclusiveLock == 0);
+
+            /* Reference the object and delete it */
+            InterlockedIncrement((LONG*)&gpaulRefCount[ulIndex]);
+            GDIOBJ_vDeleteObject(pentry->einfo.pobj);
+        }
+    }
+
+    /* Pass 2: everything else, in handle-table order */
+    for (ulIndex = RESERVE_ENTRIES_COUNT; ulIndex < gulFirstUnused; ulIndex++)
+    {
+        pentry = &gpentHmgr[ulIndex];
+
+        /* Check if the object is owned by the process, skipping the
+         * already-destroyed driver objects */
+        if (pentry->ObjectOwner.ulObj == dwProcessId &&
+            pentry->Objt != GDIObjType_DRVOBJ_TYPE)
         {
             ASSERT(pentry->einfo.pobj->cExclusiveLock == 0);
 

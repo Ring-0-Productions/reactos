@@ -146,11 +146,11 @@ CSR_API(SrvGetThreadConsoleDesktop)
 
     Status = GetThreadConsoleDesktop(GetThreadConsoleDesktopRequest->ThreadId,
                                      &GetThreadConsoleDesktopRequest->ConsoleDesktop);
-    if (!NT_SUCCESS(Status))
-    {
-        DPRINT1("GetThreadConsoleDesktop(%lu) failed with Status 0x%08x\n",
-                GetThreadConsoleDesktopRequest->ThreadId, Status);
-    }
+    /* NOTE: no DPRINT here, not even DPRINT1. GetThreadDesktop() is polled
+     * thousands of times during process startup (and by games); any print
+     * on this hot path costs ~10ms of synchronous serial I/O per call and
+     * wedges the whole system (csrss at 99%, frozen display). */
+    (void)Status;
 
     /* Windows-compatibility: Always return success since User32 relies on this! */
     return STATUS_SUCCESS;

@@ -79,7 +79,8 @@ static HRESULT WINAPI singlefontfileenumerator_GetCurrentFontFile(IDWriteFontFil
 {
     struct test_fontenumerator *enumerator = impl_from_IDWriteFontFileEnumerator(iface);
 
-    IDWriteFontFile_AddRef((*file = enumerator->file));
+    *file = enumerator->file;
+    IDWriteFontFile_AddRef(*file);
 
     return S_OK;
 }
@@ -99,7 +100,7 @@ static HRESULT WINAPI singlefontfileenumerator_MoveNext(IDWriteFontFileEnumerato
     return S_OK;
 }
 
-static const struct IDWriteFontFileEnumeratorVtbl singlefontfileenumeratorvtbl =
+static struct IDWriteFontFileEnumeratorVtbl singlefontfileenumeratorvtbl =
 {
     singlefontfileenumerator_QueryInterface,
     singlefontfileenumerator_AddRef,
@@ -203,7 +204,7 @@ static HRESULT WINAPI fontdatastream_GetLastWriteTime(IDWriteFontFileStream *ifa
     return E_NOTIMPL;
 }
 
-static const IDWriteFontFileStreamVtbl fontdatastreamvtbl =
+static IDWriteFontFileStreamVtbl fontdatastreamvtbl =
 {
     fontdatastream_QueryInterface,
     fontdatastream_AddRef,
@@ -288,7 +289,7 @@ static HRESULT WINAPI resourcefontfileloader_CreateStreamFromKey(IDWriteFontFile
     return E_FAIL;
 }
 
-static const struct IDWriteFontFileLoaderVtbl resourcefontfileloadervtbl =
+static struct IDWriteFontFileLoaderVtbl resourcefontfileloadervtbl =
 {
     resourcefontfileloader_QueryInterface,
     resourcefontfileloader_AddRef,
@@ -369,7 +370,7 @@ static HRESULT WINAPI resourcecollectionloader_CreateEnumeratorFromKey(IDWriteFo
     return hr;
 }
 
-static const struct IDWriteFontCollectionLoaderVtbl resourcecollectionloadervtbl =
+static struct IDWriteFontCollectionLoaderVtbl resourcecollectionloadervtbl =
 {
     resourcecollectionloader_QueryInterface,
     resourcecollectionloader_AddRef,
@@ -1061,7 +1062,7 @@ static HRESULT WINAPI testrenderer_DrawInlineObject(IDWriteTextRenderer *iface,
     return S_OK;
 }
 
-static const IDWriteTextRendererVtbl testrenderervtbl = {
+static IDWriteTextRendererVtbl testrenderervtbl = {
     testrenderer_QI,
     testrenderer_AddRef,
     testrenderer_Release,
@@ -1154,7 +1155,7 @@ static HRESULT WINAPI testinlineobj2_GetBreakConditions(IDWriteInlineObject *ifa
     return S_OK;
 }
 
-static const IDWriteInlineObjectVtbl testinlineobjvtbl = {
+static IDWriteInlineObjectVtbl testinlineobjvtbl = {
     testinlineobj_QI,
     testinlineobj_AddRef,
     testinlineobj_Release,
@@ -1164,7 +1165,7 @@ static const IDWriteInlineObjectVtbl testinlineobjvtbl = {
     testinlineobj_GetBreakConditions
 };
 
-static const IDWriteInlineObjectVtbl testinlineobjvtbl2 =
+static IDWriteInlineObjectVtbl testinlineobjvtbl2 =
 {
     testinlineobj_QI,
     testinlineobj_AddRef,
@@ -1175,7 +1176,7 @@ static const IDWriteInlineObjectVtbl testinlineobjvtbl2 =
     testinlineobj2_GetBreakConditions
 };
 
-static struct test_inline_obj *create_test_inline_object(const IDWriteInlineObjectVtbl *vtable)
+static struct test_inline_obj *create_test_inline_object(IDWriteInlineObjectVtbl *vtable)
 {
     struct test_inline_obj *object = calloc(1, sizeof(*object));
 
@@ -1200,7 +1201,7 @@ static HRESULT WINAPI testinlineobj3_GetOverhangMetrics(IDWriteInlineObject *ifa
     return E_NOTIMPL;
 }
 
-static const IDWriteInlineObjectVtbl testinlineobjvtbl3 = {
+static IDWriteInlineObjectVtbl testinlineobjvtbl3 = {
     testinlineobj_QI,
     testinlineobj_AddRef,
     testinlineobj_Release,
@@ -1251,7 +1252,7 @@ static ULONG WINAPI testeffect_Release(IUnknown *iface)
     return ref;
 }
 
-static const IUnknownVtbl testeffectvtbl = {
+static IUnknownVtbl testeffectvtbl = {
     testeffect_QI,
     testeffect_AddRef,
     testeffect_Release
@@ -4955,7 +4956,7 @@ static HRESULT WINAPI fontcollection_GetFontFromFontFace(IDWriteFontCollection *
     return E_NOTIMPL;
 }
 
-static const IDWriteFontCollectionVtbl fallbackcollectionvtbl = {
+static IDWriteFontCollectionVtbl fallbackcollectionvtbl = {
     fontcollection_QI,
     fontcollection_AddRef,
     fontcollection_Release,

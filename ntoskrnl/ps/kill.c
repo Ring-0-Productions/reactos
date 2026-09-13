@@ -502,6 +502,24 @@ PspExitThread(IN NTSTATUS ExitStatus)
     /* Lower to Passive Level */
     KeLowerIrql(PASSIVE_LEVEL);
 
+    /* FIX (FPU-teardown crashes): if this thread still owns the FPU state
+     * cached on this CPU, release ownership now. Otherwise a later #NM
+     * would dereference this ETHREAD after it is freed. The state itself
+     * is discarded; nobody can legitimately use it anymore. */
+    if (KeGetCurrentPrcb()->NpxThread == &Thread->Tcb)
+    {
+        KeGetCurrentPrcb()->NpxThread = NULL;
+        Thread->Tcb.NpxState = NPX_STATE_NOT_LOADED;
+    }
+
+    /* TEMP-DEBUG (APC-leak hunt): log APC-disable count at thread-exit
+     * entry and (below) before the CombinedApcDisable==0 assert, to tell
+     * lifetime leaks (already nonzero here) from teardown leaks. */
+    DPRINT("APCTRACE enter TID=%lx PID=%lx apc=%d\n",
+            (ULONG)HandleToUlong(Thread->Cid.UniqueThread),
+            (ULONG)HandleToUlong(Thread->Cid.UniqueProcess),
+            (int)Thread->Tcb.CombinedApcDisable);
+
     /* Can't be a worker thread */
     if (Thread->ActiveExWorker)
     {
@@ -826,6 +844,11 @@ PspExitThread(IN NTSTATUS ExitStatus)
     /* Save the exit status and exit time */
     Thread->ExitStatus = ExitStatus;
     KeQuerySystemTime(&Thread->ExitTime);
+
+    /* TEMP-DEBUG (APC-leak hunt): value right before the assert. */
+    DPRINT("APCTRACE preassert TID=%lx apc=%d\n",
+            (ULONG)HandleToUlong(Thread->Cid.UniqueThread),
+            (int)Thread->Tcb.CombinedApcDisable);
 
     /* Sanity check */
     ASSERT(Thread->Tcb.CombinedApcDisable == 0);

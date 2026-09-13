@@ -27,6 +27,10 @@
 WINE_DEFAULT_DEBUG_CHANNEL(d3d);
 WINE_DECLARE_DEBUG_CHANNEL(d3d_perf);
 
+/* GAMING-PERF: per-draw counter (incremented from cs.c emit_draw,
+ * read + reset from the fps meter below) */
+LONG g_gaming_draw_count = 0;
+
 void wined3d_swapchain_cleanup(struct wined3d_swapchain *swapchain)
 {
     HRESULT hr;
@@ -600,15 +604,21 @@ static void swapchain_gl_present(struct wined3d_swapchain *swapchain,
 
     TRACE("Presenting DC %p.\n", context_gl->dc);
 
+    /* GAMING-PERF: present-path + timing split */
+    static DWORD present_ms = 0, gdi_presents = 0, gl_presents = 0;
+    DWORD present_start = GetTickCount();
+
     pixel_format = &wined3d_adapter_gl(swapchain->device->adapter)->pixel_formats[context_gl->pixel_format];
     if (context_gl->dc == wined3d_device_gl(swapchain->device)->backup_dc
             || (pixel_format->swap_method != WGL_SWAP_COPY_ARB
             && swapchain_present_is_partial_copy(swapchain, dst_rect)))
     {
+        ++gdi_presents;
         swapchain_blit_gdi(swapchain, context, src_rect, dst_rect);
     }
     else
     {
+        ++gl_presents;
         gl_info = context_gl->gl_info;
 
         swapchain_gl_set_swap_interval(swapchain, context_gl, swap_interval);
@@ -636,6 +646,29 @@ static void swapchain_gl_present(struct wined3d_swapchain *swapchain,
 
     wined3d_texture_validate_location(swapchain->front_buffer, 0, WINED3D_LOCATION_DRAWABLE);
     wined3d_texture_invalidate_location(swapchain->front_buffer, 0, ~WINED3D_LOCATION_DRAWABLE);
+
+    /* GAMING-PERF: fps meter (rare: 1 line per 120 presents) */
+    {
+        static DWORD start_tick = 0, frames = 0;
+        DWORD now = GetTickCount();
+        if (!start_tick) start_tick = now;
+        present_ms += now - present_start;
+        if (++frames >= 120)
+        {
+            DWORD ms = now - start_tick;
+            LONG draws = InterlockedExchange(&g_gaming_draw_count, 0);
+            FIXME("GAMING-PERF fps: %lu frames in %lu ms (~%lu.%lu fps), present %lu ms total (gdi %lu / gl %lu), draws %ld (~%lu/frame).\n",
+                    frames, ms, ms ? (frames * 1000) / ms : 0,
+                    ms ? ((frames * 10000) / ms) % 10 : 0,
+                    present_ms, gdi_presents, gl_presents,
+                    draws, frames ? draws / (LONG)frames : 0);
+            start_tick = now;
+            frames = 0;
+            present_ms = 0;
+            gdi_presents = 0;
+            gl_presents = 0;
+        }
+    }
 
     context_release(context);
 }

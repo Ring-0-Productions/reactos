@@ -12,6 +12,36 @@ DBG_DEFAULT_CHANNEL(UserDisplay);
 BOOL gbBaseVideo = FALSE;
 static PPROCESSINFO gpFullscreen = NULL;
 
+/* Gaming (fullscreen restore): last desktop mode before a fullscreen
+ * switch, used when the registry has no usable DefaultSettings
+ * (e.g. driver default mode never persisted). Mirrors gpFullscreen:
+ * single-entry because fullscreen ownership is single-ppi already. */
+static DEVMODEW gdmRestoreDesktop;
+static BOOLEAN gbRestoreDesktopValid = FALSE;
+
+/* Gaming (fullscreen restore): seed the desktop baseline from the
+ * driver-default mode (boot desktop). Called from MDEV creation with
+ * default settings; driver defaults never move at runtime, so this is
+ * immune to game mode switches that happen before the first
+ * CDS_FULLSCREEN. First seed wins; explicit user persistence
+ * (CDS_UPDATEREGISTRY) resets it so the next fullscreen re-saves. */
+VOID
+NTAPI
+UserSeedDesktopMode(PDEVMODEW pdm)
+{
+    if (gbRestoreDesktopValid)
+        return;
+    if ((pdm->dmFields & (DM_PELSWIDTH | DM_PELSHEIGHT)) != (DM_PELSWIDTH | DM_PELSHEIGHT))
+        return;
+    RtlCopyMemory(&gdmRestoreDesktop, pdm, min(pdm->dmSize, sizeof(DEVMODEW)));
+    gdmRestoreDesktop.dmSize = sizeof(DEVMODEW);
+    gdmRestoreDesktop.dmDriverExtra = 0;
+    gbRestoreDesktopValid = TRUE;
+    ERR("DISPRESTORE seeded desktop %lux%lu bpp %lu\n",
+        gdmRestoreDesktop.dmPelsWidth, gdmRestoreDesktop.dmPelsHeight,
+        gdmRestoreDesktop.dmBitsPerPel);
+}
+
 static const PWCHAR KEY_VIDEO = L"\\Registry\\Machine\\HARDWARE\\DEVICEMAP\\VIDEO";
 
 VOID
@@ -745,6 +775,13 @@ UserChangeDisplaySettings(
             ERR("Could not load registry settings\n");
             return DISP_CHANGE_BADPARAM;
         }
+        /* Registry has no resolution (driver default never persisted)?
+         * Fall back to the desktop mode remembered at fullscreen entry. */
+        if (((dm.dmFields & (DM_PELSWIDTH | DM_PELSHEIGHT)) != (DM_PELSWIDTH | DM_PELSHEIGHT)) &&
+            gbRestoreDesktopValid)
+        {
+            dm = gdmRestoreDesktop;
+        }
     }
     else if (pdm->dmSize < FIELD_OFFSET(DEVMODEW, dmFields))
     {
@@ -783,6 +820,14 @@ UserChangeDisplaySettings(
     if ((dm.dmFields & DM_DISPLAYFREQUENCY) && (dm.dmDisplayFrequency == 0))
         dm.dmDisplayFrequency = ppdev->pdmwDev->dmDisplayFrequency;
 
+    /* TEMP-DEBUG (#22): exit-restore forensics */
+    if (pdm == NULL)
+    {
+        ERR("DISPRESTORE restore candidate %lux%lu vs current %lux%lu\n",
+            dm.dmPelsWidth, dm.dmPelsHeight,
+            ppdev->pdmwDev->dmPelsWidth, ppdev->pdmwDev->dmPelsHeight);
+    }
+
     /* Look for the requested DEVMODE */
     if (!LDEVOBJ_bProbeAndCaptureDevmode(ppdev->pGraphicsDevice, &dm, &newDevMode, FALSE))
     {
@@ -807,6 +852,10 @@ UserChangeDisplaySettings(
             /* Store the settings */
             RegWriteDisplaySettings(hkey, newDevMode);
 
+            /* A persisted mode is the new desktop baseline; drop the
+             * remembered one so the next fullscreen re-saves fresh. */
+            gbRestoreDesktopValid = FALSE;
+
             /* Close the registry key */
             ZwClose(hkey);
         }
@@ -822,8 +871,20 @@ UserChangeDisplaySettings(
         RtlCompareMemory(newDevMode, ppdev->pdmwDev, newDevMode->dmSize) == newDevMode->dmSize &&
         !(flags & CDS_RESET))
     {
-        ERR("DEVMODE matches, nothing to do\n");
-        goto leave;
+        if (pdm == NULL)
+        {
+            /* Exit-time restore: the record matches, but hardware may
+             * have diverged via DXG-side switches; force the re-assert
+             * below instead of skipping it. Success clears gpFullscreen
+             * via UserUpdateFullscreen, killing the stale "Failed" too. */
+            ERR("DISPRESTORE re-asserting matching mode %lux%lu\n",
+                dm.dmPelsWidth, dm.dmPelsHeight);
+        }
+        else
+        {
+            ERR("DEVMODE matches, nothing to do\n");
+            goto leave;
+        }
     }
 
     /* Shall we apply the settings? */
@@ -859,6 +920,23 @@ UserChangeDisplaySettings(
         {
             /* Setting mode succeeded */
             lResult = DISP_CHANGE_SUCCESSFUL;
+            if ((flags & CDS_FULLSCREEN) && !gbRestoreDesktopValid)
+            {
+                /* No baseline yet (no boot seed, no registry): remember
+                 * the mode we are leaving. Never overwrite a valid
+                 * baseline on re-entry: mid-game plain switches must
+                 * not move it. */
+                RtlCopyMemory(&gdmRestoreDesktop, ppdev->pdmwDev,
+                              min(ppdev->pdmwDev->dmSize, sizeof(DEVMODEW)));
+                gdmRestoreDesktop.dmSize = sizeof(DEVMODEW);
+                gdmRestoreDesktop.dmDriverExtra = 0;
+                gbRestoreDesktopValid = TRUE;
+                ERR("DISPRESTORE saved desktop %lux%lu bpp %lu\n",
+                    gdmRestoreDesktop.dmPelsWidth, gdmRestoreDesktop.dmPelsHeight,
+                    gdmRestoreDesktop.dmBitsPerPel);
+            }
+            /* NOTE: plain (non-fullscreen) switches deliberately leave
+             * the baseline alone: games fiddle with those mid-session. */
             ExFreePoolWithTag(ppdev->pdmwDev, GDITAG_DEVMODE);
             ppdev->pdmwDev = newDevMode;
 

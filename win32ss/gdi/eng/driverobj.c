@@ -29,7 +29,37 @@ DRIVEROBJ_vCleanup(PVOID pObject)
     pFreeProc = pedo->drvobj.pFreeProc;
     if (pFreeProc)
     {
-        NT_VERIFY(pFreeProc(&pedo->drvobj));
+        DPRINT1("DRIVEROBJ_vCleanup: calling free proc %p obj %p dhpdev %p hdev %p (tid %lx)\n",
+                pFreeProc, pedo->drvobj.pvObj, pedo->drvobj.dhpdev, pedo->drvobj.hdev,
+                (ULONG)HandleToUlong(PsGetCurrentThread()->Cid.UniqueThread));
+        /* The free callback is third-party driver code (e.g. nv4_disp)
+         * running at teardown, when the objects it references may already
+         * be gone (its EngDeviceIoControl with a stale device crashes in
+         * IoBuildDeviceIoControlRequest). A dying driver's cleanup must
+         * never take the session down: isolate its faults, like Windows
+         * does around driver callbacks.
+         * NOTE: only undo damage done INSIDE the call: save and restore
+         * the APC-disable count. The outer path legitimately holds a
+         * critical region across cleanup (forcing 0 trips resource.c's
+         * "APCs still enabled" break in UserLeave); restoring preserves
+         * it while dropping any imbalance the faulted driver leaked. */
+        /* NOTE: CombinedApcDisable is a ULONG overlaying two SHORT counts
+         * (low word = kernel APCs, high word = special/guarded APCs). It
+         * MUST be saved/restored whole: a SHORT truncates a legitimately
+         * held guarded region (0xFFFF0000) and the restore would corrupt it. */
+        ULONG SavedApcDisable = PsGetCurrentThread()->Tcb.CombinedApcDisable;
+        _SEH2_TRY
+        {
+            pFreeProc(&pedo->drvobj);
+        }
+        _SEH2_EXCEPT(EXCEPTION_EXECUTE_HANDLER)
+        {
+            DPRINT1("DRIVEROBJ_vCleanup: driver free proc faulted, code %lx (tolerated, tid %lx)\n",
+                    _SEH2_GetExceptionCode(),
+                    (ULONG)HandleToUlong(PsGetCurrentThread()->Cid.UniqueThread));
+            PsGetCurrentThread()->Tcb.CombinedApcDisable = SavedApcDisable;
+        }
+        _SEH2_END
     }
 }
 

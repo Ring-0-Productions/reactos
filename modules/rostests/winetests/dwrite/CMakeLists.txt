@@ -1,7 +1,7 @@
 
 
 include_directories(BEFORE ${REACTOS_SOURCE_DIR}/sdk/include/wine)
-add_compile_definitions(-DWINETEST_USE_DBGSTR_LONGLONG)
+add_compile_definitions(WINETEST_USE_DBGSTR_LONGLONG)
 
 list(APPEND SOURCE
     analyzer.c

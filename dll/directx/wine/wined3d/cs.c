@@ -30,6 +30,9 @@ static NTSTATUS (WINAPI *pNtWaitForAlertByThreadId)(void *addr, const LARGE_INTE
 
 #define WINED3D_INITIAL_CS_SIZE 4096
 
+/* GAMING-PERF: per-draw counter, defined in swapchain.c */
+extern LONG g_gaming_draw_count;
+
 struct wined3d_deferred_upload
 {
     struct wined3d_resource *resource;
@@ -1170,6 +1173,10 @@ void wined3d_device_context_emit_draw(struct wined3d_device_context *context,
 {
     const struct wined3d_d3d_info *d3d_info = &context->device->adapter->d3d_info;
     struct wined3d_cs_draw *op;
+
+    /* GAMING-PERF: per-draw counter (defined in swapchain.c, read + reset
+     * from the fps meter) */
+    InterlockedIncrement(&g_gaming_draw_count);
 
     op = wined3d_device_context_require_space(context, sizeof(*op), WINED3D_CS_QUEUE_DEFAULT);
     op->opcode = WINED3D_CS_OP_DRAW;

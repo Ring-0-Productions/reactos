@@ -200,7 +200,11 @@ list(APPEND SOURCE
     ${REACTOS_SOURCE_DIR}/ntoskrnl/ke/thrdschd.c
     ${REACTOS_SOURCE_DIR}/ntoskrnl/ke/time.c
     ${REACTOS_SOURCE_DIR}/ntoskrnl/ke/timerobj.c
+    ${REACTOS_SOURCE_DIR}/ntoskrnl/ke/hbd.c
     ${REACTOS_SOURCE_DIR}/ntoskrnl/ke/wait.c
+    ${REACTOS_SOURCE_DIR}/ntoskrnl/kse/kse.c
+    ${REACTOS_SOURCE_DIR}/ntoskrnl/kse/driverscope.c
+    ${REACTOS_SOURCE_DIR}/ntoskrnl/kse/versionlie.c
     ${REACTOS_SOURCE_DIR}/ntoskrnl/alpc/alpcinit.c
     ${REACTOS_SOURCE_DIR}/ntoskrnl/alpc/alpcport.c
     ${REACTOS_SOURCE_DIR}/ntoskrnl/alpc/alpccon.c

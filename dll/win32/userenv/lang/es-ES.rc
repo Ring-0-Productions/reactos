@@ -43,4 +43,6 @@ BEGIN
     IDS_CACHE "Configuración local\\Archivos temporales de Internet"
     IDS_HISTORY "Configuración local\\Historial"
     IDS_COOKIES "Cookies"
+    IDS_LOCALLOWAPPDATA "Datos de programa\\LocalLow"
+    IDS_ROAMINGAPPDATA "Datos de programa\\Roaming"
 END

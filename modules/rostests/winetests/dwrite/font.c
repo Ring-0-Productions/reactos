@@ -663,7 +663,7 @@ static HRESULT WINAPI singlefontfileenumerator_MoveNext(IDWriteFontFileEnumerato
     return S_OK;
 }
 
-static const struct IDWriteFontFileEnumeratorVtbl singlefontfileenumeratorvtbl =
+static struct IDWriteFontFileEnumeratorVtbl singlefontfileenumeratorvtbl =
 {
     singlefontfileenumerator_QueryInterface,
     singlefontfileenumerator_AddRef,
@@ -738,7 +738,7 @@ static HRESULT WINAPI resourcecollectionloader_CreateEnumeratorFromKey(IDWriteFo
     return hr;
 }
 
-static const struct IDWriteFontCollectionLoaderVtbl resourcecollectionloadervtbl = {
+static struct IDWriteFontCollectionLoaderVtbl resourcecollectionloadervtbl = {
     resourcecollectionloader_QueryInterface,
     resourcecollectionloader_AddRef,
     resourcecollectionloader_Release,
@@ -823,7 +823,7 @@ static HRESULT WINAPI fontdatastream_GetLastWriteTime(IDWriteFontFileStream *ifa
     return E_NOTIMPL;
 }
 
-static const IDWriteFontFileStreamVtbl fontdatastreamvtbl =
+static IDWriteFontFileStreamVtbl fontdatastreamvtbl =
 {
     fontdatastream_QueryInterface,
     fontdatastream_AddRef,
@@ -889,7 +889,7 @@ static HRESULT WINAPI resourcefontfileloader_CreateStreamFromKey(IDWriteFontFile
     return E_FAIL;
 }
 
-static const struct IDWriteFontFileLoaderVtbl resourcefontfileloadervtbl = {
+static struct IDWriteFontFileLoaderVtbl resourcefontfileloadervtbl = {
     resourcefontfileloader_QueryInterface,
     resourcefontfileloader_AddRef,
     resourcefontfileloader_Release,
@@ -966,7 +966,7 @@ static HRESULT WINAPI test_geometrysink_Close(ID2D1SimplifiedGeometrySink *iface
     return E_NOTIMPL;
 }
 
-static const ID2D1SimplifiedGeometrySinkVtbl test_geometrysink_vtbl = {
+static ID2D1SimplifiedGeometrySinkVtbl test_geometrysink_vtbl = {
     test_geometrysink_QueryInterface,
     test_geometrysink_AddRef,
     test_geometrysink_Release,
@@ -1002,7 +1002,7 @@ static void WINAPI test_geometrysink2_EndFigure(ID2D1SimplifiedGeometrySink *ifa
     ok(0, "unexpected call\n");
 }
 
-static const ID2D1SimplifiedGeometrySinkVtbl test_geometrysink2_vtbl = {
+static ID2D1SimplifiedGeometrySinkVtbl test_geometrysink2_vtbl = {
     test_geometrysink_QueryInterface,
     test_geometrysink_AddRef,
     test_geometrysink_Release,
@@ -2946,7 +2946,7 @@ static HRESULT WINAPI fontfileenumerator_MoveNext(IDWriteFontFileEnumerator *ifa
     return S_OK;
 }
 
-static const struct IDWriteFontFileEnumeratorVtbl dwritefontfileenumeratorvtbl =
+static struct IDWriteFontFileEnumeratorVtbl dwritefontfileenumeratorvtbl =
 {
     fontfileenumerator_QueryInterface,
     fontfileenumerator_AddRef,
@@ -3007,7 +3007,7 @@ static HRESULT WINAPI fontcollectionloader_CreateEnumeratorFromKey(IDWriteFontCo
     return S_OK;
 }
 
-static const struct IDWriteFontCollectionLoaderVtbl dwritefontcollectionloadervtbl = {
+static struct IDWriteFontCollectionLoaderVtbl dwritefontcollectionloadervtbl = {
     fontcollectionloader_QueryInterface,
     fontcollectionloader_AddRef,
     fontcollectionloader_Release,
@@ -3234,7 +3234,7 @@ static HRESULT WINAPI fontfileloader_CreateStreamFromKey(IDWriteFontFileLoader *
     return 0x8faecafe;
 }
 
-static const struct IDWriteFontFileLoaderVtbl dwritefontfileloadervtbl = {
+static struct IDWriteFontFileLoaderVtbl dwritefontfileloadervtbl = {
     fontfileloader_QueryInterface,
     fontfileloader_AddRef,
     fontfileloader_Release,
@@ -8964,7 +8964,7 @@ static ULONG WINAPI testowner_Release(IUnknown *iface)
     return InterlockedDecrement(&object->ref);
 }
 
-static const IUnknownVtbl testownervtbl = {
+static IUnknownVtbl testownervtbl = {
     testowner_QueryInterface,
     testowner_AddRef,
     testowner_Release,

@@ -3384,7 +3384,7 @@ static BOOL wined3d_adapter_init_gl_caps(struct wined3d_adapter_gl *adapter_gl,
     TRACE("adapter_gl %p.\n", adapter_gl);
 
     gl_renderer_str = (const char *)gl_info->gl_ops.gl.p_glGetString(GL_RENDERER);
-    TRACE("GL_RENDERER: %s.\n", debugstr_a(gl_renderer_str));
+    FIXME("GAMING-PERF GL_RENDERER: %s.\n", debugstr_a(gl_renderer_str));
     if (!gl_renderer_str)
     {
         ERR("Received a NULL GL_RENDERER.\n");
@@ -3392,7 +3392,7 @@ static BOOL wined3d_adapter_init_gl_caps(struct wined3d_adapter_gl *adapter_gl,
     }
 
     gl_vendor_str = (const char *)gl_info->gl_ops.gl.p_glGetString(GL_VENDOR);
-    TRACE("GL_VENDOR: %s.\n", debugstr_a(gl_vendor_str));
+    FIXME("GAMING-PERF GL_VENDOR: %s.\n", debugstr_a(gl_vendor_str));
     if (!gl_vendor_str)
     {
         ERR("Received a NULL GL_VENDOR.\n");
@@ -3401,7 +3401,7 @@ static BOOL wined3d_adapter_init_gl_caps(struct wined3d_adapter_gl *adapter_gl,
 
     /* Parse the GL_VERSION field into major and minor information */
     gl_version_str = (const char *)gl_info->gl_ops.gl.p_glGetString(GL_VERSION);
-    TRACE("GL_VERSION: %s.\n", debugstr_a(gl_version_str));
+    FIXME("GAMING-PERF GL_VERSION: %s.\n", debugstr_a(gl_version_str));
     if (!gl_version_str)
     {
         ERR("Received a NULL GL_VERSION.\n");
@@ -3819,6 +3819,20 @@ static BOOL wined3d_adapter_init_gl_caps(struct wined3d_adapter_gl *adapter_gl,
             ERR("Card %04x:%04x not found in driver DB.\n", vendor, device);
             return FALSE;
         }
+    }
+    FIXME("GAMING-PERF card: %s (%04x:%04x), vidmem %u MB, emulated vram 0x%s bytes.\n",
+            debugstr_a(caps_gl_ctx->gpu_description->description),
+            caps_gl_ctx->gpu_description->vendor, caps_gl_ctx->gpu_description->device,
+            caps_gl_ctx->gpu_description->vidmem,
+            wine_dbgstr_longlong(caps_gl_ctx->vram_bytes));
+    if (!caps_gl_ctx->vram_bytes)
+    {
+        /* The ICD has no WGL_WINE_query_renderer, so no VRAM size came
+         * back. Reporting 0 makes apps spill everything to sysmem and
+         * re-upload per frame. Fall back to the card DB value. */
+        caps_gl_ctx->vram_bytes = (UINT64)caps_gl_ctx->gpu_description->vidmem * 1024 * 1024;
+        FIXME("GAMING-PERF vram was 0, using card DB %s bytes.\n",
+                wine_dbgstr_longlong(caps_gl_ctx->vram_bytes));
     }
     fixup_extensions(gl_info, caps_gl_ctx, gl_renderer_str, gl_vendor);
 

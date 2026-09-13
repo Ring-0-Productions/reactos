@@ -54,7 +54,13 @@ DxDdLock(HANDLE hSurface,
         mapMemoryData.fpProcess = 0;
         mapMemoryData.lpDD = (PDD_DIRECTDRAW_GLOBAL)peDdGl;
 
+        /* TEMP-DEBUG (0x50 hunt): the driver's MapMemory maps VRAM into the
+         * process (the mdlsup churn) and reads PDEV linkage that may be
+         * stale right after a mode switch. Last enter without exit = caught. */
+        DbgPrint("DDITRACE enter MapMemory lpDD=%p\n", mapMemoryData.lpDD);
         peDdGl->ddCallbacks.MapMemory(&mapMemoryData);
+        DbgPrint("DDITRACE exit MapMemory => %lx fp=%lx\n",
+                 (ULONG)mapMemoryData.ddRVal, (ULONG)mapMemoryData.fpProcess);
 
         if (!mapMemoryData.ddRVal)
         {

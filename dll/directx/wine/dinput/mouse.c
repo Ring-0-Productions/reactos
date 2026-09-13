@@ -419,7 +419,14 @@ static int dinput_mouse_hook( LPDIRECTINPUTDEVICE8A iface, WPARAM wparam, LPARAM
 static void warp_check( SysMouseImpl* This, BOOL force )
 {
     DWORD now = GetCurrentTime();
-    const DWORD interval = This->clipped ? 500 : 10;
+    /* GAMING-MOUSE: always recenter while exclusive is active. The old
+     * (!clipped-only) warp ran exactly once per acquire; afterwards the
+     * cursor roamed free inside the clip until it pinned at an edge and
+     * deltas died (aim stuck at the window border, windowed AND
+     * fullscreen). Recentering every poll keeps relative motion flowing.
+     * 10ms throttle bounds warp traffic; the synthetic move yields zero
+     * delta by construction (hook pos == cursor pos == center). */
+    const DWORD interval = 10;
 
     if (force || (This->need_warp && (now - This->last_warped > interval)))
     {
@@ -430,13 +437,10 @@ static void warp_check( SysMouseImpl* This, BOOL force )
         This->need_warp = FALSE;
         if (!GetClientRect(This->base.win, &rect)) return;
         MapWindowPoints( This->base.win, 0, (POINT *)&rect, 2 );
-        if (!This->clipped)
-        {
-            mapped_center.x = (rect.left + rect.right) / 2;
-            mapped_center.y = (rect.top + rect.bottom) / 2;
-            TRACE("Warping mouse to %d - %d\n", mapped_center.x, mapped_center.y);
-            SetCursorPos( mapped_center.x, mapped_center.y );
-        }
+        mapped_center.x = (rect.left + rect.right) / 2;
+        mapped_center.y = (rect.top + rect.bottom) / 2;
+        TRACE("Warping mouse to %d - %d\n", mapped_center.x, mapped_center.y);
+        SetCursorPos( mapped_center.x, mapped_center.y );
         if (This->base.dwCoopLevel & DISCL_EXCLUSIVE)
         {
             /* make sure we clip even if the window covers the whole screen */
@@ -459,11 +463,16 @@ static HRESULT WINAPI SysMouseWImpl_Acquire(LPDIRECTINPUTDEVICE8W iface)
 {
     SysMouseImpl *This = impl_from_IDirectInputDevice8W(iface);
     POINT point;
-    HRESULT res;
+    HRESULT hr;
 
     TRACE("(this=%p)\n",This);
 
-    if ((res = IDirectInputDevice2WImpl_Acquire(iface)) != DI_OK) return res;
+    hr = IDirectInputDevice2WImpl_Acquire(iface);
+    FIXME("GAMING-MOUSE acquire coop=%#lx (%s) warp_override=%d win=%p res=%#lx.\n",
+            This->base.dwCoopLevel,
+            (This->base.dwCoopLevel & DISCL_EXCLUSIVE) ? "EXCLUSIVE" : "nonexclusive",
+            This->warp_override, This->base.win, hr);
+    if (FAILED(hr)) return hr;
 
     /* Init the mouse state */
     GetCursorPos( &point );

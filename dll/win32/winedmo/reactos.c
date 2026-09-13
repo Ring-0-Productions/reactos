@@ -23,6 +23,8 @@
 #include <libavformat/avformat.h>
 #include <libavformat/avio.h>
 
+#include <libswscale/swscale.h>
+
 HMODULE AVUtilLibrary = NULL;
 HMODULE AVCodecLibrary = NULL;
 HMODULE AVFormatLibrary = NULL;
@@ -923,9 +925,9 @@ struct SwsContext *sws_alloc_context(void)
 }
 
 
-void sws_free_context(struct SwsContext *swsContext)
+void sws_free_context(struct SwsContext **ctx)
 {
-    typedef void (*fn_t)(struct SwsContext *);
+    typedef void (*fn_t)(struct SwsContext **);
 
     static fn_t fn = NULL;
 
@@ -934,7 +936,7 @@ void sws_free_context(struct SwsContext *swsContext)
         fn_t,
         sws_free_context);
 
-    fn(swsContext);
+    fn(ctx);
 }
 
 

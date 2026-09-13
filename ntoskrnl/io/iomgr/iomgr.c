@@ -30,6 +30,12 @@ NTAPI
 WmiInitialize(
     VOID);
 
+/* TEMP-DEBUG (remove after hang debug) */
+VOID
+NTAPI
+HbdInit(
+    VOID);
+
 /* DATA ********************************************************************/
 
 POBJECT_TYPE IoDeviceObjectType = NULL;
@@ -532,6 +538,9 @@ IoInitSystem(IN PLOADER_PARAMETER_BLOCK LoaderBlock)
         return FALSE;
     }
 
+    /* Initialize Kernel Shim engine */
+    KseInitialize(0, LoaderBlock);
+
     /* Initialize PnP manager */
     IopInitializePlugPlayServices();
 
@@ -540,6 +549,9 @@ IoInitSystem(IN PLOADER_PARAMETER_BLOCK LoaderBlock)
 
     /* Initialize WMI */
     WmiInitialize();
+
+    /* Initialize Kernel Shim engine */
+    KseInitialize(1, LoaderBlock);
 
     /* Initialize HAL Root Bus Driver */
     HalInitPnpDriver();
@@ -640,6 +652,9 @@ IoInitSystem(IN PLOADER_PARAMETER_BLOCK LoaderBlock)
         DPRINT1("PsLocateSystemDll failed: %lx\n", Status);
         return FALSE;
     }
+
+    /* TEMP-DEBUG (remove after hang debug): start heartbeat watchdog */
+    HbdInit();
 
     /* Return success */
     return TRUE;

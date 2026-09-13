@@ -1348,6 +1348,17 @@ MmCleanProcessAddressSpace(IN PEPROCESS Process)
         /* Grab the current VAD */
         Vad = (PMMVAD)VadTree->BalancedRoot.RightChild;
 
+        /* TEMP-DEBUG (table-leak hunt): log every VAD the cleanup visits,
+         * to correlate against leftover tables (visited+removed+PTEs remain
+         * = remover bug; never visited = vanished-earlier bug). */
+        DPRINT("VADCLEAN pid=%lx type=%lu priv=%lu ca=%p [%p-%p]\n",
+                (ULONG)HandleToUlong(Process->UniqueProcessId),
+                (ULONG)Vad->u.VadFlags.VadType,
+                (ULONG)Vad->u.VadFlags.PrivateMemory,
+                Vad->ControlArea,
+                (PVOID)(Vad->StartingVpn << PAGE_SHIFT),
+                (PVOID)((Vad->EndingVpn << PAGE_SHIFT) | (PAGE_SIZE - 1)));
+
         /* Check for old-style memory areas */
         if (MI_IS_MEMORY_AREA_VAD(Vad))
         {
@@ -1366,11 +1377,74 @@ MmCleanProcessAddressSpace(IN PEPROCESS Process)
         ASSERT(VadTree->NumberGenericTableElements >= 1);
         MiRemoveNode((PMMADDRESS_NODE)Vad, VadTree);
 
-        /* Only regular VADs supported for now */
-        ASSERT(Vad->u.VadFlags.VadType == VadNone);
+        /* Only regular VADs supported for now.
+         * NOTE (gaming): a game that TerminateProcess'es itself leaves VRAM
+         * (VadDevicePhysicalMemory) or image views behind; the handling
+         * below (MiRemoveMappedView / MiDeleteVirtualAddresses) already
+         * deals with them, so don't park the whole session in KDB here.
+         * Log for forensics and continue. */
+        if (Vad->u.VadFlags.VadType != VadNone)
+        {
+            DPRINT("MmCleanProcessAddressSpace: non-regular VAD type %lu [%p-%p], continuing\n",
+                    (ULONG)Vad->u.VadFlags.VadType,
+                    (PVOID)(Vad->StartingVpn << PAGE_SHIFT),
+                    (PVOID)((Vad->EndingVpn << PAGE_SHIFT) | (PAGE_SIZE - 1)));
+        }
 
         /* Check if this is a section VAD */
-        if (!(Vad->u.VadFlags.PrivateMemory) && (Vad->ControlArea))
+        if (Vad->u.VadFlags.VadType == VadDevicePhysicalMemory)
+        {
+            /* Device (VRAM) mappings carry no PFN accounting: the generic
+             * delete path bugchecks on their PFN entries (0x1A/0x401, the
+             * PFN's PteAddress points elsewhere since the page is shared).
+             * Drop valid 4K PTEs directly; page tables are freed wholesale
+             * later anyway, so nothing leaks. */
+            PVOID Va = (PVOID)(Vad->StartingVpn << PAGE_SHIFT);
+            PVOID EndVa = (PVOID)((Vad->EndingVpn << PAGE_SHIFT) | (PAGE_SIZE - 1));
+            ULONG Erased = 0, Skipped = 0;
+            KIRQL OldIrql;
+            /* MiDeletePde (via the table-ref drain) needs the PFN lock held,
+             * like the generic path provides internally. Working-set lock is
+             * already held here; PFN nests inside, same order as generic. */
+            OldIrql = MiAcquirePfnLock();
+            for (; Va <= EndVa; Va = (PVOID)((ULONG_PTR)Va + PAGE_SIZE))
+            {
+                PMMPTE Pte = MiAddressToPte(Va);
+                PMMPDE Pde = MiPteToPde(Pte);
+                if (Pde->u.Hard.Valid && !Pde->u.Hard.LargePage &&
+                    Pte->u.Hard.Valid)
+                {
+                    PMMPFN TablePfn;
+                    MI_ERASE_PTE(Pte);
+                    Erased++;
+                    /* Drop the table page's share count for this PTE, like
+                     * the generic MiDeletePteRange path does; without this
+                     * MiDeletePde trips on ShareCount == 1 below. */
+                    TablePfn = MiGetPfnEntry(Pde->u.Hard.PageFrameNumber);
+                    MiDecrementShareCount(TablePfn, Pde->u.Hard.PageFrameNumber);
+                    /* Drain the page-table reference like the generic path
+                     * does; free the table when it empties so the page
+                     * directory count drains (else procsup.c:1511 trips). */
+                    if (MiDecrementPageTableReferences(Va) == 0)
+                    {
+                        MiDeletePde(Pde, Process);
+                        Va = (PVOID)((ULONG_PTR)MiPdeToAddress(Pde + 1) - PAGE_SIZE);
+                    }
+                }
+                else
+                {
+                    Skipped++;
+                }
+            }
+            MiReleasePfnLock(OldIrql);
+            KeFlushCurrentTb();
+            DPRINT("MmCleanProcessAddressSpace: dropped device-physical VAD [%p-%p] (%lu erased, %lu skipped)\n",
+                    (PVOID)(Vad->StartingVpn << PAGE_SHIFT), EndVa, Erased, Skipped);
+
+            /* Release the working set */
+            MiUnlockProcessWorkingSetUnsafe(Process, Thread);
+        }
+        else if (!(Vad->u.VadFlags.PrivateMemory) && (Vad->ControlArea))
         {
             /* Remove the view */
             MiRemoveMappedView(Process, Vad);
@@ -1429,6 +1503,202 @@ MmDeleteProcessAddressSpace(IN PEPROCESS Process)
     if (Process->Vm.WorkingSetExpansionLinks.Flink != NULL)
         RemoveEntryList(&Process->Vm.WorkingSetExpansionLinks);
     MiReleaseExpansionLock(OldIrql);
+
+    /* Attach-aware diagnostics: PspDeleteProcess often runs foreign-
+     * detached (System cleaning Halo). Without attach, self-map reads show
+     * the EXECUTOR's tables (this misled us for days: the static idx0/idx498
+     * pair was System's, not the victim's!). Attach to the victim when
+     * foreign + passive + unattached + APCs enabled; dump/sweep are
+     * skipped otherwise (they would lie). */
+    PETHREAD DiagThread = PsGetCurrentThread();
+    KAPC_STATE DiagApcState;
+    BOOLEAN DiagAttached = FALSE;
+    BOOLEAN DiagInVictim =
+        (PsGetCurrentProcess() == Process) ||
+        (KeIsAttachedProcess() &&
+         (DiagThread->Tcb.ApcState.Process == (PKPROCESS)&Process->Pcb));
+    if (!DiagInVictim && (KeGetCurrentIrql() == PASSIVE_LEVEL) &&
+        !KeIsAttachedProcess() &&
+        (DiagThread->Tcb.CombinedApcDisable == 0))
+    {
+        KeStackAttachProcess(&Process->Pcb, &DiagApcState);
+        DiagAttached = TRUE;
+        DiagInVictim = TRUE;
+    }
+
+    /* TEMP-DEBUG (teardown table-leak hunt): dump valid user PDEs.
+     * Runs at PASSIVE without locks (diagnostic only; counts may race).
+     * Tables with refs but no covering VAD (or unexpected owners) are
+     * the leak. Placed BEFORE the PFN lock: debug prints must not run
+     * at DISPATCH. */
+    if (DiagInVictim)
+    {
+        ULONG_PTR Va;
+        PPEB Peb = Process->Peb;
+        /* NOTE: never dereference Peb fields here: this can run lazily in a
+         * FOREIGN process context (PspDeleteProcess <- Ob delete <- handle
+         * rundown) after the address space is gone; any user-VA touch
+         * faults (0x7FFD4094 seen). Pointer value only. */
+        DPRINT("PDETBL pid=%lx peb=%p\n", (ULONG)HandleToUlong(Process->UniqueProcessId), Peb);
+        for (Va = 0; Va < (ULONG_PTR)MmHighestUserAddress; Va += 0x400000)
+        {
+            PMMPTE Pte = MiAddressToPte((PVOID)Va);
+            PMMPDE Pde = MiPteToPde(Pte);
+            if (Pde->u.Long != 0)
+            {
+                if (Pde->u.Hard.Valid && !Pde->u.Hard.LargePage)
+                {
+                    PMMPFN PfnT = MiGetPfnEntry(Pde->u.Hard.PageFrameNumber);
+                        ULONG vi;
+                        ULONG ValidPtes = 0;
+                        ULONG_PTR FirstValid = 0;
+                        ULONG ProtoPtes = 0;
+                        ULONG_PTR FirstPteVal = 0;
+                        for (vi = 0; vi < 1024; vi++)
+                        {
+                            PMMPTE Sub = Pte + vi;
+                            if (Sub->u.Hard.Valid)
+                            {
+                                if (!FirstValid)
+                                {
+                                    FirstValid = Va + (vi << PAGE_SHIFT);
+                                    FirstPteVal = Sub->u.Long;
+                                }
+                                if (Sub->u.Hard.Prototype) ProtoPtes++;
+                                ValidPtes++;
+                            }
+                        }
+                        DPRINT("PDETBL pid=%lx idx=%lu va=%08lx share=%u ref=%lu validptes=%lu first=%08lx proto=%lu firstpte=%08lx\n",
+                                (ULONG)HandleToUlong(Process->UniqueProcessId),
+                                (ULONG)(Va >> 22), Va,
+                                (unsigned)PfnT->u2.ShareCount,
+                                (ULONG)PfnT->u3.e2.ReferenceCount,
+                                ValidPtes, FirstValid, ProtoPtes, FirstPteVal);
+                }
+                else
+                {
+                    DPRINT("PDETBL pid=%lx idx=%lu va=%08lx raw=%08lx (large/invalid)\n",
+                            (ULONG)HandleToUlong(Process->UniqueProcessId),
+                            (ULONG)(Va >> 22), Va, Pde->u.Long);
+                }
+            }
+        }
+    }
+    else
+    {
+        DPRINT("PDETBL pid=%lx SKIPPED (not attached to victim)\n",
+                (ULONG)HandleToUlong(Process->UniqueProcessId));
+    }
+
+    /* Safety net (moved here from MmCleanProcessAddressSpace): the VAD
+     * loop can leave valid PTEs with no covering VAD, and LATE mappers
+     * (teardown-time activity on sibling threads) can add more AFTER the
+     * VAD loop ran -- sweeping earlier provably misses them. This is the
+     * latest point where the tables still exist: anything still valid here
+     * has no owner left. Walk per TABLE, no skip-ahead: map paged-out
+     * tables in, drop prototype PTEs directly, let the generic path
+     * handle the rest of each table.
+     * CONTEXT: PspDeleteProcess usually ATTACHES to the victim, so user
+     * tables are reachable even when the executor is a foreign (System)
+     * thread -- PsGetCurrentProcess() == Process is the WRONG test (it
+     * skipped exactly the lazy Halo deletions that need sweeping).
+     * Correct test: executor is victim, or attached TO victim. */
+    {
+        if (DiagInVictim && (KeGetCurrentIrql() == PASSIVE_LEVEL))
+        {
+        ULONG_PTR TblVa;
+        ULONG SweptProto = 0, SweptTables = 0, SweptSkip = 0;
+        KIRQL SweepIrql;
+        /* WS-unsafe lock needs all APCs disabled (miarm.h:1183): the VAD
+         * loop inherits this from its caller, but our attached context
+         * runs fully enabled. Guarded region around the WS usage. */
+        KeEnterGuardedRegion();
+        MiLockProcessWorkingSetUnsafe(Process, DiagThread);
+        for (TblVa = 0; TblVa < (ULONG_PTR)MmHighestUserAddress; TblVa += 0x400000)
+        {
+            PMMPDE Pde = MiPteToPde(MiAddressToPte((PVOID)TblVa));
+            ULONG vi;
+            ULONG HaveLeft = 0;
+            ULONG TableGone = 0;
+            if (!Pde->u.Long)
+                continue;
+            if (!Pde->u.Hard.Valid)
+            {
+                MiMakeSystemAddressValid(MiPteToAddress(Pde), Process);
+                if (!Pde->u.Hard.Valid || Pde->u.Hard.LargePage)
+                {
+                    SweptSkip++;
+                    continue;
+                }
+            }
+            else if (Pde->u.Hard.LargePage)
+            {
+                SweptSkip++;
+                continue;
+            }
+            ULONG ValidHere = 0;
+            for (vi = 0; vi < 1024; vi++)
+            {
+                PMMPTE Sub = MiAddressToPte((PVOID)(TblVa + (vi << PAGE_SHIFT)));
+                if (Sub->u.Hard.Valid) ValidHere++;
+            }
+            if (ValidHere == 0)
+            {
+                /* Empty table the generic path never frees (its free only
+                 * triggers via per-PTE decs hitting 0): free it outright so
+                 * the directory drains. Seen on every TerminateProcess exit
+                 * (debug assert; silent leak in release). */
+                SweepIrql = MiAcquirePfnLock();
+                MiDeletePde(Pde, Process);
+                MiReleasePfnLock(SweepIrql);
+                TableGone = 1;
+                SweptTables++;
+                continue;
+            }
+            SweepIrql = MiAcquirePfnLock();
+            for (vi = 0; vi < 1024; vi++)
+            {
+                PMMPTE Sub = MiAddressToPte((PVOID)(TblVa + (vi << PAGE_SHIFT)));
+                if (Sub->u.Hard.Valid && Sub->u.Hard.Prototype)
+                {
+                    MI_ERASE_PTE(Sub);
+                    SweptProto++;
+                    if (MiDecrementPageTableReferences((PVOID)(TblVa + (vi << PAGE_SHIFT))) == 0)
+                    {
+                        MiDeletePde(Pde, Process);
+                        TableGone = 1;
+                        break;
+                    }
+                }
+                else if (Sub->u.Long != 0)
+                {
+                    HaveLeft = 1;
+                }
+            }
+            MiReleasePfnLock(SweepIrql);
+            if (!TableGone && HaveLeft)
+            {
+                MiDeleteVirtualAddresses(TblVa,
+                                         TblVa | (0x400000 - 1),
+                                         NULL);
+                SweptTables++;
+            }
+        }
+        MiUnlockProcessWorkingSetUnsafe(Process, DiagThread);
+        KeLeaveGuardedRegion();
+        DPRINT("MmDeleteProcessAddressSpace: safety net pid=%lx swept %lu proto, %lu tables, %lu skipped\n",
+                (ULONG)HandleToUlong(Process->UniqueProcessId),
+                SweptProto, SweptTables, SweptSkip);
+    }
+    else
+    {
+        DPRINT("MmDeleteProcessAddressSpace: safety net pid=%lx SKIPPED\n",
+                (ULONG)HandleToUlong(Process->UniqueProcessId));
+    }
+    }
+
+    if (DiagAttached)
+        KeUnstackDetachProcess(&DiagApcState);
 
     /* Acquire the PFN lock */
     OldIrql = MiAcquirePfnLock();

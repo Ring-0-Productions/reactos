@@ -491,6 +491,9 @@ static HRESULT WINAPI DECLSPEC_HOTPATCH d3d9_CreateDevice(IDirect3D9Ex *iface, U
 
     TRACE("iface %p, adapter %u, device_type %#x, focus_window %p, flags %#lx, parameters %p, device %p.\n",
             iface, adapter, device_type, focus_window, flags, parameters, device);
+    FIXME("GAMING-PERF CreateDevice type %#x flags %#lx (%s vertex processing).\n",
+            device_type, flags,
+            (flags & 0x20) ? "SOFTWARE" : ((flags & 0x40) ? "HARDWARE" : ((flags & 0x80) ? "MIXED" : "unknown")));
 
     if (!(object = calloc(1, sizeof(*object))))
         return E_OUTOFMEMORY;

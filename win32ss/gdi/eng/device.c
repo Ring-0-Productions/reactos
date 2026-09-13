@@ -20,6 +20,13 @@ static PGRAPHICS_DEVICE gpGraphicsDeviceLast = NULL;
 static HSEMAPHORE ghsemGraphicsDeviceList;
 static ULONG giDevNum = 1;
 
+/* Failed device registrations, by VideoN index: last attempt time in
+ * 100ns interrupt-time units. Devices that fail to open are backed off
+ * instead of retried on every EnumDisplayDevices (hot-polling apps). */
+#define REGISTER_FAIL_BACKOFF_100NS (60ULL * 10000000ULL)
+#define MAX_TRACKED_VIDEO_DEVICES 16
+static ULONGLONG s_LastRegisterFailTick[MAX_TRACKED_VIDEO_DEVICES];
+
 CODE_SEG("INIT")
 NTSTATUS
 NTAPI
@@ -223,6 +230,23 @@ EngpUpdateGraphicsDeviceList(VOID)
             continue;
         }
 
+        /* A device whose open keeps failing (e.g. a secondary head that
+         * rejects CREATE) must not be retried on EVERY enumeration:
+         * hot-polling apps (hardware monitors) call EnumDisplayDevices
+         * continuously, and each retry costs a failed open + serial print.
+         * Back off recently-failed devices; hotplug still appears within
+         * the backoff window. */
+        if (iDevNum < ARRAYSIZE(s_LastRegisterFailTick))
+        {
+            ULONGLONG Now = KeQueryInterruptTime();
+            if (s_LastRegisterFailTick[iDevNum] != 0 &&
+                Now - s_LastRegisterFailTick[iDevNum] <
+                    REGISTER_FAIL_BACKOFF_100NS)
+            {
+                continue;
+            }
+        }
+
         /* Read the reg key name */
         cbValue = sizeof(awcBuffer);
         Status = RegQueryValue(hkey, awcDeviceName, REG_SZ, awcBuffer, &cbValue);
@@ -234,7 +258,12 @@ EngpUpdateGraphicsDeviceList(VOID)
 
         /* Initialize the driver for this device */
         pGraphicsDevice = InitDisplayDriver(awcDeviceName, awcBuffer);
-        if (!pGraphicsDevice) continue;
+        if (!pGraphicsDevice)
+        {
+            if (iDevNum < ARRAYSIZE(s_LastRegisterFailTick))
+                s_LastRegisterFailTick[iDevNum] = KeQueryInterruptTime();
+            continue;
+        }
     }
 
     /* Close the device map registry key */
@@ -1016,6 +1045,22 @@ EngDeviceIoControl(
     KeInitializeEvent(&Event, SynchronizationEvent, FALSE);
 
     DeviceObject = (PDEVICE_OBJECT) hDevice;
+
+    /* The handle may dangle: at teardown a driver's DRIVEROBJ cleanup can
+     * pass a device that is already gone (nv4_disp does this at game exit:
+     * once faulting in IoBuildDeviceIoControlRequest, once bugchecking
+     * NO_MORE_IRP_STACK_LOCATIONS with a zeroed StackSize). Never trust it
+     * blindly: validate without faulting, like a handle check should.
+     * NOTE: do NOT check Size: IoCreateDevice sets it to
+     * sizeof(DEVICE_OBJECT) + extension size, so that check rejects every
+     * legit device (killed boot with 0xB4). Type + StackSize is enough. */
+    if (!MmIsAddressValid(DeviceObject) ||
+        DeviceObject->Type != IO_TYPE_DEVICE ||
+        DeviceObject->StackSize < 1)
+    {
+        ERR("EngDeviceIoControl: stale device handle %p rejected (caller %p)\n", hDevice, _ReturnAddress());
+        return ERROR_INVALID_HANDLE;
+    }
 
     Irp = IoBuildDeviceIoControlRequest(dwIoControlCode,
                                         DeviceObject,

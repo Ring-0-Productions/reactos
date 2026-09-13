@@ -1,3 +1,31 @@
+# ReactOS Gaming — rama `gaming`
+
+> Base ReactOS capaz de correr juegos 3D con driver NVIDIA real. Hito actual: **Halo Combat Evolved jugable en 3D en GT 710 (353.62), sale limpio a 1366x768 y ~60 fps en escenas ligeras**.
+
+- Upstream: `ReactOS-Longhorn-Initiative/reactos` (`Longhorn-ReactOS-Stable`, `328deb67`).
+- Registro de cambios gaming: [`GAMING-CHANGES.md`](GAMING-CHANGES.md) (#1–#31).
+- Hardware validado: BIOSTAR H81MHV3, i3-4170 monoprocesador, GT 710, Realtek `10EC:8136`. Escritorio 1366x768, juego 800x600.
+- Defaults gaming: `HKCU\Software\Wine\Direct3D` DWORD `csmt=0`.
+- Build: RosBE-Unix 2.2.1, `configure.sh -DENABLE_ROSTESTS=1 -DENABLE_ROSAPPS=1`, `ninja -j12 bootcd` (ver `build-LH-Stable/bootcd.iso` ~504 MB).
+
+## Media — juegos verificados
+
+Deja tus capturas y clips aquí y se verán en esta tabla. Rutas sugeridas:
+
+- `docs/gaming/screenshots/`
+- `docs/gaming/videos/`
+
+| Juego | Estado | Screenshot | Video |
+|---|---|---|---|
+| Halo Combat Evolved (fullscreen 800x600 -> restore 1366x768) | Jugable, salida limpia, 30–60 fps según draws | ![Halo gameplay](docs/gaming/screenshots/halo-gameplay.png) | [Halo gameplay](docs/gaming/videos/halo-gameplay.mp4) |
+| Halo (menú / campaña) | 60 fps en escenas ~200 draws, ~30 fps con ~400 draws | ![Halo menú](docs/gaming/screenshots/halo-menu.png) | [Halo menú](docs/gaming/videos/halo-menu.mp4) |
+| GTA San Andreas (vanilla, sin mods) | En validación — salida/teardown en prueba | ![GTA SA](docs/gaming/screenshots/gta-sa.png) | [GTA SA](docs/gaming/videos/gta-sa.mp4) |
+| OpenGL teardown (`glteardown.exe`) | Repro crash `wglMakeCurrent` en estudio | ![glteardown](docs/gaming/screenshots/glteardown.png) | [glteardown](docs/gaming/videos/glteardown.mp4) |
+
+> Si una imagen/video aún no existe verás un enlace roto — súbelo con ese mismo nombre y listo.
+
+---
+
 <p align=center>
   <a href="https://reactos.org/">
     <img alt="ReactOS" src="https://reactos.org/wiki/images/0/02/ReactOS_logo.png">
